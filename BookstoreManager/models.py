@@ -47,6 +47,7 @@ class DebtCollection(db.Model):
     customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False)
     employee_id = Column(Integer, ForeignKey(Employee.id), nullable=False)
     date = Column(Date, nullable=False)
+    amount = Column(Float, nullable=False)
 
 
 # Thông tin sách trong kho
