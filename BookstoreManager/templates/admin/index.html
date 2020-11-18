@@ -1,0 +1,31 @@
+<!--Trang chủ của hệ quản trị-->
+{% extends 'admin/master.html' %}
+
+<!--Ghi đè tiêu đề-->
+{% block title %}
+    Quản trị hệ thống
+{% endblock %}
+
+<!-- Ghi đè metadata ở <head> -->
+{% block head_meta %}
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+
+<!-- Chèn thêm file để định dạng css -->
+{% block head%}
+    <link href="{{ url_for('static', filename='css/admin-custom.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+<!--    Khi gọi current_user nó sẽ tham chiếu đến user_loader để sử dụng, nếu đã đăng nhập thì is_authenticated sẽ = True-->
+    {% if current_user.is_authenticated %}
+        <h1>Chào mừng đến với trang quản trị</h1>
+        <h2>{{ current_user.name }}</h2>
+    {% else %}
+        {% include 'admin/login.html' %}
+    {% endif %}
+{% endblock %}
