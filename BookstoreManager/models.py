@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from BookstoreManager import db
+from flask_login import UserMixin
 
 
 class CommonIdentityBase(db.Model):
@@ -9,10 +10,19 @@ class CommonIdentityBase(db.Model):
     name = Column(String(50), nullable=False)
 
 
-class AuthIndentityBase(db.Model):
+class AuthIndentityBase(db.Model, UserMixin):
     __abstract__ = True
     username = Column(String(20), nullable=False)
-    password = Column(String(20), nullable=False)
+    password = Column(String(40), nullable=False)
+    active = Column(Boolean, default=True)
+
+    def __str__(self):
+        return self.name
+
+
+# Danh sách tài khoản đăng nhập (demo)
+class SystemUser(CommonIdentityBase, AuthIndentityBase):
+    __tablename__ = 'system_user'
 
 
 # Thông tin nhân viên và vai trò trong hệ thống
@@ -60,7 +70,7 @@ class BookStorage(CommonIdentityBase):
     # Sách được nhập bởi những đơn hàng nào
     imported_by = relationship('ImportDetail', backref='book_storage', lazy=True)
     # Sách được bán trên những hóa đơn nào
-    sold_invoice = relationship('Invoice', backref='book_storage', lazy=True)
+    sold_invoice = relationship('InvoiceDetail', backref='book_storage', lazy=True)
 
 
 class BookImport(db.Model):
