@@ -20,10 +20,13 @@ class ModelAuthenticatedView(ModelView):
         return current_user.is_authenticated
 
 
-class SellingBookView(AuthenticatedView):
+class RegisterView(BaseView):
+    def is_accessible(self):
+        return not current_user.is_authenticated
+
     @expose('/')
     def index(self):
-        return self.render('admin/selling-book.html')
+        return self.render('admin/register.html')
 
 
 class LogoutView(AuthenticatedView):
@@ -33,9 +36,15 @@ class LogoutView(AuthenticatedView):
         return redirect("/admin")
 
 
-admin.add_view(SellingBookView(name='Bán sách'))
+admin.add_view(RegisterView(name='Đăng ký tài khoản'))
 admin.add_view(ModelAuthenticatedView(SystemUser, db.session, name="Quản lý người dùng"))
-admin.add_view(ModelAuthenticatedView(BookStorage, db.session))
+admin.add_view(ModelAuthenticatedView(Employee, db.session, name="Nhân viên"))
+admin.add_view(ModelAuthenticatedView(Customer, db.session, name="Khách hàng"))
+admin.add_view(ModelAuthenticatedView(BookStorage, db.session, name="Kho sách"))
+admin.add_view(ModelAuthenticatedView(DebtCollection, db.session))
 admin.add_view(ModelAuthenticatedView(BookImport, db.session))
+admin.add_view(ModelAuthenticatedView(ImportDetail, db.session))
+admin.add_view(ModelAuthenticatedView(Invoice, db.session))
+admin.add_view(ModelAuthenticatedView(InvoiceDetail, db.session))
 admin.add_view(LogoutView(name="Đăng xuất"))
 

@@ -13,7 +13,7 @@ class CommonIdentityBase(db.Model):
 class AuthIndentityBase(db.Model, UserMixin):
     __abstract__ = True
     username = Column(String(20), nullable=False)
-    password = Column(String(20), nullable=False)
+    password = Column(String(40), nullable=False)
     active = Column(Boolean, default=True)
 
     def __str__(self):
