@@ -1,8 +1,8 @@
-from flask import render_template, request, redirect
-from flask_login import login_user
 from BookstoreManager import app, login, utils
 from BookstoreManager.admin import *
 from BookstoreManager.models import *
+from flask import render_template, request, redirect, session, url_for
+from flask_login import login_user
 import hashlib
 
 
@@ -34,26 +34,36 @@ def login_admin():
 
 
 # Xử lý action register
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register/", defaults={'err_msg': None}, methods=["GET", "POST"])
+@app.route("/register/<err_msg>", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
-def register_admin():
-    err_msg = ""
+def register_admin(err_msg):
     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
-    if request.method == "POST":
-        # Lấy dữ liệu từ form (thông qua request)
-        username = request.form.get("registerUsername")
-        name = request.form.get("registerName")
-        password = request.form.get("registerPassword")
-        confirm = request.form.get("confirmPassword")
-        if confirm.strip() != password.strip():
-            err_msg = "Mật khẩu không khớp"
-        else:
-            if utils.add_admin(name=name,username=username,password=password):
-                return redirect("/admin")
+    if not err_msg:
+        # Nếu không có lỗi
+        if request.method == "POST":
+            # Lấy dữ liệu từ form (thông qua request)
+            username = request.form.get("registerUsername")
+            name = request.form.get("registerName")
+            password = request.form.get("registerPassword")
+            confirm = request.form.get("confirmPassword")
+            # Nếu mật khẩu nhập lại không đúng
+            if confirm.strip() != password.strip():
+                # Lưu một giá trị tạm báo lỗi trong session
+                session["message"] = "Mật khẩu không khớp"
             else:
-                err_msg = "505"
-    return render_template("/admin/index.html")
-
+                # Tiện ích thêm người dùng vào hệ thống
+                if utils.add_admin(name=name, username=username, password=password):
+                    session["message"] = "Đăng ký thành công"
+                else:
+                    session["message"] = "Server internal error"
+        if session["message"]:
+            return redirect(url_for("login_admin", err_msg=session["message"]))
+        else:
+            return redirect(url_for("login_admin", err_msg=session["message"]))
+    # Nếu có lỗi từ đầu
+    else:
+        return render_template('register.html')
 
 # Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
 # dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu

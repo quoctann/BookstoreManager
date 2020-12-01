@@ -1,7 +1,95 @@
+/* =========== */
+/* Style chung */
+/* ============*/
 * {
     font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    color: #333;
 }
 
-.nav-bar {
-    color: red !important;
+h1, h2, h3 {
+    font-family: 'Questrial', sans-serif;
+    font-weight: 500;
+}
+
+a, a:hover {
+ text-decoration: none;
+ color: inherit;
+}
+
+/* Tùy biến thanh cuộn */
+::-webkit-scrollbar {
+  width: 0.5vh;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #bdc3c7;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2c3e50;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+}
+
+/* ================= */
+/* Menu dọc bên trái */
+/* ================= */
+.vertical-nav {
+  min-width: 17rem;
+  width: 17rem;
+  height: 100vh; /* lấy 100% viewport */
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s;
+  overflow-y: scroll;
+}
+
+.page-content {
+  width: calc(100% - 17rem);
+  margin-left: 17rem; /* bằng với width của sidebar */
+  transition: all 0.4s;
+}
+
+/* Ẩn thanh navbar, trigger từ js */
+#sidebar.active {
+  margin-left: -17rem; /* bằng với min-width sidebar, ra khỏi viewport */
+}
+
+#content.active {
+  width: 100%; /* sau khi sidebar out view, lấy 100% viewport */
+  margin: 0;
+}
+
+/* Cho thiết bị màn hình nhỏ, đt nằm ngang hoặc nhỏ hơn 768px */
+@media (max-width: 768px) {
+  #sidebar {
+    margin-left: -17rem;
+  }
+  #sidebar.active {
+    margin-left: 0;
+  }
+  #content {
+    width: 100%;
+    margin: 0;
+  }
+  #content.active {
+    margin-left: 17rem;
+    width: calc(100% - 17rem);
+  }
+}
+
+/* ================= */
+/* Nội dung hiển thị */
+/* ================= */
+body {
+    background-color: #AFBDB8
+    background: -webkit-linear-gradient(to right, #2193b0, #6dd5ed);
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
 }

@@ -1,25 +1,19 @@
+<!--Admin register form-->
 {% extends 'admin/index.html' %}
-{% block body %}
-{% if err_msg %}
-<div class="bg-warning text-danger text-center">
-    <h2>Lỗi đăng ký {{ err_msg }}</h2>
-</div>
-{% endif %}
-    <!--Admin register form-->
-<h2 class="text-center text-info bg-light p-2">Đăng ký tài khoản Admin</h2>
-<form action="{{ url_for('register_admin') }}" method="post">
-    <div class="form-group">
-        <input type="text" class="form-control" name="registerName" placeholder="Nhập tên">
-    </div>
-    <div class="form-group">
-        <input type="text" class="form-control" name="registerUsername" placeholder="Nhập tên đăng nhập">
-    </div>
-    <div class="form-group">
-        <input type="password" class="form-control" name="registerPassword" placeholder="Nhập tên mật khẩu">
-    </div><div class="form-group">
-        <input type="password" class="form-control" name="confirmPassword" placeholder="Nhập lại mật khẩu">
-    </div>
-    <div><button type="submit" value="Login" class="btn btn-primary">Đăng ký</button></div>
-</form>
-
+{% block page_content %}
+    <h2 class="text-center p-2">Thêm nhân viên</h2>
+    <form action="{{ url_for('register_admin') }}" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="registerName" placeholder="Nhập tên">
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="registerUsername" placeholder="Nhập tên đăng nhập">
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" name="registerPassword" placeholder="Nhập tên mật khẩu">
+        </div><div class="form-group">
+            <input type="password" class="form-control" name="confirmPassword" placeholder="Nhập lại mật khẩu">
+        </div>
+        <div><button type="submit" value="Login" class="btn btn-success">Đăng ký</button></div>
+    </form>
 {% endblock %}
