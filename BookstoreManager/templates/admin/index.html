@@ -1,10 +1,13 @@
 <!-- Trang chủ của phân hệ quản trị -->
 {% extends 'admin/master.html' %}
+{% import 'admin/task_card.html' as taskcard %}
+
 
 <!-- Tiêu đề-->
 {% block title %}
 Quản lý nhà sách
 {% endblock %}
+
 
 <!-- Chèn thêm file để định dạng css -->
 {% block head_css%}
@@ -13,67 +16,33 @@ Quản lý nhà sách
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Roboto&display=swap" rel="stylesheet">
 <link href="{{ url_for('static', filename='css/admin-custom.css') }}" rel="stylesheet">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
 {% endblock %}
+
 
 <!-- Phần quy định layout của trang -->
 {% block page_body %}
 <div class="container{% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}">
-    <!-- Thanh điều hướng sidebar -->
-    <div class="vertical-nav bg-white" id="sidebar">
-        <div class="py-4 px-3 mb-4 bg-light">
-            <div class="media d-flex align-items-center"><img src="https://res.cloudinary.com/mhmd/image/upload/v1556074849/avatar-1_tcnd60.png" alt="..." width="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
-                <div class="media-body">
-                    {% if current_user.is_authenticated %}
-                        <h4 class="m-0">{{ current_user.name }}</h4>
-                        <p class="font-weight-light text-muted mb-0">{{ current_user.name }}</p>
-                    {% else %}
-                        <h4 class="m-0">Unknown</h4>
-                        <p class="font-weight-light text-warning mb-0">Login required</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Tiêu đề trình điều hướng-->
-        <p class=" px-3 small font-weight-bold text-uppercase pb-4 mb-0">TÁC VỤ</p>
-        {% block main_menu %}
-        <ul class="nav flex-column mb-0">
-<!--    <li class="nav-item">-->
-<!--      <a href="#" class="nav-link text-dark bg-light">-->
-<!--                <i class="fa fa-th-large mr-3 text-primary fa-fw"></i>-->
-<!--            -->
-<!--            </a>-->
-<!--    </li>-->
-        {{ layout.menu() }}
-        </ul>
-        {% endblock %}
-
-        <!-- Tiêu đề trình điều hướng-->
-        <p class="text-gray font-weight-bold text-uppercase px-3 small py-4 mb-0">Tra cứu</p>
-        {% block menu_links %}
-        <ul class="nav flex-column bg-white mb-0">
-<!--        <li class="nav-item">-->
-<!--          <a href="#" class="nav-link text-dark font-italic">-->
-<!--                    <i class="fa fa-area-chart mr-3 text-primary fa-fw"></i>-->
-<!--                    Thông tin kho-->
-<!--                </a>-->
-<!--        </li>-->
-        {{ layout.menu_links() }}
-        </ul>
-        {% endblock %}
-    </div>
-    <!-- Kết thúc vertical navbar -->
+    <!-- Vertical navbar -->
+    {% include 'admin/sidebar.html' %}
 
     <!-- Phần nội dung chính hiển thị bên phải-->
     {% block body %}
     {{ super() }}
-    <div class="page-content p-5" id="content">
-    <!-- Toggle button -->
-        <button id="sidebarCollapse" type="button" class="btn btn-light bg-white rounded-pill shadow-sm px-4 mb-4"><i class="fa fa-bars mr-2"></i><small class="text-uppercase font-weight-bold">Toggle</small></button>
+    <div class="page-content px-2 py-5  " id="content">
+    <!-- Nút ẩn bảng điều khiển/sidebar -->
+        <button id="sidebarCollapse" type="button" class="btn btn-light bg-white rounded-pill shadow-sm px-4 mb-4"><i class="fa fa-bars mr-2"></i><small class="text-uppercase font-weight-bold">menu điều khiển</small></button>
         {% block page_content %}
+        <!-- Phần để các view khác sử dụng hiển thị -->
             {% if current_user.is_authenticated %}
-            <h1>Chào mừng đến với trang quản trị</h1>
-            <h2>{{ current_user.name }}</h2>
+            <h2>Xin chào {{ current_user.name }}! </h2>
+            <div class="grid-container">
+                {{ taskcard.task('1', 'Bán sách', 'Chọn tác vụ này để bán sách cho khách hàng') }}
+                {{ taskcard.task('2', 'Nhập sách', 'Chọn tác vụ này để nhập sách vào kho') }}
+                {{ taskcard.task('3', 'Thu nợ', 'Chọn tác vụ này để thu nợ khách hàng') }}
+                {{ taskcard.task('4', 'Báo cáo', 'Chọn tác vụ này để xuất báo cáo nợ, báo cáo kho') }}
+            </div>
             {% else %}
                 {% include 'admin/login.html' %}
             {% endif %}
@@ -82,8 +51,9 @@ Quản lý nhà sách
     <!-- Hết phần nội dung hiển thị bên phải-->
 </div>
 <!--Hết phần container-->
-    {% endblock %} <!-- block body -->
-{% endblock %} <!-- block page_body -->
+    {% endblock %} <!-- end block body -->
+{% endblock %} <!-- end block page_body -->
+
 
 <!--Phần JS cuối trang-->
 {% block tail_js %}

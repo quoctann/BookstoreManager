@@ -65,6 +65,7 @@ def register_admin(err_msg):
     else:
         return render_template('register.html')
 
+
 # Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
 # dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
 # đến đối tượng đang đăng nhập
