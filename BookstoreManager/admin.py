@@ -1,13 +1,12 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView, expose
 from flask import redirect
-from flask_admin.model import BaseModelView
-from wtforms import Form
-
 from BookstoreManager import admin, db
 from BookstoreManager.models import *
 from flask_login import current_user, logout_user
 
+
+# Tùy chỉnh view
 
 # Tùy chỉnh lại model view cho phù hợp với layout
 class CustomModelView(ModelView):
@@ -50,9 +49,50 @@ class LogoutView(AuthenticatedView):
         return redirect("/admin")
 
 
-admin.add_view(RegisterView(name='Thêm nhân viên'))
-admin.add_view(LogoutView(name="Đăng xuất"))
-# Xem dữ liệu thô
+# Các view tác vụ
+
+class SellView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/sell.html')
+
+
+class ImportView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/import.html')
+
+
+class DebtCollectionView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/debt_collection.html')
+
+
+class ReportView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/report.html')
+
+
+class StorageView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/storage.html')
+
+
+class CustomerView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/customer.html')
+
+
+admin.add_view(SellView(name="Bán sách"))
+admin.add_view(DebtCollectionView(name="Thu nợ"))
+admin.add_view(ReportView(name="Báo cáo"))
+admin.add_view(ImportView(name="Nhập sách"))
+admin.add_view(StorageView(name="Xem kho"))
+admin.add_view(CustomerView(name="Khách hàng"))
 admin.add_view(ModelAuthenticatedView(BookStorage, db.session,
                                       category="Xem dữ liệu thô",
                                       name="Kho sách"))
@@ -62,5 +102,7 @@ admin.add_view(ModelAuthenticatedView(Customer, db.session,
 admin.add_view(ModelAuthenticatedView(InvoiceDetail, db.session,
                                       category="Xem dữ liệu thô",
                                       name="Hóa đơn"))
+admin.add_view(RegisterView(name='Thêm nhân viên'))
+admin.add_view(LogoutView(name="Đăng xuất"))
 
 

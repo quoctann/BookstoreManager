@@ -1,0 +1,10 @@
+{% import 'admin/task_card.html' as taskcard %}
+
+<div class="grid-container">
+    <a href="/admin/sellview/">{{ taskcard.task('1', 'Bán sách', 'Chọn tác vụ này để bán sách cho khách hàng') }}</a>
+    <a href="/admin/debtcollectionview/">{{ taskcard.task('2', 'Thu nợ', 'Chọn tác vụ này để thu nợ khách hàng') }}
+    <a href="/admin/reportview/">{{ taskcard.task('3', 'Báo cáo', 'Chọn tác vụ này để xuất báo cáo nợ, báo cáo kho') }}
+    <a href="/admin/importview/">{{ taskcard.task('4', 'Nhập sách', 'Chọn tác vụ này để nhập sách vào kho') }}
+    <a href="/admin/storageview/">{{ taskcard.task('5', 'Xem kho', 'Chọn tác vụ này để xem sản phẩm tồn trong kho') }}
+    <a href="/admin/customerview/">{{ taskcard.task('6', 'Khách hàng', 'Chọn tác vụ này để xem thông tin khách hàng') }}
+</div>

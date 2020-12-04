@@ -1,6 +1,5 @@
 <!-- Trang chủ của phân hệ quản trị -->
 {% extends 'admin/master.html' %}
-{% import 'admin/task_card.html' as taskcard %}
 
 
 <!-- Tiêu đề-->
@@ -37,12 +36,7 @@ Quản lý nhà sách
         <!-- Phần để các view khác sử dụng hiển thị -->
             {% if current_user.is_authenticated %}
             <h2>Xin chào {{ current_user.name }}! </h2>
-            <div class="grid-container">
-                {{ taskcard.task('1', 'Bán sách', 'Chọn tác vụ này để bán sách cho khách hàng') }}
-                {{ taskcard.task('2', 'Nhập sách', 'Chọn tác vụ này để nhập sách vào kho') }}
-                {{ taskcard.task('3', 'Thu nợ', 'Chọn tác vụ này để thu nợ khách hàng') }}
-                {{ taskcard.task('4', 'Báo cáo', 'Chọn tác vụ này để xuất báo cáo nợ, báo cáo kho') }}
-            </div>
+                {% include 'admin/task.html' %}
             {% else %}
                 {% include 'admin/login.html' %}
             {% endif %}
