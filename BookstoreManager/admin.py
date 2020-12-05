@@ -10,9 +10,9 @@ from flask_login import current_user, logout_user
 
 # Tùy chỉnh lại model view cho phù hợp với layout
 class CustomModelView(ModelView):
-    list_template = 'admin/model_list.html'
-    create_template = 'admin/model_create.html'
-    edit_template = 'admin/model_edit.html'
+    list_template = 'admin/model/model_list.html'
+    create_template = 'admin/model/model_create.html'
+    edit_template = 'admin/model/model_edit.html'
     can_delete = False
     can_edit = False
     can_create = False
@@ -49,8 +49,7 @@ class LogoutView(AuthenticatedView):
         return redirect("/admin")
 
 
-# Các view tác vụ
-
+# Các view của tác vụ
 class SellView(AuthenticatedView):
     @expose('/')
     def index(self):
@@ -87,6 +86,8 @@ class CustomerView(AuthenticatedView):
         return self.render('admin/task_view/customer.html')
 
 
+# Thêm view vào trang chủ
+# Tác vụ
 admin.add_view(SellView(name="Bán sách"))
 admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
@@ -102,6 +103,7 @@ admin.add_view(ModelAuthenticatedView(Customer, db.session,
 admin.add_view(ModelAuthenticatedView(InvoiceDetail, db.session,
                                       category="Xem dữ liệu thô",
                                       name="Hóa đơn"))
+# Tính năng bổ sung
 admin.add_view(RegisterView(name='Thêm nhân viên'))
 admin.add_view(LogoutView(name="Đăng xuất"))
 

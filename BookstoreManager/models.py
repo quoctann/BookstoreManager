@@ -23,6 +23,7 @@ class AuthIndentityBase(db.Model, UserMixin):
 # Danh sách tài khoản đăng nhập (demo)
 class SystemUser(CommonIdentityBase, AuthIndentityBase):
     __tablename__ = 'system_user'
+    role = Column(String(10), nullable=False, default='Employee')
 
 
 # Thông tin nhân viên và vai trò trong hệ thống
