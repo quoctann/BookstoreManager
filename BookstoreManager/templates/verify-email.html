@@ -1,0 +1,10 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="text-info">Chào mừng đến với Thanh Vũ Store</h2>
+        <p>
+            Bạn có thể đăng nhập ngay bây giờ, tuy nhiên để sử dụng đầy đủ các dịch vụ của chúng tôi, bạn vui lòng xác nhận email bằng cách nhấn vào liên kết đã được gửi đến <span class="text-info">{{ user_email }}</span>. Xin lưu ý mã xác nhận sẽ hết hạn trong vòng 15 phút.<br>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi!
+        </p>
+    </div>
+{% endblock %}

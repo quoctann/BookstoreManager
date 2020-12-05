@@ -1,0 +1,213 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <form>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('book_list_by_cate', cate_id=book.category) }}">{{ book.category }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ book.name }}</li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+
+        <!-- Product Detail Start -->
+        <div class="product-detail">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="product-detail-top">
+                            <div class="row align-items-center">
+                                <!--    nơi hiển thị bìa sách   -->
+                                <div class="col-md-5">
+                                    <img src="{{ url_for('static', filename=book.path) }}" alt="{{ book.name }}"/>
+                                </div>
+                                <!--    nơi hiển thị thông tin sách   -->
+                                <div class="col-md-7">
+                                    <div class="product-content">
+                                        <div class="title"><h2>{{ book.name }}</h2></div>
+                                        <div class="title"><h5>Tác giả: {{ book.author }}</h5></div>
+                                        <div class="ratting">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="price">
+                                            <h5>Giá: {{ "{:,}".format(book.selling_price) }} VNĐ</h5>
+                                        </div>
+                                        <div class="quantity">
+                                            <h4>Số lượng: </h4>
+                                            <div class="qty">
+                                                <button class="btn-minus"><i class="fa fa-minus"></i></button>
+                                                <input type="text" value="1">
+                                                <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="action">
+                                            <a class="btn" href="#"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</a>
+                                            <a class="btn" href="#"><i class="fa fa-shopping-bag"></i>Mua ngay</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--    nơi hiển tin sách liên quan cùng thể loại -->
+                        <div class="product">
+                            <div class="section-header">
+                                <h1>Sản phẩm liên quan</h1>
+                            </div>
+
+                            <div class="row align-items-center product-slider product-slider-3">
+                                {% for b in book_relate %}
+                                <div class="col-lg-3">
+                                    <div class="product-item">
+                                    <div class="product-title">
+                                        <a href="#">{{ b.name }}</a>
+                                        <div class="ratting">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <div class="product-image">
+                                        <a href="product-detail.html">
+                                            <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                        </a>
+                                        <div class="product-action">
+                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
+                                            <a href="#"><i class="fa fa-heart"></i></a>
+                                            <a href="#"><i class="fa fa-search"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="product-price">
+                                        <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                        <a class="btn" href=""><i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                                    </div>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Bar Start -->
+                    <div class="col-lg-4 sidebar">
+                        <div class="sidebar-widget category">
+                            <h2 class="title">Danh mục</h2>
+                            <nav class="navbar bg-light">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#"><i class="fa fa-female"></i>Samsung</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#"><i class="fa fa-child"></i>Iphone</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#"><i class="fa fa-tshirt"></i>Realme</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#"><i class="fa fa-mobile-alt"></i>Máy tính bản</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#"><i class="fa fa-microchip"></i>Phụ kiện</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="sidebar-widget widget-slider">
+                            <div class="sidebar-slider normal-slider">
+                                {% for b in books %}
+                                <div class="col-lg-3">
+                                    <div class="product-item">
+                                    <div class="product-title">
+                                        <a href="#">{{ b.name }}</a>
+                                        <div class="ratting">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <div class="product-image">
+                                        <a href="product-detail.html">
+                                            <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                        </a>
+                                        <div class="product-action">
+                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
+                                            <a href="#"><i class="fa fa-heart"></i></a>
+                                            <a href="#"><i class="fa fa-search"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="product-price">
+                                        <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                        <a class="btn" href=""><i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                                    </div>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="sidebar-widget brands">
+                            <h2 class="title">Thương hiệu</h2>
+                            <ul>
+                                <li><a href="#">Nulla </a><span>(45)</span></li>
+                                <li><a href="#">Curabitur </a><span>(34)</span></li>
+                                <li><a href="#">Nunc </a><span>(67)</span></li>
+                                <li><a href="#">Ullamcorper</a><span>(74)</span></li>
+                                <li><a href="#">Fusce </a><span>(89)</span></li>
+                                <li><a href="#">Sagittis</a><span>(28)</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="sidebar-widget tag">
+                            <h2 class="title">Tags</h2>
+                            <a href="#">Lorem ipsum</a>
+                            <a href="#">Vivamus</a>
+                            <a href="#">Phasellus</a>
+                            <a href="#">pulvinar</a>
+                            <a href="#">Curabitur</a>
+                            <a href="#">Fusce</a>
+                            <a href="#">Sem quis</a>
+                            <a href="#">Mollis metus</a>
+                            <a href="#">Sit amet</a>
+                            <a href="#">Vel posuere</a>
+                            <a href="#">orci luctus</a>
+                            <a href="#">Nam lorem</a>
+                        </div>
+                    </div>
+                    <!-- Side Bar End -->
+                </div>
+            </div>
+        </div>
+        <!-- Product Detail End -->
+
+        <!-- Brand Start -->
+        <div class="brand">
+            <div class="container-fluid">
+                <div class="brand-slider">
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-1.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-2.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-3.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-4.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-5.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-6.png') }}" alt=""></div>
+                </div>
+            </div>
+        </div>
+        <!-- Brand End -->
+{% endblock %}
