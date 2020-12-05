@@ -10,3 +10,7 @@ def add_admin(name, username, password):
     db.session.commit()
 
     return user
+
+
+class TaskRules:
+    pass
