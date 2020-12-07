@@ -199,3 +199,16 @@ body {
         margin-top: 2rem;
     }
 }
+
+/* ============== */
+/* Trang bán sách */
+/* ============== */
+.sell .list-group-horizontal-sm {
+    border: none;
+}
+
+.sell .list-group-horizontal-sm .list-group-item.active {
+     background-image: linear-gradient(90deg, rgba(204, 255, 136, 0.5), rgba(119, 170, 119, 0.5));
+     border: rgba(204, 255, 136, 0.5);
+     box-shadow: 0 0 10px gray;
+}

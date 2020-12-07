@@ -9,6 +9,10 @@ import hashlib
 # Điều hướng tới trang chủ mặc định
 @app.route("/")
 def index():
+    # Session lưu thuộc tính nợ của khách hàng có vi phạm quy định không
+    session['valid_debt'] = 'init'
+    # Session lưu thuộc tính nhân viên đã kiểm tra nợ của KH chưa
+    session['debt_checking_status'] = 'init'
     return render_template("index.html")
 
 
@@ -72,6 +76,31 @@ def register_admin(err_msg):
 @login.user_loader
 def user_load(user_id):
     return SystemUser.query.get(user_id)
+
+
+# Xử lý action bán sách
+@app.route('/admin/sellview/', methods=["GET", "POST"])
+def check_debt():
+    if request.method == "POST" and session['valid_debt'] == 'init':
+        customer_id = request.form.get('customer_id')
+        customer = Customer.query.filter_by(id=customer_id).first()
+        # Nếu query khách hàng có tồn tại
+        if customer:
+            debt = int(customer.debt)
+            # Kiểm tra nghiệp vụ
+            if debt and debt <= 20000:
+                session['valid_debt'] = 'OK'
+            return redirect(url_for('sellview.index'))
+
+    # Sau khi bán xong trả lại trạng thái ban đầu
+    session['valid_debt'] = 'init'
+    # Gọi phương thức index(self) từ admin.py
+    return redirect(url_for('sellview.index'))
+
+
+def sold_task():
+    session['valid_debt'] = 'init'
+    return redirect(url_for('sellview.index'))
 
 
 if __name__ == "__main__":

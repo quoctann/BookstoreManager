@@ -1,5 +1,43 @@
 {% extends 'admin/index.html' %}
+{{ super() }}
 
 {% block page_content %}
-    <h1>this is selling book front page</h1>
+<div class="sell">
+  <h3 class="py-2">Vui lòng chọn phương thức bán hàng:</h3>
+  <!-- Lựa chọn đối tượng đang bán hàng -->
+  <div class="list-group list-group-horizontal-sm text-center py-2" id="sell-option-list" role="tablist">
+    <a class="list-group-item list-group-item-dark list-group-item-action active" data-toggle="list" href="#retail-offline" role="tab" onload="printDate()" onclick="printDate()">Bán tại quầy</a>
+    <a class="list-group-item list-group-item-dark list-group-item-action" data-toggle="list" href="#retail-online" role="tab">Bán online</a>
+  </div>
+
+  <!-- Tab hiển thị tương ứng -->
+  <div class="tab-content py-4">
+    <div class="tab-pane bg-light rounded shadow p-4 active" id="retail-offline" role="tabpanel">
+      {% if valid_debt == 'init' %}
+      <p>Vui lòng kiểm tra nợ của khách hàng trước khi bán</p>
+      <form action="{{ url_for('check_debt') }}" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="customer_id" placeholder="Nhập ID Khách hàng">
+        </div>
+        <div><button type="submit" value="Check" class="btn btn-danger">Kiểm tra</button></div>
+      </form>
+      {% endif %}
+
+      {% if valid_debt == 'OK' %}
+        <h2>HÓA ĐƠN BÁN HÀNG</h2>
+        <button class="btn btn-primary" onclick="addProduct()">Tạo đơn hàng mới</button>
+        <form action="{{ url_for('check_debt') }}" method="post">
+          <div id="sell_form" class="my-2"></div>
+          <div><button type="submit" value="Check" class="btn btn-danger">Kết thúc</button></div>
+        </form>
+      {% endif%}
+
+    </div>
+
+    <div class="tab-pane bg-light rounded shadow p-4" id="retail-online" role="tabpanel">
+      <p>Dev</p>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView, expose
-from flask import redirect
+from flask import redirect, url_for, request, session
 from BookstoreManager import admin, db
 from BookstoreManager.models import *
 from flask_login import current_user, logout_user
@@ -47,7 +47,9 @@ class LogoutView(AuthenticatedView):
 class SellView(AuthenticatedView):
     @expose('/')
     def index(self):
-        return self.render('admin/task_view/sell.html')
+        # Nợ của khách hàng có vi phạm quy định không
+        valid_debt = session['valid_debt']
+        return self.render('admin/task_view/sell.html', valid_debt=valid_debt)
 
 
 class ImportView(AuthenticatedView):
@@ -107,9 +109,15 @@ class RuleView(AdminView):
         return self.render('admin/task_view/rule.html')
 
 
+# Admin thao tác với bảng
+class CanCreate(AdminModelView):
+    can_create = True
+    column_display_pk = True
+
+
 # THÊM VIEW VÀO TRANG CHỦ
 # Tác vụ
-admin.add_view(SellView(name="Bán sách"))
+admin.add_view(SellView(name="Bán sách", endpoint='sellview'))
 admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
 admin.add_view(ImportView(name="Nhập sách"))
@@ -118,13 +126,13 @@ admin.add_view(CustomerView(name="Khách hàng"))
 admin.add_view(AdminModelView(BookStorage, db.session,
                               category="Xem dữ liệu thô",
                               name="Kho sách"))
-admin.add_view(AdminModelView(Customer, db.session,
-                              category="Xem dữ liệu thô",
-                              name="Khách hàng"))
+admin.add_view(CanCreate(Customer, db.session,
+                         category="Xem dữ liệu thô",
+                         name="Khách hàng"))
 admin.add_view(AdminModelView(InvoiceDetail, db.session,
                               category="Xem dữ liệu thô",
                               name="Hóa đơn"))
 # Tính năng bổ sung
 admin.add_view(RegisterView(name='Thêm nhân viên'))
-admin.add_view(RuleView(name='Quy định'))
+admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))
