@@ -5,20 +5,10 @@ from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, 
 import hashlib
 
 
-def add_admin(name, username, password):
-    user = SystemUser(name=name, username=username,
-                      password=str(hashlib.md5(password.strip().encode("utf-8")).hexdigest()))
-    db.session.add(user)
-    db.session.commit()
-
-    return user
-
-
-def add_Customer(name, email, username, password, avatar_path):
+def add_customer(name, email, username, password, avatar_path, phone, address):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    u = Customer(name=name, email=email,
-                 username=username, password=password,
-                 avatar=avatar_path)
+    u = Customer(username=username, password=password, avatar=avatar_path, name=name,
+                 email=email, address=address, phone=phone)
     try:
         db.session.add(u)
         db.session.commit()

@@ -33,7 +33,7 @@
             font-weight: 700;
         }
     </style>
-    <body>
+    <body class="login">
 
         <!-- Nav Bar Start -->
         <div class="nav ">
@@ -59,7 +59,7 @@
                         {% if not current_user.is_authenticated %}
                         <div class="navbar-nav ml-auto">
                             <div class="nav-item">
-                                <a class="nav-link" href="{{ url_for('login_Customer') }}">Đăng nhập</a>
+                                <a class="nav-link" href="{{ url_for('login_customer') }}">Đăng nhập</a>
                             </div>
                             <div class="nav-item">
                                 <a class="nav-link" href="{{ url_for('register') }}">Đăng ký</a>

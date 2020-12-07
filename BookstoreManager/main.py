@@ -13,7 +13,7 @@ randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
 
 # Xử lý action login-Customer
 @app.route('/login', methods=["get", "post"])
-def login_Customer():
+def login_customer():
     err_msg = ""
     if request.method == 'POST':
         # lấy thông tin đăng nhập
@@ -59,14 +59,16 @@ def register():
             name = request.form.get('name')
             email = request.form.get('email')
             username = request.form.get('username')
+            phone = request.form.get('phone')
+            address = request.form.get('address')
 
             avatar = request.files["avatar"]
             avatar_path = 'images/upload/%s' % avatar.filename
             avatar.save(os.path.join(app.root_path,
                                      'static/',
                                      avatar_path))
-            if utils.add_Customer(name=name, email=email, username=username,
-                                  password=password, avatar_path=avatar_path):
+            if utils.add_customer(username=username, password=password, avatar_path=avatar_path, name=name,
+                                  email=email, address=address, phone=phone):
                 return redirect('/')
             else:
                 err_msg = "Hệ thống đang có lỗi! Vui lòng quay lại sau!"
