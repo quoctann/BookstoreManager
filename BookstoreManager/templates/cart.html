@@ -5,9 +5,9 @@
         <div class="breadcrumb-wrap">
             <div class="container-fluid">
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
                     <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
-                    <li class="breadcrumb-item active">Thanh toán</li>
+                    <li class="breadcrumb-item active">Giỏ hàng</li>
                 </ul>
             </div>
         </div>
@@ -15,7 +15,7 @@
 
         <!-- Cart Start -->
         <div class="cart-page">
-            <div class="container-fluid">
+            <div class="">
                 <div class="row">
                     <!--    list sách có trong giỏ    -->
                     <div class="col-lg-8">
@@ -51,20 +51,21 @@
                                             <!--   giá   price là key của từ điển cart   -->
                                             <td>{{ "{:,}".format(b.price) }} VNĐ</td>
 
-                                            <!--    Tùy chỉnh số lượng, chưa tủy chỉnh được     -->
+                                            <!--    Tùy chỉnh số lượng  -->
+
                                             <td>
                                                 <div class="">
-                                                    <button class="btn-minus"><i class="fa fa-minus"></i></button>
-                                                    <input type="text" value="{{ b.quantity }}">
-                                                    <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                                    <button class="btn-minus" onclick="subtractCart({{ b.id }})"><i class="fa fa-minus"></i></button>
+                                                    <input type="text" value="{{ b.quantity }}" >
+                                                    <button class="btn-plus" onclick="addToCart({{ b.id }})"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </td>
 
                                             <!--    Tổng giá: giá * số lượng   -->
                                             <td>{{ "{:,}".format(b.price * b.quantity) }} VNĐ</td>
 
-                                            <!--    xử lý xóa sách ra khỏi giá, tạm thời bở qua chức năng này   -->
-                                            <td><button><i class="fa fa-trash"></i></button></td>
+                                            <!--    xử lý xóa sách ra khỏi giỏ  -->
+                                            <td><button onclick="deleteCart({{ b.id }})"><i class="fa fa-trash"></i></button></td>
                                         </tr>
                                     {% endfor %}
                                     {% else %}
@@ -90,8 +91,9 @@
                                             <h2>Tổng tiền: {{ "{:,}".format(cart_info.total_amount) }} VNĐ</h2>
                                         </div>
                                         <div class="cart-btn" style="text-align: center">
-                                            <button onclick="pay()"
-                                                    class="btn btn-danger ">Thanh toán</button>
+                                            <a href="{{ url_for('checkout') }}">
+                                                <button class="btn btn-danger ">Thanh toán</button>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

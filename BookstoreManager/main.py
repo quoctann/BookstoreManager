@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message, Mail
 from BookstoreManager import app, login, utils, mail, decorator
 from BookstoreManager.admin import *
@@ -8,29 +8,7 @@ import hashlib, os, json
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
-
 randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
-
-
-# # Xử lý action login-admin
-# @app.route("/login-admin", methods=["GET", "POST"])
-# # Phương thức này được gọi từ login.html
-# def login_admin():
-#     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
-#     if request.method == "POST":
-#         # Lấy dữ liệu từ form (thông qua request)
-#         username = request.form.get("loginUsername")
-#         password = request.form.get("loginPassword")
-#         # Dùng thuật toán MD5 băm mã ra dưới dạng hexa
-#         password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
-#         # Strip() dùng để bỏ khoảng trắng ở hai đầu chuỗi ký tự
-#         user = SystemUser.query.filter(SystemUser.username == username.strip(),
-#                                        SystemUser.password == password).first()
-#         # Nếu không giá trị thì trả về null
-#         if user:
-#             login_user(user=user)
-#     # Thực tế là chuyển đến trang admin -> index.html
-#     return redirect("/admin")
 
 
 # Xử lý action login-Customer
@@ -42,7 +20,7 @@ def login_Customer():
         username = request.form.get('username')
         password = request.form.get('password', '')
 
-        #kiểm tra đăng nhập
+        # kiểm tra đăng nhập
         customer = utils.check_login(username=username, password=password)
         if customer:
             login_user(user=customer)
@@ -59,6 +37,11 @@ def login_Customer():
 @app.route("/logout")
 def logout():
     logout_user()
+    # Xóa hết các bộ nhớ tạm của session
+    if 'cart' in session:
+        del session['cart']
+    if 'wish' in session:
+        del session['wish']
     return redirect(url_for("index"))
 
 
@@ -83,7 +66,7 @@ def register():
                                      'static/',
                                      avatar_path))
             if utils.add_Customer(name=name, email=email, username=username,
-                              password=password, avatar_path=avatar_path):
+                                  password=password, avatar_path=avatar_path):
                 return redirect('/')
             else:
                 err_msg = "Hệ thống đang có lỗi! Vui lòng quay lại sau!"
@@ -140,7 +123,7 @@ def request_sent(user_email):
     return render_template("recovery-sent.html", user_email=user_email)
 
 
-@app.route('/recovery_account/<token>/<user_email>', methods=['GET','POST'])
+@app.route('/recovery_account/<token>/<user_email>', methods=['GET', 'POST'])
 def recovery_account(token, user_email):
     try:
         e = randomToken.loads(token, salt='recovery_account', max_age=3600)
@@ -157,37 +140,12 @@ def recovery_account(token, user_email):
     return render_template('recovery-account.html')
 
 
-
-
-
-
-
 # Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
 # dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
 # đến đối tượng đang đăng nhập
 @login.user_loader
 def user_load(user_id):
     return Customer.query.get(user_id)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/test')
-def test():
-    return render_template('test.html')
-
 
 
 # Điều hướng tới trang chủ mặc định
@@ -198,6 +156,7 @@ def index():
     return render_template('index.html', booknew=booknew, book_tieuthuyet=book_tieuthuyet)
 
 
+# Xem các thể loại sách
 @app.route('/book-list')
 def book_list(cate_id=None):
     author = request.args.get('author')
@@ -210,13 +169,14 @@ def book_list(cate_id=None):
     return render_template('book-list.html', books=books, cate_id=cate_id)
 
 
-# list sách theo category đường
+# list sách theo category đường dẫn
 @app.route('/book-list/<cate_id>')
 def book_list_by_cate(cate_id):
     books = utils.get_book_by_cate(cate_id)
     return render_template('book-list.html', books=books, cate_id=cate_id)
 
 
+# Xem thông tin sách cụ thể
 @app.route('/book-detail/<int:book_id>')
 def book_detail(book_id):
     book = utils.get_book_by_id(book_id=book_id)
@@ -229,6 +189,9 @@ def book_detail(book_id):
 # xử lý theo main.js    addToCart()
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
+
     if 'cart' not in session:
         session['cart'] = {}
 
@@ -238,7 +201,7 @@ def add_to_cart():
 
     id = str(data.get("id"))
     name = data.get("name")
-    price = data.get("selling_price")       # từ khóa "selling_price" chỉ qua main.js
+    price = data.get("selling_price")  # từ khóa "selling_price" chỉ qua main.js
     path = data.get("path")
 
     if id in cart:
@@ -247,7 +210,7 @@ def add_to_cart():
         cart[id] = {
             "id": id,
             "name": name,
-            "price": price,         # từ khóa "price" trỏ tới utils
+            "price": price,  # từ khóa "price" trỏ tới utils
             "path": path,
             "quantity": 1
         }
@@ -258,38 +221,151 @@ def add_to_cart():
 
     return jsonify({
         "total_amount": price,
+        "total_quantity": quan,
+        'message': 'Sách đã được thêm vào giỏ!'             # không bật alert nên không hiển thị thông báo này
+    })
+
+
+
+@app.route('/api/subtractcart', methods=['post'])
+def subtract_cart():
+
+    if 'cart' not in session:
+        session['cart'] = {}
+
+    cart = session['cart']
+
+    data = json.loads(request.data)
+
+    id = str(data.get("id"))
+
+    if id in cart:
+        cart[id]["quantity"] = cart[id]["quantity"] - 1
+    session['cart'] = cart
+
+    quan, price = utils.cart_stats(cart)
+
+    return jsonify({
+        "total_amount": price,
         "total_quantity": quan
     })
 
 
-# dữ liệu nhận được từ utils thông qua session cart
-@app.route('/cart')
-@decorator.login_required
-def cart():
-    quan, price = utils.cart_stats(session.get('cart'))
-    cart_info = {
+@app.route('/api/deletecart', methods=['post'])
+def delete_cart():
+
+    if 'cart' not in session:
+        session['cart'] = {}
+
+    cart = session['cart']
+
+    data = json.loads(request.data)
+
+    id = str(data.get("id"))
+
+    if id in cart:
+        cart.pop(id)
+    session['cart'] = cart
+
+    if not cart:
+        del session['cart']
+
+    quan, price = utils.cart_stats(cart)
+
+    return jsonify({
         "total_amount": price,
         "total_quantity": quan
+    })
+
+
+
+# dữ liệu nhận được từ utils thông qua session cart
+@app.route('/cart')
+@decorator.login_required_cart
+def cart():
+    quantity, price = utils.cart_stats(session.get('cart'))
+    cart_info = {
+        "total_amount": price,
+        "total_quantity": quantity
     }
-    return render_template('cart.html',
-                           cart_info=cart_info)
+    return render_template('cart.html', cart_info=cart_info)
 
 
 # -------------------------- Xử lý thanh toán -------------------------------------
 
+@app.route('/checkout')
+@login_required
+def checkout():
+    quantity, price = utils.cart_stats(session.get('cart'))
+    cart_info = {
+        "total_amount": price,
+        "total_quantity": quantity
+    }
+    return render_template('checkout.html', cart_info=cart_info)
+
+
+# Muốn thanh toán thì phải tạo nhân viên mặt định có id = 1
+# @app.route('/api/pay', methods=['post'])
+# def pay():
+#     if utils.add_invoice(session.get('cart')):
+#         del session['cart']
+#         return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
+#
+#     return jsonify({'message': 'failed'})
+
+
+
+
+# test
 @app.route('/api/pay', methods=['post'])
 def pay():
-    if utils.add_invoice(session.get('cart')):
-        del session['cart']
-        return jsonify({'message': 'Add receipt successful!'})
+    if 'info' not in session:
+        session['info'] = {}
+
+    info = session['info']
+
+    data = json.loads(request.data)
+
+    id = current_user.id
+    phone = data.get("phone")
+    address = data.get("address")  # từ khóa "selling_price" chỉ qua main.js
+    if phone and address:
+        return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
+
+    # if id in info:
+    #     pass
+    # else:
+    #     cart[id] = {
+    #         "phone": phone,
+    #         "address": address
+    #     }
+    #
+    # session['info'] = info
+    # if phone and address:
+    #     return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
+
+
+
+    # if utils.add_invoice(session.get('cart'), session.get('info')):
+    #     del session['cart']
+    #     return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
 
     return jsonify({'message': 'failed'})
 
 
-# ----------------------- Danh sách yêu thích, chưa hoàn thành ---------------------------
 
+
+
+
+
+# ----------------------- Danh sách yêu thích , chưa kết được bản   ---------------------------
+
+# Đăng nhập thành công mới có thể thêm sách vào wishlist, chưa đăng nhập hiện thông báo
 @app.route('/api/wish', methods=['post'])
-def wish():
+def add_to_wish():
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
+
     if 'wish' not in session:
         session['wish'] = {}
 
@@ -302,16 +378,12 @@ def wish():
     price = data.get("selling_price")
     path = data.get("path")
 
-    # nếu book_id có trong ds, thì xóa bỏ
+    # nếu book_id mới thêm vào có trong ds, thì xóa bỏ
     if id in wish:
         pass
-        # cart[id]["quantity"] = cart[id]["quantity"] + 1
 
-    # 2 trường hợp: 1: đăng nhập thành công, hiển thị ds yêu thích đã có trên giao diện
-    # query xuống bookwish, filter theo current_user lấy list book_id, từ book_id truy vấn các dữ liệu cần lấy để hiện thị lên giao diện
 
-    #   trường  hợp 2: sách yêu thích mới được thêm vào cuối ds
-    # giả định khách chưa có ds yêu thích -> tạo
+    #   Sách yêu thích mới được thêm vào cuối ds
     #   thêm book_id vào trong ds yêu thích của người dùng hiện thời
     else:
         wish[id] = {
@@ -323,52 +395,56 @@ def wish():
 
     session['wish'] = wish
 
-
     if utils.add_wishlist(session.get('wish')):
-        del session['wish']
-        return jsonify({'message': 'Add bookwish successful!'})
+        return jsonify({'message': 'Sách đã được thêm vào danh mục yêu thích!'})
 
     return jsonify({'message': 'failed'})
 
-    # return jsonify({
-    #
-    # })
+
+# Xóa sách trong ds yêu thích
+@app.route('/api/deletewish', methods=['post'])
+def delete_wish():
+
+    if 'wish' not in session:
+        session['wish'] = {}
+
+    wish = session['wish']
+
+    data = json.loads(request.data)
+
+    id = str(data.get("id"))
+
+    if id in wish:
+        wish.pop(id)
+    session['wish'] = wish
+
+    if not wish:
+        del session['wish']
+
+    return jsonify({
+        'message': 'Sách đã được xóa khỏi danh sách yêu thích!'
+    })
 
 
+# Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích - chưa làm được
 @app.route('/wishlist')
+@decorator.login_required_wishlist
 @login_required
 def wishlist():
     return render_template('wishlist.html')
 
 
+@app.route('/contact')
+@login_required
+def contact():
+    return render_template('contact.html')
 
 
-
-# @app.route('/checkout')
-# @login_required
-# def checkout():
-#     return render_template('checkout.html')
-#
-#
-# @app.route('/contact')
-# @login_required
-# def contact():
-#     return render_template('contact.html')
-#
-#
-# @app.route('/my-account')
-# @login_required
-# def my_account():
-#     return render_template('my-account.html')
-
-
-
-
-
-
-
-
-
+# Chưa xây dựng chức năng
+@app.route('/my-account')
+@login_required
+def my_account():
+    return render_template('my-account.html')
 
 
 

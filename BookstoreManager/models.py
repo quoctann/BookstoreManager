@@ -12,6 +12,7 @@ class CommonIdentityBase(db.Model):
 
     avatar = Column(String(50))
 
+
 class AuthIndentityBase(db.Model, UserMixin):
     __abstract__ = True
     username = Column(String(20), nullable=False)
@@ -45,13 +46,13 @@ class Employee(CommonIdentityBase, AuthIndentityBase):
 class Customer(CommonIdentityBase, AuthIndentityBase):
     __tablename__ = 'customer'
     email = Column(String(40), nullable=False)
-    address = Column(String(100))
-    phone = Column(Integer)
 
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
     paid_invoice = relationship('Invoice', backref='customer', lazy=True)
+
+    wish_id = relationship('WishDetail', backref='customer', lazy=True)
 
 
 # Dữ liệu khi nhân viên thu nợ khách hàng
@@ -77,6 +78,9 @@ class BookStorage(CommonIdentityBase):
     # Sách được bán trên những hóa đơn nào
     sold_invoice = relationship('InvoiceDetail', backref='book_storage', lazy=True)
 
+    wish_id = relationship('WishDetail', backref='book_storage', lazy=True)
+
+
 # thông tin phiếu sách
 class BookImport(db.Model):
     __tablename__ = 'book_import'
@@ -87,6 +91,7 @@ class BookImport(db.Model):
     employee_incharge = Column(Integer, ForeignKey(Employee.id))
     # Chi tiết đơn hàng
     import_detail = relationship('ImportDetail', backref='book_import', lazy=True)
+
 
 # thông tin chi tiết về phiếu nhập sách
 class ImportDetail(db.Model):
@@ -101,9 +106,12 @@ class ImportDetail(db.Model):
 class Invoice(db.Model):
     __tablename__ = 'invoice'
     invoice_id = Column(Integer, primary_key=True, autoincrement=True)
-    employee_id = Column(Integer, ForeignKey(Employee.id), default=1)                  # bỏ dòng nullable
+    employee_id = Column(Integer, ForeignKey(Employee.id), default=1)  # bỏ dòng nullable
     customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False)
     date = Column(Date, nullable=False, default=datetime.today())
+    email = Column(String(30), default="Chưa lấy được")
+    phone = Column(String(12), default="123")
+    address = Column(String(100), default="Chưa lấy được")
     total_price = Column(Float, nullable=False)
     # Chi tiết hóa đơn
     invoice_detail = relationship('InvoiceDetail', backref='invoice', lazy=True)
@@ -117,11 +125,9 @@ class InvoiceDetail(db.Model):
     price = Column(Float, nullable=False)
 
 
-# thông tin sách được yêu thích
-class BookWish(db.Model):
+class WishDetail(db.Model):
+    wish_id = Column(Integer, ForeignKey(Customer.id), primary_key=True, nullable=False)
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
-    customer_id = Column(Integer, ForeignKey(Customer.id), primary_key=True, nullable=False)
-    active = Column(Boolean, default=True)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 from flask_login import current_user
 
 from BookstoreManager import app, db
-from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, BookWish
+from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, WishDetail
 import hashlib
 
 
@@ -17,8 +17,8 @@ def add_admin(name, username, password):
 def add_Customer(name, email, username, password, avatar_path):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     u = Customer(name=name, email=email,
-             username=username, password=password,
-             avatar=avatar_path)
+                 username=username, password=password,
+                 avatar=avatar_path)
     try:
         db.session.add(u)
         db.session.commit()
@@ -31,7 +31,7 @@ def add_Customer(name, email, username, password, avatar_path):
 def check_login(username, password):
     password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
     return Customer.query.filter(Customer.username == username,
-                             Customer.password == password).first()
+                                 Customer.password == password).first()
 
 
 def check_Customer(username):
@@ -65,7 +65,7 @@ def get_book_by_id(book_id):
 
 
 def get_book_by_cate(cate_id):
-    return BookStorage.query.filter(BookStorage.category==cate_id).all()
+    return BookStorage.query.filter(BookStorage.category == cate_id).all()
 
 
 #   ----------------------    Phần xử lý chức năng giỏ hàng -------------------
@@ -75,17 +75,37 @@ def cart_stats(cart):
     if cart:
         for b in cart.values():
             total_quantity = total_quantity + b["quantity"]
-            total_amount = total_amount + b["quantity"] * b["price"]        # được trỏ từ "price" ở main.py
+            total_amount = total_amount + b["quantity"] * b["price"]  # được trỏ từ "price" ở main.py
 
     return total_quantity, total_amount
 
 
 #   ----------------------- Xử lý thanh toán ----------------------
-# chưa xong
-def add_invoice(cart):
+
+def add_invoice(cart, info):
+    # if cart and current_user.is_authenticated:
+    #     total_quantity, total_amount = cart_stats(cart)
+    #     invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
+    #     db.session.add(invoice)
+    #
+    #     for b in list(cart.values()):
+    #         detail = InvoiceDetail(invoice=invoice,
+    #                                book_id=int(b["id"]),
+    #                                quantity=b["quantity"],
+    #                                price=b["price"])
+    #         db.session.add(detail)
+    #
+    #     try:
+    #         db.session.commit()
+    #         return True
+    #     except Exception as ex:
+    #         print(ex)
+    # return False
+
     if cart and current_user.is_authenticated:
         total_quantity, total_amount = cart_stats(cart)
-        invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
+        invoice = Invoice(customer_id=current_user.id, total_price=total_amount,
+                          email=current_user.email, phone=info["phone"], address=info["address"])
         db.session.add(invoice)
 
         for b in list(cart.values()):
@@ -100,25 +120,32 @@ def add_invoice(cart):
             return True
         except Exception as ex:
             print(ex)
-
     return False
-
-
 
 # ---------------------- xử lý thêm sách vào danh mục yêu thích -----------------------
 
 def add_wishlist(wishlist):
     if wishlist and current_user.is_authenticated:
+
         # thêm các sách mới được yêu thích xuống db
         for b in list(wishlist.values()):
-            bookwish = BookWish(book_id=b["id"],
-                                customer_id=current_user)
-        db.session.add(bookwish)
+            book = WishDetail(wish_id=current_user.id,
+                              book_id=b["id"])
+        db.session.add(book)
+
     try:
         db.session.commit()
         return True
     except Exception as ex:
         print(ex)
 
-
     return False
+
+
+
+# Query db theo current_user để lấy danh sách yêu thích hiển thị cho người dùng hiện thời
+# def get_wish_detail_by_current_user(current_user_id):
+#     return WishDetail.query.join(WishDetail, Wish.wish_id == WishDetail.wish_id).filer(Wish.customer_id.contains(current_user_id)).add_columns(Wish.wish_id).all()
+
+
+
