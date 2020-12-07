@@ -2,13 +2,13 @@
 <html lang="vi">
     <head>
         <meta charset="utf-8">
-        <title>Thanh Vũ Store</title>
+        <title>Vin Book</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="Thanh Vu eCommerce webstite" name="keywords">
         <meta content="Thanh Vu eCommerce website" name="description">
 
         <!-- Favicon -->
-        <link href="{{ url_for('static', filename='img/logo.png') }}" rel="icon">
+        <link href="{{ url_for('static', filename='images/tem/logo.jpg') }}" rel="icon" >
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Roboto&display=swap" rel="stylesheet">
@@ -52,13 +52,7 @@
                             <a href="{{ url_for('cart') }}" class="nav-item nav-link">Giỏ hàng</a>
                             <a href="{{ url_for('checkout') }}" class="nav-item nav-link">Thanh toán</a>
                             <a href="{{ url_for('my_account') }}" class="nav-item nav-link">Tài khoản</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Thêm</a>
-                                <div class="dropdown-menu">
-                                    <a href="{{ url_for('wishlist') }}" class="dropdown-item">Yêu thích</a>
-                                    <a href="{{ url_for('contact') }}" class="dropdown-item">Liên hệ</a>
-                                </div>
-                            </div>
+                            <a href="{{ url_for('wishlist') }}" class="nav-item nav-link">Yêu thích</a>
                         {% endif %}
                         </div>
 
@@ -67,14 +61,18 @@
                             <div class="nav-item">
                                 <a class="nav-link" href="{{ url_for('login_Customer') }}">Đăng nhập</a>
                             </div>
+                            <div class="nav-item">
+                                <a class="nav-link" href="{{ url_for('register') }}">Đăng ký</a>
+                            </div>
                         </div>
                         {% else %}
                         <div class="navbar-nav ml-auto">
                             <div class="nav-item">
-                                <a class="nav-link" href="">{{ current_user.name }}</a>
+                                <a href="{{ url_for('my_account') }}">
+                                    <img src="{{ url_for('static', filename=current_user.avatar) }}" alt="{{ current_user.name }}"
+                                     style="border-radius: 1rem; width: 35px; margin-top: 2px; margin-right: 15px;"/>
+                                </a>
                             </div>
-                        </div>
-                        <div class="navbar-nav ml-auto">
                             <div class="nav-item">
                                 <a class="nav-link" href="{{ url_for('logout') }}">Đăng xuất</a>
                             </div>
@@ -93,19 +91,25 @@
         <div class="bottom-bar">
             <div class="container-fluid">
                 <div class="row align-items-center">
+                    <!-- logon - home -->
                     <div class="col-md-3">
                         <div class="logo">
-                            <a href="index.html">
-                                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+                            <a href="{{ url_for('index') }}">
+                                <img src="{{ url_for('static', filename='images/tem/logo.jpg') }}" alt="Logo"
+                                     style="border-radius: 1rem; margin-left: 60px;">
                             </a>
                         </div>
                     </div>
+
+                    <!-- Chức năng tìm kiếm -->
                     <div class="col-md-6">
                         <div class="search">
-                            <input type="text" placeholder="Tìm kiếm">
+                            <input type="text" placeholder="Tìm kiếm" name="kw">
                             <button><i class="fa fa-search"></i></button>
                         </div>
                     </div>
+
+                    <!-- giỏ hàng, ds yêu thích -->
                     <div class="col-md-3">
                         <div class="user">
                             <a href="{{ url_for('wishlist', current_user_id=current_user.id) }}" class="btn wishlist">
@@ -183,15 +187,7 @@
                     <div class="col-md-6">
                         <div class="payment-method">
                             <h2>Chấp nhận thanh toán:</h2>
-                            <img src="{{ url_for('static' ,filename='img/payment-method.png') }}" alt="Payment Security" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="payment-security">
-                            <h2>Bảo mật bởi:</h2>
-                            <img src="{{ url_for('static' ,filename='img/godaddy.svg') }}" alt="Payment Security" />
-                            <img src="{{ url_for('static' ,filename='img/norton.svg') }}" alt="Payment Security" />
-                            <img src="{{ url_for('static' ,filename='img/ssl.svg') }}" alt="Payment Security" />
+                            <img src="{{ url_for('static' ,filename='images/tem/momo.png') }}" alt="Payment Security" />
                         </div>
                     </div>
                 </div>
@@ -216,7 +212,12 @@
         <!-- Footer Bottom End -->
 
         <!-- Back to Top -->
-        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        <a href="#" onclick="topFunction()"
+           class="back-to-top" id="btnTop"><i class="fa fa-chevron-up"></i>
+        </a>
+
+
+
 
         <!-- JavaScript Libraries -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

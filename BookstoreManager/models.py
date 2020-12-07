@@ -46,7 +46,9 @@ class Employee(CommonIdentityBase, AuthIndentityBase):
 class Customer(CommonIdentityBase, AuthIndentityBase):
     __tablename__ = 'customer'
     email = Column(String(40), nullable=False)
-
+    address = Column(String(100))
+    phone = Column(Integer)
+    debt = Column(Float, default=0)
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
@@ -109,13 +111,10 @@ class Invoice(db.Model):
     employee_id = Column(Integer, ForeignKey(Employee.id), default=1)  # bỏ dòng nullable
     customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False)
     date = Column(Date, nullable=False, default=datetime.today())
-    email = Column(String(30), default="Chưa lấy được")
-    phone = Column(String(12), default="123")
-    address = Column(String(100), default="Chưa lấy được")
     total_price = Column(Float, nullable=False)
     # Chi tiết hóa đơn
     invoice_detail = relationship('InvoiceDetail', backref='invoice', lazy=True)
-
+    shipping = relationship('ShippingDetail', backref='invoice', lazy=True, uselist=False)
 
 # Chi tiết hóa đơn
 class InvoiceDetail(db.Model):
@@ -124,6 +123,12 @@ class InvoiceDetail(db.Model):
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
 
+
+# Đơn hàng
+class ShippingDetail(db.Model):
+    invoice_id = Column(Integer, ForeignKey(Invoice.invoice_id), primary_key=True, nullable=False)
+    address = Column(String(100))
+    phone = Column(Integer)
 
 class WishDetail(db.Model):
     wish_id = Column(Integer, ForeignKey(Customer.id), primary_key=True, nullable=False)

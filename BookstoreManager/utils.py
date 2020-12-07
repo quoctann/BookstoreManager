@@ -1,7 +1,7 @@
 from flask_login import current_user
 
 from BookstoreManager import app, db
-from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, WishDetail
+from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, WishDetail, ShippingDetail
 import hashlib
 
 
@@ -41,7 +41,17 @@ def check_Customer(username):
 def check_mail(email):
     return Customer.query.filter(Customer.email == email).first()
 
+# Chức năng lọc dữ liệu theo 1 từ khóa - bar-footer
+# chức năng này cần kết bảng, và tạo thêm bảng BookCate
+def read_books(kw=None):
+    books = BookStorage.query
+    if kw:
+        books = books.filter(BookStorage.name.contains(kw))
 
+    return books.all()
+
+
+# Chức năng lọc dữ liệu - book-list
 def read_books(cate_id=None, kw=None, from_price=None, to_price=None, author=None):
     books = BookStorage.query
 
@@ -60,6 +70,7 @@ def read_books(cate_id=None, kw=None, from_price=None, to_price=None, author=Non
     return books.all()
 
 
+# Chức năng xem thông tin sách chi tiết - book-detail
 def get_book_by_id(book_id):
     return BookStorage.query.get(book_id)
 
@@ -82,31 +93,35 @@ def cart_stats(cart):
 
 #   ----------------------- Xử lý thanh toán ----------------------
 
-def add_invoice(cart, info):
-    # if cart and current_user.is_authenticated:
-    #     total_quantity, total_amount = cart_stats(cart)
-    #     invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
-    #     db.session.add(invoice)
-    #
-    #     for b in list(cart.values()):
-    #         detail = InvoiceDetail(invoice=invoice,
-    #                                book_id=int(b["id"]),
-    #                                quantity=b["quantity"],
-    #                                price=b["price"])
-    #         db.session.add(detail)
-    #
-    #     try:
-    #         db.session.commit()
-    #         return True
-    #     except Exception as ex:
-    #         print(ex)
-    # return False
+# def add_invoice(cart):
+#     if cart and current_user.is_authenticated:
+#         total_quantity, total_amount = cart_stats(cart)
+#         invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
+#         db.session.add(invoice)
+#
+#         for b in list(cart.values()):
+#             detail = InvoiceDetail(invoice=invoice,
+#                                    book_id=int(b["id"]),
+#                                    quantity=b["quantity"],
+#                                    price=b["price"])
+#             db.session.add(detail)
+#
+#         try:
+#             db.session.commit()
+#             return True
+#         except Exception as ex:
+#             print(ex)
+#     return False
 
+
+def add_invoice(cart, phone, address):
     if cart and current_user.is_authenticated:
         total_quantity, total_amount = cart_stats(cart)
-        invoice = Invoice(customer_id=current_user.id, total_price=total_amount,
-                          email=current_user.email, phone=info["phone"], address=info["address"])
+        invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
         db.session.add(invoice)
+
+        shipping = ShippingDetail(invoice=invoice, phone=phone, address=address)
+        db.session.add(shipping)
 
         for b in list(cart.values()):
             detail = InvoiceDetail(invoice=invoice,
@@ -122,11 +137,10 @@ def add_invoice(cart, info):
             print(ex)
     return False
 
-# ---------------------- xử lý thêm sách vào danh mục yêu thích -----------------------
 
+# ---------------------- xử lý thêm sách vào danh mục yêu thích -----------------------
 def add_wishlist(wishlist):
     if wishlist and current_user.is_authenticated:
-
         # thêm các sách mới được yêu thích xuống db
         for b in list(wishlist.values()):
             book = WishDetail(wish_id=current_user.id,

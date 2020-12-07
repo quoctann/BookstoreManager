@@ -15,6 +15,7 @@ function addToCart(id, name, price, path) {
         }
     }).then(res => res.json()).then(data => {
         console.info(data);
+        alert(data.message);
         location.reload();
     }).catch(err => {
         console.log(err);
@@ -79,9 +80,7 @@ function deleteCart(id) {
 //}
 
 
-
-// test
-function pay(phone, address) {
+function pay() {
     fetch('/api/pay', {
         method: 'post',
         headers: {
@@ -94,6 +93,7 @@ function pay(phone, address) {
         console.log(res);
     })
 }
+
 
 
 // --------------------- xử lý thêm sách vào danh mục yêu thích ----------------------
@@ -137,5 +137,23 @@ function deleteWish(id) {
     })
 }
 
+// back to top
+var btnTop = document.getElementById("btnTop");
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    var btnTop = document.getElementById("btnTop");
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 500) {
+        btnTop.style.display = "block";
+    } else {
+        btnTop.style.display = "none";
+    }
+}
+
+
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
 
 

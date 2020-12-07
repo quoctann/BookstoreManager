@@ -96,6 +96,7 @@
 
                                         <!--    Ảnh về sách, các thao tác tiện lợi  -->
                                         <div class="product-image">
+                                            <!--    Ảnh về sách  -->
                                             <a href="">
                                                 <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
                                             </a>
@@ -108,7 +109,8 @@
                                                 </a>
                                                 <a href="javascript:;"
                                                    onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                    <i class="fa fa-heart"></i></a>
+                                                    <i class="fa fa-heart"></i>
+                                                </a>
                                             </div>
                                         </div>
 
@@ -149,20 +151,4 @@
         </div>
         <!-- Product List End -->
 
-
-
-        <!-- Brand Start -->
-        <div class="brand">
-            <div class="container-fluid">
-                <div class="brand-slider">
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-1.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-2.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-3.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-4.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-5.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-6.png') }}" alt=""></div>
-                </div>
-            </div>
-        </div>
-        <!-- Brand End -->
 {% endblock %}

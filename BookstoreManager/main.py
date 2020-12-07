@@ -293,66 +293,75 @@ def cart():
 
 # -------------------------- Xử lý thanh toán -------------------------------------
 
-@app.route('/checkout')
-@login_required
-def checkout():
-    quantity, price = utils.cart_stats(session.get('cart'))
-    cart_info = {
-        "total_amount": price,
-        "total_quantity": quantity
-    }
-    return render_template('checkout.html', cart_info=cart_info)
+# @app.route('/checkout')
+# @login_required
+# def checkout():
+#     quantity, price = utils.cart_stats(session.get('cart'))
+#     cart_info = {
+#         "total_amount": price,
+#         "total_quantity": quantity
+#     }
+#     return render_template('checkout.html', cart_info=cart_info)
 
 
 # Muốn thanh toán thì phải tạo nhân viên mặt định có id = 1
 # @app.route('/api/pay', methods=['post'])
 # def pay():
 #     if utils.add_invoice(session.get('cart')):
-#         del session['cart']
+#         # del session['cart']
 #         return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
 #
-#     return jsonify({'message': 'failed'})
+#     return jsonify({'message': 'failed - chưa có sản phẩm để thanh toán!'})
+
+
+
+# thành công ghi dữ liệu, nhưng không kiểm soát được thao tác thanh toán
+@app.route('/checkout', methods=['get', 'post'])
+@login_required
+def checkout():
+    err_msg = ""
+    quantity, price = utils.cart_stats(session.get('cart'))
+    cart_info = {
+        "total_amount": price,
+        "total_quantity": quantity
+    }
+    if request.method == 'POST':
+
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        if session:
+            if utils.add_invoice(cart=session.get('cart'), phone=phone, address=address):
+                del session['cart']
+            else:
+                err_msg = "Hiện chưa có sách trong giỏ hàng!"
+
+
+    return render_template('checkout.html', cart_info=cart_info, err_msg=err_msg)
 
 
 
 
-# test
-@app.route('/api/pay', methods=['post'])
-def pay():
-    if 'info' not in session:
-        session['info'] = {}
-
-    info = session['info']
-
-    data = json.loads(request.data)
-
-    id = current_user.id
-    phone = data.get("phone")
-    address = data.get("address")  # từ khóa "selling_price" chỉ qua main.js
-    if phone and address:
-        return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
-
-    # if id in info:
-    #     pass
-    # else:
-    #     cart[id] = {
-    #         "phone": phone,
-    #         "address": address
-    #     }
-    #
-    # session['info'] = info
-    # if phone and address:
-    #     return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
 
 
-
-    # if utils.add_invoice(session.get('cart'), session.get('info')):
-    #     del session['cart']
-    #     return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
-
-    return jsonify({'message': 'failed'})
-
-
+# @app.route('/checkout')
+# @login_required
+# def checkout():
+#     quantity, price = utils.cart_stats(session.get('cart'))
+#     cart_info = {
+#         "total_amount": price,
+#         "total_quantity": quantity
+#     }
+#     return render_template('checkout.html', cart_info=cart_info)
+#
+#
+# # Muốn thanh toán thì phải tạo nhân viên mặt định có id = 1
+# @app.route('/api/pay', methods=['post'])
+# def pay():
+#     if utils.add_invoice(session.get('cart')):
+#         # del session['cart']
+#         return jsonify({'message': 'Bạn đã thêm thanh toán thành công!'})
+#
+#     return jsonify({'message': 'failed - chưa có sản phẩm để thanh toán!'})
 
 
 
@@ -433,11 +442,6 @@ def delete_wish():
 def wishlist():
     return render_template('wishlist.html')
 
-
-@app.route('/contact')
-@login_required
-def contact():
-    return render_template('contact.html')
 
 
 # Chưa xây dựng chức năng

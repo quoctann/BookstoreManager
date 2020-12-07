@@ -5,7 +5,7 @@
         <div class="header">
             <div class="container-fluid">
                 <div class="flex-container" style="display: flex; align-items: stretch; background-color: #f1f1f1;">
-                    <!--    menu dọc góc bên trái    -->
+                    <!--    menu dọc góc bên trái - chưa xử lý chức năng    -->
                     <div style="flex-grow: 3" class="col-md-3">
                         <nav class="navbar bg-light">
                             <ul class="navbar-nav">
@@ -34,7 +34,7 @@
                         </nav>
                     </div>
 
-                    <!--    slide giới thiệu sách  -->
+                    <!--    slide giới thiệu sách - hiện để cho có :v -->
                     <div style="flex-grow: 7" id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                             <div class="carousel-inner">
                                 <div class="carousel-item active wall">
@@ -63,23 +63,6 @@
 
 
 
-        <!-- Brand Start -->
-                            <!--    Các hình ảnh mô tả event giảm giá    -->
-        <div class="brand">
-            <div class="container-fluid">
-                <div class="brand-slider">
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-1.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-2.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-3.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-4.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-5.png') }}" alt=""></div>
-                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-6.png') }}" alt=""></div>
-                </div>
-            </div>
-        </div>
-        <!-- Brand End -->
-
-
 
         <!-- Featured Product Start -->
                                         <!--    container hiển thị sách có trong db    -->
@@ -97,7 +80,7 @@
 
                             <!--    Tên, mô tả đánh giá bằng sao    -->
                             <div class="product-title">
-                                <a href="#">{{ b.name }}</a>
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
                                 <div class="ratting">
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
@@ -113,8 +96,14 @@
                                     <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
                                 </a>
                                 <div class="product-action">
-                                    <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                    <a href="#"><i class="fa fa-heart"></i></a>
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
                                 </div>
                             </div>
 
@@ -149,7 +138,7 @@
 
                             <!--    Tên, mô tả đánh giá bằng sao    -->
                             <div class="product-title">
-                                <a href="#">{{ b.name }}</a>
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
                                 <div class="ratting">
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
@@ -165,8 +154,14 @@
                                     <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
                                 </a>
                                 <div class="product-action">
-                                    <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                    <a href="#"><i class="fa fa-heart"></i></a>
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
                                 </div>
                             </div>
 

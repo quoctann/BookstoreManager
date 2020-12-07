@@ -20,6 +20,11 @@
 
 <form method="post" action="" enctype="multipart/form-data">
                 <div class="row">
+                    {% if err_msg %}
+                    <div class="alert alert-danger">
+                        <h5>{{ err_msg }}</h5>
+                    </div>
+                    {% endif %}
 
                     <!--    Khách hàng điền thông tin vào form  -->
                     <div class="col-lg-8">
@@ -138,7 +143,7 @@
                                 </div>
 
                                 <div class="checkout-btn">
-                                    <button onclick="pay({{ phone }}, {{ address }})">Xác nhận thanh toán</button>
+                                    <button onclick="pay()">Xác nhận thanh toán</button>
                                 </div>
                             </div>
                     </div>
