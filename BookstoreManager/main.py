@@ -98,10 +98,5 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
-def sold_task():
-    session['valid_debt'] = 'init'
-    return redirect(url_for('sellview.index'))
-
-
 if __name__ == "__main__":
     app.run(debug=True)

@@ -74,6 +74,7 @@ class BookStorage(CommonIdentityBase):
     sold_invoice = relationship('InvoiceDetail', backref='book_storage', lazy=True)
 
 
+# Thông tin phiếu nhập sách
 class BookImport(db.Model):
     __tablename__ = 'book_import'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -85,6 +86,7 @@ class BookImport(db.Model):
     import_detail = relationship('ImportDetail', backref='book_import', lazy=True)
 
 
+# Chi tiết phiếu nhập sách
 class ImportDetail(db.Model):
     __tablename__ = 'import_detail'
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
@@ -112,6 +114,10 @@ class InvoiceDetail(db.Model):
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
 
+
+# Thông tin danh sách yêu thích của khách hàng (wishlist)
+
+# Chi tiết wishlist
 
 if __name__ == '__main__':
     db.create_all()
