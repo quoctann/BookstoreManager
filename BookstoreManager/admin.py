@@ -47,9 +47,7 @@ class LogoutView(AuthenticatedView):
 class SellView(AuthenticatedView):
     @expose('/')
     def index(self):
-        # Nợ của khách hàng có vi phạm quy định không
-        valid_debt = session['valid_debt']
-        return self.render('admin/task_view/sell.html', valid_debt=valid_debt)
+        return self.render('admin/task_view/sell.html', valid_debt=session['valid_debt'], sell_for=session['sell_for'])
 
 
 class ImportView(AuthenticatedView):
