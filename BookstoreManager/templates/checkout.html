@@ -17,14 +17,14 @@
 
         <div class="checkout">
             <div class="container-fluid">
-
-<form method="post" action="" enctype="multipart/form-data">
-                <div class="row">
                     {% if err_msg %}
                     <div class="alert alert-danger">
                         <h5>{{ err_msg }}</h5>
                     </div>
                     {% endif %}
+<form method="post" action="" enctype="multipart/form-data">
+                <div class="row">
+
 
                     <!--    Khách hàng điền thông tin vào form  -->
                     <div class="col-lg-8">
@@ -35,31 +35,27 @@
                                 <h2>Thông tin của bạn</h2>
                                 <div class="row">
                                     <!--    Hiển thị tên của người dùng hiện thời  -->
-                                    <div class="col-md-8">
-                                        <label>Tên</label>
-                                        <input class="form-control" type="text" value="{{ current_user.name }}" readonly>
-                                    </div>
-
-                                    <!--    Hiển thị email của người dừng hiện thời  -->
-                                    <div class="col-md-6">
-                                        <label>E-mail</label>
-                                        <input class="form-control" type="text" value="{{ current_user.email }}" readonly>
+                                    <div class="col-md-6 form-group">
+                                        <label for="name">Tên</label>
+                                        <input class="form-control" name="name"
+                                               type="text" value="{{ current_user.name }}"
+                                               id="name">
                                     </div>
 
                                     <!--    Điền sdt  -->
                                     <div class="col-md-6 form-group">
                                         <label for="phone">Số điện thoại</label>
                                         <input class="form-control" name="phone"
-                                               type="number" placeholder="Số điện thoại . . ."
-                                               required id="phone">
+                                               type="number" value="{{ current_user.phone }}"
+                                               id="phone">
                                     </div>
 
                                     <!--    Điền địa chỉ  -->
                                     <div class="col-md-12 form-group">
                                         <label for="address">Địa chỉ</label>
                                         <input class="form-control" name="address"
-                                               type="text" placeholder="Địa chỉ. . ."
-                                               required id="address">
+                                               type="text" value="{{ current_user.address }}"
+                                               id="address">
                                     </div>
                                 </div>
                             </div>
@@ -126,6 +122,8 @@
 
                             <!--    Hình thức thanh toán    -->
                             <div class="checkout-payment">
+
+                                <!--    Hình thức thanh toán    -->
                                 <div class="payment-methods">
                                     <h1>Hình thức thanh toán</h1>
                                     <div class="payment-method">
@@ -142,8 +140,9 @@
                                     </div>
                                 </div>
 
+                                <!--    nút xác nhận thanh toán    -->
                                 <div class="checkout-btn">
-                                    <button onclick="pay()">Xác nhận thanh toán</button>
+                                    <input  type="submit" value="Thanh toán" class="btn btn-danger" />
                                 </div>
                             </div>
                     </div>

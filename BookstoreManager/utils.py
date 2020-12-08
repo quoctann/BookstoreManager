@@ -1,7 +1,8 @@
 from flask_login import current_user
 
 from BookstoreManager import app, db
-from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, WishDetail, ShippingDetail
+from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, InvoiceDetail, WishDetail, \
+    ShippingDetail
 import hashlib
 
 
@@ -30,6 +31,7 @@ def check_Customer(username):
 
 def check_mail(email):
     return Customer.query.filter(Customer.email == email).first()
+
 
 # Chức năng lọc dữ liệu theo 1 từ khóa - bar-footer
 # chức năng này cần kết bảng, và tạo thêm bảng BookCate
@@ -83,35 +85,13 @@ def cart_stats(cart):
 
 #   ----------------------- Xử lý thanh toán ----------------------
 
-# def add_invoice(cart):
-#     if cart and current_user.is_authenticated:
-#         total_quantity, total_amount = cart_stats(cart)
-#         invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
-#         db.session.add(invoice)
-#
-#         for b in list(cart.values()):
-#             detail = InvoiceDetail(invoice=invoice,
-#                                    book_id=int(b["id"]),
-#                                    quantity=b["quantity"],
-#                                    price=b["price"])
-#             db.session.add(detail)
-#
-#         try:
-#             db.session.commit()
-#             return True
-#         except Exception as ex:
-#             print(ex)
-#     return False
 
-
-def add_invoice(cart, phone, address):
+# test tạo 3 bảng song song độc lập (1 : 2)
+def add_invoice(cart):
     if cart and current_user.is_authenticated:
         total_quantity, total_amount = cart_stats(cart)
         invoice = Invoice(customer_id=current_user.id, total_price=total_amount)
         db.session.add(invoice)
-
-        shipping = ShippingDetail(invoice=invoice, phone=phone, address=address)
-        db.session.add(shipping)
 
         for b in list(cart.values()):
             detail = InvoiceDetail(invoice=invoice,
@@ -126,6 +106,18 @@ def add_invoice(cart, phone, address):
         except Exception as ex:
             print(ex)
     return False
+
+
+# Tạo bảng đặt hàng
+def add_shipping(invoice_id, name, phone, address):
+    shipping = ShippingDetail(invoice_id=invoice_id, name=name, phone=phone, address=address)
+    try:
+        db.session.add(shipping)
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
 
 
 # ---------------------- xử lý thêm sách vào danh mục yêu thích -----------------------
@@ -146,10 +138,14 @@ def add_wishlist(wishlist):
     return False
 
 
-
 # Query db theo current_user để lấy danh sách yêu thích hiển thị cho người dùng hiện thời
 # def get_wish_detail_by_current_user(current_user_id):
 #     return WishDetail.query.join(WishDetail, Wish.wish_id == WishDetail.wish_id).filer(Wish.customer_id.contains(current_user_id)).add_columns(Wish.wish_id).all()
 
 
+# --------------    Chỉnh sửa thông tin khách hàng  -------------
 
+# sửa thông tin khách hàng  - chưa xong
+def change_info(user_id, name, phone, email, address):
+    user = Customer.query.filter(Customer.id == user_id).first()
+    return user_id

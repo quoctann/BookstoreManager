@@ -52,12 +52,11 @@
                                             <td>{{ "{:,}".format(b.price) }} VNĐ</td>
 
                                             <!--    Tùy chỉnh số lượng  -->
-
                                             <td>
                                                 <div class="">
                                                     <button class="btn-minus" onclick="subtractCart({{ b.id }})"><i class="fa fa-minus"></i></button>
                                                     <input type="text" value="{{ b.quantity }}" >
-                                                    <button class="btn-plus" onclick="addToCart({{ b.id }})"><i class="fa fa-plus"></i></button>
+                                                    <button class="btn-plus" onclick="addPlus({{ b.id }})"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </td>
 
@@ -75,6 +74,7 @@
                                     {% endif %}
                                     <!--    kết thúc vòng lặp   -->
                                     </tbody>
+
                                 </table>
                             </div>
                         </div>

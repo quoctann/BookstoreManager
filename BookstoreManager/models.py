@@ -126,7 +126,9 @@ class InvoiceDetail(db.Model):
 
 # Đơn hàng
 class ShippingDetail(db.Model):
-    invoice_id = Column(Integer, ForeignKey(Invoice.invoice_id), primary_key=True, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False)
+    invoice_id = Column(Integer, ForeignKey(Invoice.invoice_id), nullable=False)
     address = Column(String(100))
     phone = Column(Integer)
 
