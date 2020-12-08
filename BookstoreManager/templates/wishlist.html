@@ -34,11 +34,8 @@
                                     <!--    Thông tin sách yêu thích   -->
 
                                     <!--    Thông tin sách yêu thích của người hiện có  -->
-
-
-                                    <!--    Thông tin sách yêu thích mới được thêm vào  -->
-                                    {% if 'wish' in session %}
-                                    {% for b in session['wish'].values() %}
+                                    {% if bookwish %}
+                                    {% for b in bookwish %}
                                     <tbody class="align-middle">
                                         <tr>
                                             <!--    ảnh thu nhỏ   -->
@@ -51,7 +48,7 @@
                                             </td>
 
                                             <!--   giá   price là key của từ điển wish   -->
-                                            <td>{{ "{:,}".format(b.price) }} VNĐ</td>
+                                            <td>{{ "{:,}".format(b.selling_price) }} VNĐ</td>
 
                                             <td><button onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.price }}, '{{ b.path }}')" class="btn-cart">Thêm vào giỏ</button></td>
                                             <td><button onclick="deleteWish({{ b.id }})"><i class="fa fa-trash"></i></button></td>

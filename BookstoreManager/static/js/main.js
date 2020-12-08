@@ -163,6 +163,7 @@ function deleteWish(id) {
         }
     }).then(res => res.json()).then(data => {
         console.info(data);
+//        alert(data.message);
         location.reload();
     }).catch(err => {
         console.log(err);

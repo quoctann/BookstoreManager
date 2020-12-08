@@ -138,6 +138,28 @@ def add_wishlist(wishlist):
     return False
 
 
+# kết theo bảng bên trái
+def read_wish():
+    return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == current_user.id).all()
+
+
+def get_wish(book_id):
+    return WishDetail.query.filter(book_id  == WishDetail.book_id).first()
+
+
+# Xóa sách ra khỏi danh sách yêu thích - có cập nhập xuống db
+def del_wish(book_id):
+    w = WishDetail.query.filter(WishDetail.book_id == book_id and WishDetail.wish_id == current_user.id).first()
+    try:
+        db.session.delete(w)
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+
+    return False
+
+
 # Query db theo current_user để lấy danh sách yêu thích hiển thị cho người dùng hiện thời
 # def get_wish_detail_by_current_user(current_user_id):
 #     return WishDetail.query.join(WishDetail, Wish.wish_id == WishDetail.wish_id).filer(Wish.customer_id.contains(current_user_id)).add_columns(Wish.wish_id).all()
@@ -149,3 +171,23 @@ def add_wishlist(wishlist):
 def change_info(user_id, name, phone, email, address):
     user = Customer.query.filter(Customer.id == user_id).first()
     return user_id
+
+
+
+
+
+
+# isouter=True : Kết trái
+
+# def read_join():
+    # WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+
+    # Có nhiêu lấy hết, trùng dữ liệu: theo wishdetail
+    # return db.session.query(BookStorage).join(WishDetail)
+
+    # return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == current_user.id)
+
+    # return db.session.query(WishDetail, WishDetail.wish_id == current_user.id).join(BookStorage.wish_id)
+
+    # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+

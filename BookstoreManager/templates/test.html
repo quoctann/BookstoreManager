@@ -1,0 +1,21 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+
+                                {% for b in book %}
+                                     <tr>
+                                            <!--    Tên sách   -->
+                                            <td>{{ b.name }}</td>
+
+                                            <!--   giá   price là key của từ điển cart   -->
+                                            <td>{{ b.selling_price }} </td>
+
+                                            <!--    Số lượng  -->
+
+                                        </tr>
+                                {% endfor %}
+
+
+
+
+{% endblock %}

@@ -137,5 +137,11 @@ class WishDetail(db.Model):
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
 
 
+
+
+
+
+
+
 if __name__ == '__main__':
     db.create_all()

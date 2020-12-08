@@ -399,27 +399,27 @@ def add_to_wish():
 
 
 # Xóa sách trong ds yêu thích
-@app.route('/api/deletewish', methods=['post'])
-def delete_wish():
-    if 'wish' not in session:
-        session['wish'] = {}
-
-    wish = session['wish']
-
-    data = json.loads(request.data)
-
-    id = str(data.get("id"))
-
-    if id in wish:
-        wish.pop(id)
-    session['wish'] = wish
-
-    if not wish:
-        del session['wish']
-
-    return jsonify({
-        'message': 'Sách đã được xóa khỏi danh sách yêu thích!'
-    })
+# @app.route('/api/deletewish', methods=['post'])
+# def delete_wish():
+#     if 'wish' not in session:
+#         session['wish'] = {}
+#
+#     wish = session['wish']
+#
+#     data = json.loads(request.data)
+#
+#     id = str(data.get("id"))
+#
+#     if id in wish:
+#         wish.pop(id)
+#     session['wish'] = wish
+#
+#     if not wish:
+#         del session['wish']
+#
+#     return jsonify({
+#         'message': 'Sách đã được xóa khỏi danh sách yêu thích!'
+#     })
 
 
 # Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích - chưa làm được
@@ -427,7 +427,8 @@ def delete_wish():
 @decorator.login_required_wishlist
 @login_required
 def wishlist():
-    return render_template('wishlist.html')
+    bookwish = utils.read_wish()
+    return render_template('wishlist.html', bookwish=bookwish)
 
 
 # Chưa xây dựng chức năng
@@ -435,6 +436,41 @@ def wishlist():
 @login_required
 def my_account():
     return render_template('my-account.html')
+
+
+# ---------------------- test chức năng mới ------------------------
+@app.route('/test')
+def get_book():
+    book = utils.read_wish()
+    return render_template('test.html', book=book)
+
+
+
+
+@app.route('/api/deletewish', methods=['post'])
+def delete_wish():
+    data = json.loads(request.data)
+    id = str(data.get("id"))
+    # wish = utils.get_wish(id)
+    if utils.get_wish(id):
+        if utils.del_wish(id):
+            return jsonify({
+                'message': 'Sách đã được xóa khỏi danh sách yêu thích!'
+            })
+
+    else:
+        return jsonify({
+            'message': 'Sai ở đâu đó!'
+        })
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
