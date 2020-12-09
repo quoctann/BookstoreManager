@@ -1,11 +1,9 @@
 from BookstoreManager import app, login, utils
 from BookstoreManager.admin import *
 from BookstoreManager.models import *
-from flask import render_template, request, redirect, session, url_for, jsonify
+from flask import render_template, request, redirect, session, url_for
 from flask_login import login_user
 import hashlib
-import json
-import os
 
 
 # |=============|
@@ -16,8 +14,11 @@ import os
 # Điều hướng tới trang chủ mặc định
 @app.route("/")
 def index():
-    utils.reset_value()
-    session['test_num'] = 0
+    session['valid_debt'] = 'init'
+    # Session lưu thuộc tính nhân viên đã kiểm tra nợ của KH chưa
+    session['debt_checking_status'] = 'init'
+    # Lưu tạm thời tên của khách hàng
+    session['sell_for'] = 'init'
     return render_template("index.html")
 
 
@@ -38,7 +39,6 @@ def user_load(user_id):
 @app.route("/login-admin", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
 def login_admin():
-    utils.reset_value()
     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if request.method == "POST":
         # Lấy dữ liệu từ form (thông qua request)
@@ -92,10 +92,6 @@ def register_employee(err_msg):
 # Xử lý action bán sách
 @app.route('/admin/sellview/', methods=["GET", "POST"])
 def check_debt():
-    # valid_debt lưu trạng thái của tác vụ với các giá trị:
-    # init: khởi tạo, bắt đầu bán hàng
-    # violated: vi phạm quy định, xuất thông báo lỗi
-    # OK: khách hàng hợp lệ, cho phép bán
     if request.method == "POST" and \
             (session['valid_debt'] == 'init' or session['valid_debt'] == 'violated'):
         customer_id = request.form.get('customer_id')
@@ -110,23 +106,11 @@ def check_debt():
             else:
                 session['valid_debt'] = 'violated'
             return redirect(url_for('sellview.index'))
-        # Sau khi bán xong trả lại trạng thái ban đầu
+    # Sau khi bán xong trả lại trạng thái ban đầu
         session['valid_debt'] = 'init'
 
-    # Sau khi đã kiểm tra và khách hàng hợp lệ
     if request.method == "POST" and (session['valid_debt'] == 'OK'):
-        # Lấy toàn bộ request từ form > kiểu dictionary
-        for arg in request.form:
-            # Input name: quantity-số là số lượng sản phẩm tương ứng với input name 'số' mà id sản phẩm
-            # request.form sẽ lấy tất cả các request từ form
-            # request.form sẽ trả về InmutableDict, parse sang dict bằng to_dict để sử dụng len()
-            # arg là trường key của một phần tử dict tương đương với input name
-            for count in range(len(request.form.to_dict())):
-                if arg == ('quantity-'+str(count)):
-                    print('quantity is', request.form.get(arg))
-                elif arg == str(count):
-                    print('product is', request.form.get(arg))
-        print('OK')
+        pass
 
     # Gọi phương thức index(self) từ admin.py
     return redirect(url_for('sellview.index'))
