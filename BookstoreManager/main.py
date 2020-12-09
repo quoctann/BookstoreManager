@@ -8,6 +8,11 @@ import json
 import os
 
 
+# |=============|
+# | XỬ LÝ CHUNG |
+# |=============|
+
+
 # Điều hướng tới trang chủ mặc định
 @app.route("/")
 def index():
@@ -16,7 +21,20 @@ def index():
     return render_template("index.html")
 
 
-# Xử lý action login
+# Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
+# dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
+# đến đối tượng đang đăng nhập
+@login.user_loader
+def user_load(user_id):
+    return SystemUser.query.get(user_id)
+
+
+# |=====================|
+# | XỬ LÝ PHÂN HỆ ADMIN |
+# |=====================|
+
+
+# Xử lý action login của admin
 @app.route("/login-admin", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
 def login_admin():
@@ -38,14 +56,14 @@ def login_admin():
     return redirect("/admin")
 
 
-# Xử lý action register
-@app.route("/register/", defaults={'err_msg': None}, methods=["GET", "POST"])
-@app.route("/register/<err_msg>", methods=["GET", "POST"])
+# Xử lý action thêm nhân viên
+@app.route("/register-employee/", defaults={'err_msg': None}, methods=["GET", "POST"])
+@app.route("/register-employee/<err_msg>", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
-def register_admin(err_msg):
+def register_employee(err_msg):
     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if not err_msg:
-        # Nếu không có lỗi
+        # Nếu không có lỗi và bút submit được trigger
         if request.method == "POST":
             # Lấy dữ liệu từ form (thông qua request)
             username = request.form.get("registerUsername")
@@ -58,7 +76,7 @@ def register_admin(err_msg):
                 session["message"] = "Mật khẩu không khớp"
             else:
                 # Tiện ích thêm người dùng vào hệ thống
-                if utils.add_admin(name=name, username=username, password=password):
+                if utils.add_employee(name=name, username=username, password=password):
                     session["message"] = "Đăng ký thành công"
                 else:
                     session["message"] = "Server internal error"
@@ -68,15 +86,7 @@ def register_admin(err_msg):
             return redirect(url_for("login_admin", err_msg=session["message"]))
     # Nếu có lỗi từ đầu
     else:
-        return render_template('register.html')
-
-
-# Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
-# dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
-# đến đối tượng đang đăng nhập
-@login.user_loader
-def user_load(user_id):
-    return SystemUser.query.get(user_id)
+        return render_template('register-employee.html')
 
 
 # Xử lý action bán sách
@@ -122,7 +132,9 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
-# API
+# |===================================|
+# | APPLICATION PROGRAMMING INTERFACE |
+# |===================================|
 
 # Test lấy giá trị
 @app.route('/api/get_value', methods=['post'])

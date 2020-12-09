@@ -97,7 +97,7 @@ class AdminModelView(CustomModelView):
 class RegisterView(AdminView):
     @expose('/')
     def index(self):
-        return self.render('admin/task_view/register.html')
+        return self.render('admin/task_view/register-employee.html')
 
 
 # View để admin xem, thay đổi quy định
