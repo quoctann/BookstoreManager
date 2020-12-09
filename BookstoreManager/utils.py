@@ -139,10 +139,12 @@ def add_wishlist(wishlist):
 
 
 # kết theo bảng bên trái
+# Đọc dữ liệu lấy thông tin sách mà khách hàng đã yêu thích
 def read_wish():
     return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == current_user.id).all()
 
 
+# Lấy dữ liệu sách theo book_id trong wishlist
 def get_wish(book_id):
     return WishDetail.query.filter(book_id  == WishDetail.book_id).first()
 
@@ -160,12 +162,7 @@ def del_wish(book_id):
     return False
 
 
-# Query db theo current_user để lấy danh sách yêu thích hiển thị cho người dùng hiện thời
-# def get_wish_detail_by_current_user(current_user_id):
-#     return WishDetail.query.join(WishDetail, Wish.wish_id == WishDetail.wish_id).filer(Wish.customer_id.contains(current_user_id)).add_columns(Wish.wish_id).all()
-
-
-# --------------    Chỉnh sửa thông tin khách hàng  -------------
+# --------------    my-acc    -------------
 
 # sửa thông tin khách hàng  - chưa xong
 def change_info(user_id, name, phone, email, address):
@@ -173,14 +170,16 @@ def change_info(user_id, name, phone, email, address):
     return user_id
 
 
-
+# view lịch sử hóa đơn của khách hàng
+def read_my_invoice():
+    return Invoice.query.filter(Invoice.customer_id == current_user.id)
 
 
 
 # isouter=True : Kết trái
 
-# def read_join():
-    # WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+def read_join():
+    WishDetail.query.filter(WishDetail.wish_id == current_user.id)
 
     # Có nhiêu lấy hết, trùng dữ liệu: theo wishdetail
     # return db.session.query(BookStorage).join(WishDetail)
@@ -190,4 +189,6 @@ def change_info(user_id, name, phone, email, address):
     # return db.session.query(WishDetail, WishDetail.wish_id == current_user.id).join(BookStorage.wish_id)
 
     # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+
+    return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == current_user.id).all()
 

@@ -182,8 +182,7 @@ def book_list_by_cate(cate_id):
 @app.route('/book-detail/<int:book_id>')
 def book_detail(book_id):
     book = utils.get_book_by_id(book_id=book_id)
-    book_relate = BookStorage.query.filter(BookStorage.category == book.category).limit(10).all()
-
+    book_relate = BookStorage.query.filter(BookStorage.category == book.category).limit(5).all()
     return render_template('book-detail.html', book=book, book_relate=book_relate)
 
 
@@ -300,7 +299,7 @@ def buy_now():
         cart[id] = {
             "id": id,
             "name": name,
-            "price": price,  # từ khóa "price" trỏ tới utils
+            "price": price,
             "path": path,
             "quantity": 1
         }
@@ -308,7 +307,6 @@ def buy_now():
     session['cart'] = cart
 
     return redirect('/checkout')
-
 
 
 # dữ liệu nhận được từ utils thông qua session cart
@@ -355,7 +353,7 @@ def checkout():
     return render_template('checkout.html', cart_info=cart_info, err_msg=err_msg)
 
 
-# ----------------------- Danh sách yêu thích , chưa kết được bản   ---------------------------
+# ----------------------- Danh sách yêu thích  ---------------------------
 
 # Đăng nhập thành công mới có thể thêm sách vào wishlist, chưa đăng nhập hiện thông báo
 @app.route('/api/wish', methods=['post'])
@@ -399,59 +397,10 @@ def add_to_wish():
 
 
 # Xóa sách trong ds yêu thích
-# @app.route('/api/deletewish', methods=['post'])
-# def delete_wish():
-#     if 'wish' not in session:
-#         session['wish'] = {}
-#
-#     wish = session['wish']
-#
-#     data = json.loads(request.data)
-#
-#     id = str(data.get("id"))
-#
-#     if id in wish:
-#         wish.pop(id)
-#     session['wish'] = wish
-#
-#     if not wish:
-#         del session['wish']
-#
-#     return jsonify({
-#         'message': 'Sách đã được xóa khỏi danh sách yêu thích!'
-#     })
-
-
-# Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích - chưa làm được
-@app.route('/wishlist')
-@decorator.login_required_wishlist
-@login_required
-def wishlist():
-    bookwish = utils.read_wish()
-    return render_template('wishlist.html', bookwish=bookwish)
-
-
-# Chưa xây dựng chức năng
-@app.route('/my-account')
-@login_required
-def my_account():
-    return render_template('my-account.html')
-
-
-# ---------------------- test chức năng mới ------------------------
-@app.route('/test')
-def get_book():
-    book = utils.read_wish()
-    return render_template('test.html', book=book)
-
-
-
-
 @app.route('/api/deletewish', methods=['post'])
 def delete_wish():
     data = json.loads(request.data)
     id = str(data.get("id"))
-    # wish = utils.get_wish(id)
     if utils.get_wish(id):
         if utils.del_wish(id):
             return jsonify({
@@ -462,6 +411,35 @@ def delete_wish():
         return jsonify({
             'message': 'Sai ở đâu đó!'
         })
+
+
+# Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích
+@app.route('/wishlist')
+@decorator.login_required_wishlist
+@login_required
+def wishlist():
+    bookwish = utils.read_wish()
+    return render_template('wishlist.html', bookwish=bookwish)
+
+
+# ------------------    Các view: lịch sử đặt hàng, chỉnh sửa thông tin của khách hàng ----------------
+@app.route('/my-account')
+@login_required
+def my_account():
+    invoice = utils.read_my_invoice()
+    return render_template('my-account.html', invoice=invoice)
+
+
+# ---------------------- test chức năng mới ------------------------
+@app.route('/test')
+def get_book():
+    book = utils.read_books()
+    return render_template('test.html', book=book)
+
+
+
+
+
 
 
 

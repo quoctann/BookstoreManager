@@ -17,7 +17,7 @@ class AuthIndentityBase(db.Model, UserMixin):
     __abstract__ = True
     username = Column(String(20), nullable=False)
     password = Column(String(40), nullable=False)
-    active = Column(Boolean, default=True)
+
 
     def __str__(self):
         return self.name
@@ -32,7 +32,6 @@ class SystemUser(CommonIdentityBase, AuthIndentityBase):
 class Employee(CommonIdentityBase, AuthIndentityBase):
     __tablename__ = 'employee'
     role = Column(String(10), nullable=False)
-    debt = Column(Float, default=0)
 
     # Chịu trách nhiệm cho nhiều phiếu thu nợ
     collect_debt = relationship('DebtCollection', backref='employee', lazy=True)
@@ -48,7 +47,8 @@ class Customer(CommonIdentityBase, AuthIndentityBase):
     email = Column(String(40), nullable=False)
     address = Column(String(100))
     phone = Column(Integer)
-    debt = Column(Float, default=0)
+    debt_id = Column(Float, default=0)
+    active = Column(Boolean, default=True)
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
