@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Global variable that any function can be accessible
 var inputID = 0;
 var totalItem = 0;
@@ -5,6 +6,9 @@ var dt = new Date();
 document.getElementById("invoice-date").innerHTML = (("0"+dt.getDate()).slice(-2)) +"."+ (("0"+(dt.getMonth()+1)).slice(-2)) +"."+ (dt.getFullYear()) +" "+ (("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
 
 // Toggle displaying navbar
+=======
+// Ẩn hiện menu bên
+>>>>>>> 9e40ad3082a183b55f4850480996dcd840df27f6
 $(function() {
   // Sidebar toggle behavior
   $('#sidebarCollapse').on('click', function() {
@@ -45,4 +49,29 @@ function printDate() {
     date = Date();
     document.getElementById("invoice-date").innerHTML = date;
     return date;
+<<<<<<< HEAD
+=======
+}
+
+
+// Promises, have a catch()
+function myFunction(id) {
+    fetch('/api/get_value', {
+        method: "post",
+        body: JSON.stringify({
+            "id": id,
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json()).then(data => {
+        console.info(data);
+        var sometime = document.getElementById("something");
+        sometime.innerText = `${data.message}`;
+    }).catch(err => {
+        console.log(err);
+    })
+
+    // promise --> await/async
+>>>>>>> 9e40ad3082a183b55f4850480996dcd840df27f6
 }

@@ -4,6 +4,11 @@ from BookstoreManager.models import *
 from flask import render_template, request, redirect, session, url_for
 from flask_login import login_user
 import hashlib
+<<<<<<< HEAD
+=======
+import json
+import os
+>>>>>>> 9e40ad3082a183b55f4850480996dcd840df27f6
 
 
 # |=============|
