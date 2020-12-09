@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail  
@@ -19,3 +20,10 @@ app.config['MAIL_USE_SSL'] = False
 db = SQLAlchemy(app=app)
 login = LoginManager(app=app)
 mail = Mail(app=app)
+
+
+
+db = SQLAlchemy(app=app)
+admin = Admin(app=app, name='Quản trị hệ thống',
+              template_mode="bootstrap4")
+login = LoginManager(app)

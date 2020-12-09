@@ -1,3 +1,4 @@
+from flask import session
 from flask_login import current_user
 
 from BookstoreManager import app, db
@@ -5,6 +6,29 @@ from BookstoreManager.models import SystemUser, Customer, BookStorage, Invoice, 
     ShippingDetail
 import hashlib
 
+def add_employee(name, username, password):
+    user = SystemUser(name=name, username=username,
+                      password=str(hashlib.md5(password.strip().encode("utf-8")).hexdigest()))
+    db.session.add(user)
+    db.session.commit()
+
+    return user
+
+
+def reset_value():
+    session['valid_debt'] = 'init'
+    # Session lưu thuộc tính nhân viên đã kiểm tra nợ của KH chưa
+    session['debt_checking_status'] = 'init'
+    # Lưu tạm thời tên của khách hàng
+    session['sell_for'] = 'init'
+
+
+class TaskRules:
+    pass
+
+
+
+# ------------------------------------------------------------ Customer --------------------------------------
 
 def add_customer(name, email, username, password, avatar_path, phone, address):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
@@ -191,4 +215,3 @@ def read_join():
     # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
 
     return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == current_user.id).all()
-

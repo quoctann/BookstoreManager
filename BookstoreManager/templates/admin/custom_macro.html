@@ -1,0 +1,10 @@
+<!-- Macro dành cho ô lựa chọn tác vụ ở trang chủ -->
+{% macro task(id, name, description) -%}
+    <div class="card">
+      <div class="card__inner">
+        <h5>{{ id }}</h5>
+        <h3>{{ name }}</h3>
+        <p>{{ description }}</p>
+      </div>
+    </div>
+{%- endmacro %}

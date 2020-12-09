@@ -1,0 +1,57 @@
+{% extends 'admin/index.html' %}
+{{ super() }}
+
+{% block page_content %}
+<div class="sell">
+  <h3 class="py-2">Vui lòng chọn phương thức bán hàng:</h3>
+  <!-- Lựa chọn đối tượng đang bán hàng -->
+  <div class="list-group list-group-horizontal-sm text-center py-2" id="sell-option-list" role="tablist">
+    <a class="list-group-item list-group-item-dark list-group-item-action active" data-toggle="list" href="#retail-offline" role="tab" onload="printDate()" onclick="printDate()">Bán tại quầy</a>
+    <a class="list-group-item list-group-item-dark list-group-item-action" data-toggle="list" href="#retail-online" role="tab">Bán online</a>
+  </div>
+
+  <!-- Tab hiển thị tương ứng -->
+  <div class="tab-content py-4">
+    <div class="tab-pane bg-light rounded shadow p-4 active" id="retail-offline" role="tabpanel">
+      {% if valid_debt == 'violated' %}
+      <p class="my-2 text-center alert alert-warning">Nợ khách hàng vượt quá quy định.
+        <a href="/admin/debtcollectionview" class="text-primary">Thu nợ tại đây.</a>
+      </p>
+      {% endif %}
+
+      {% if valid_debt == 'init' or valid_debt == 'violated' %}
+      <p>Vui lòng kiểm tra nợ của khách hàng trước khi bán</p>
+      <form action="{{ url_for('check_debt') }}" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="customer_id" placeholder="Nhập ID Khách hàng">
+        </div>
+        <div><button type="submit" value="Check" class="btn btn-danger" onclick="init()">Kiểm tra</button></div>
+      </form>
+      {% endif %}
+
+      {% if valid_debt == 'OK' %}
+        <h2 class="text-center mb-4">HÓA ĐƠN BÁN HÀNG</h2>
+        <div class="row">
+            <p class="col-sm-3">Tên khách hàng:</p>
+            <p class="col-sm-9">{{ sell_for }}</p>
+        </div>
+        <div class="row">
+            <p class="col-sm-3">Ngày bán</p>
+            <p class="col-sm-9" id="invoice-date"></p>
+        </div>
+        <button class="btn btn-primary my-2" onclick="addProduct()">Thêm sản phẩm</button>
+        <form action="{{ url_for('check_debt') }}" method="post">
+            <div id="sell_form" class="my-2"></div>
+            <div><button type="submit" value="end_session" class="btn btn-danger" onclick="init()">Kết thúc</button></div>
+        </form>
+      {% endif%}
+
+    </div>
+
+    <div class="tab-pane bg-light rounded shadow p-4" id="retail-online" role="tabpanel">
+      <p>Tracking các đơn hàng trong hệ thống</p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

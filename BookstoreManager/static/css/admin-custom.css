@@ -1,7 +1,214 @@
+/* =========== */
+/* Style chung */
+/* ============*/
 * {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    color: #1a1a1a;
+}
+
+h1, h2, h3, .text-decor {
+    font-family: 'Questrial', sans-serif;
+    font-weight: 500;
+}
+
+.text-normal {
     font-family: 'Roboto', sans-serif;
 }
 
-.nav-bar {
-    color: red !important;
+a, a:hover {
+ text-decoration: none;
+ color: inherit;
+}
+
+/* Tùy biến thanh cuộn */
+::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #bdc3c7;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff414d;
+}
+
+/* ================= */
+/* Menu dọc bên trái */
+/* ================= */
+.vertical-nav {
+  min-width: 17rem;
+  width: 17rem;
+  height: 100vh; /* lấy 100% viewport */
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 3px 3px 10px gray;
+  transition: all 0.4s;
+  overflow-y: scroll;
+}
+
+.page-content {
+  width: calc(100% - 17rem);
+  margin-left: 17rem; /* bằng với width của sidebar */
+  transition: all 0.4s;
+}
+
+/* Ẩn thanh navbar, trigger từ js */
+#sidebar.active {
+  margin-left: -17rem; /* bằng với min-width sidebar, ra khỏi viewport */
+}
+
+#content.active {
+  width: 100%; /* sau khi sidebar out view, lấy 100% viewport */
+  margin: 0;
+}
+
+/* Cho thiết bị màn hình nhỏ, đt nằm ngang hoặc nhỏ hơn 768px */
+@media (max-width: 768px) {
+  #sidebar {
+    margin-left: -17rem;
+  }
+  #sidebar.active {
+    margin-left: 0;
+  }
+  #content {
+    width: 100%;
+    margin: 0;
+  }
+  #content.active {
+    margin-left: 17rem;
+    width: calc(100% - 17rem);
+  }
+}
+
+/* Sidebar active class */
+.navbar-bar > li:hover, a.dropdown-item:hover {
+    background-image: linear-gradient(to right, rgba(119, 170, 119, 0.8), rgba(204, 255, 136, 0));
+}
+
+a.dropdown-item.active {
+    background-image: linear-gradient(to right, rgba(119, 170, 119, 1), rgba(204, 255, 136, 0.5));
+    border: none;
+    outline: none;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+}
+
+a.dropdown-item:active {
+    background-color: rgba(119, 170, 119, 1);
+}
+
+.navbar-bar > .active {
+    background-image: linear-gradient(to right, rgba(119, 170, 119, 1), rgba(204, 255, 136, 0.5));
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= */
+/* Nội dung hiển thị */
+/* ================= */
+body {
+    /* svg background thanks for www.svgbackgrounds.com */
+    background-color: #77aa77;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 2 1'%3E%3Cdefs%3E%3ClinearGradient id='a' gradientUnits='userSpaceOnUse' x1='0' x2='0' y1='0' y2='1' gradientTransform='rotate(0,0.5,0.5)'%3E%3Cstop offset='0' stop-color='%2377aa77'/%3E%3Cstop offset='1' stop-color='%234fd'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='0' y2='1' gradientTransform='rotate(90,0.5,0.5)'%3E%3Cstop offset='0' stop-color='%23cf8' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23cf8' stop-opacity='1'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='2' y2='2' gradientTransform='rotate(167,0.5,0.5)'%3E%3Cstop offset='0' stop-color='%23cf8' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23cf8' stop-opacity='1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='0' y='0' fill='url(%23a)' width='2' height='1'/%3E%3Cg fill-opacity='0'%3E%3Cpolygon fill='url(%23b)' points='0 1 0 0 2 0'/%3E%3Cpolygon fill='url(%23c)' points='2 1 2 0 0 0'/%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* ========== */
+/* Thẻ tác vụ */
+/* ========== */
+.card {
+   cursor: pointer;
+   max-width: 50rem;
+   min-height: 20rem;
+   max-height: 20rem;
+   border-radius: 4px;
+   border: 1px solid rgba(0, 0, 0, 0.1);
+   padding: 25px;
+   transform: scale(1);
+   transition: transform 250ms cubic-bezier(0.07, 0.79, 0.18, 0.92);
+   position: relative;
+}
+
+.card::before {
+   content: "";
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 5px;
+   border-radius: 4px 4px 0 0;
+   background-color: #ff414d;
+   transform: scaleX(0);
+   transition: transform 1s cubic-bezier(0.06, 1.05, 0.24, 0.97);
+   transform-origin: 0;
+}
+
+.card:hover {
+   transform: scale(1.05);
+   box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover::before {
+   transform: scaleX(1);
+}
+
+.card .card__inner h5 {
+   margin-top: 20px;
+   margin-right: 15px;
+   color: #ff414d;
+   font-size: 32px;
+   text-align: right;
+   font-weight: 600;
+}
+
+.card .card__inner h3 {
+   font-size: 40px;
+   margin-bottom: 25px;
+   font-weight: 600;
+}
+
+.card .card__inner p {
+   font-size: 16px;
+   font-weight: 400;
+   line-height: 1.8;
+}
+
+
+/* Alignment các thẻ tác vụ */
+@media (min-width: 768px) {
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 2rem;
+        margin-top: 2rem;
+    }
+}
+
+@media (min-width: 576px) {
+    .grid-container {
+        display: flex-box;
+        grid-gap: 2rem;
+        margin-top: 2rem;
+    }
+}
+
+/* ============== */
+/* Trang bán sách */
+/* ============== */
+.sell .list-group-horizontal-sm {
+    border: none;
+}
+
+.sell .list-group-horizontal-sm .list-group-item.active {
+     background-image: linear-gradient(90deg, rgba(204, 255, 136, 0.5), rgba(119, 170, 119, 0.5));
+     border: rgba(204, 255, 136, 0.5);
+     box-shadow: 0 0 10px gray;
 }

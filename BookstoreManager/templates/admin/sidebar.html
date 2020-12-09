@@ -1,0 +1,30 @@
+<!-- Thanh điều hướng sidebar -->
+<div class="vertical-nav bg-white" id="sidebar">
+    <!-- Thông tin user, avatar -->
+    <div class="py-4 px-3 mb-4 bg-light ">
+        <div class="media d-flex align-items-center"><img src="{{ url_for('static', filename='images/admin/avt.jpg') }}" alt="user avatar" width="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
+            <div class="media-body">
+                {% if current_user.is_authenticated %}
+                    <h4 class="m-0  text-decor font-weight-bold">{{ current_user.name }}</h4>
+                    <p class="font-weight-light text-muted mb-0">{{ current_user.role }}</p>
+                {% else %}
+                    <h4 class="m-0 text-decor font-weight-bold">Unknown</h4>
+                    <p class="font-weight-light text-warning mb-0">Login required</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-bottom">
+        {% block main_menu %}
+        <ul class="navbar-bar mr-auto list-group">
+            {{ layout.menu() }}
+        </ul>
+        {% endblock %}
+
+        {% block menu_links %}
+            {{ layout.menu_links() }}
+        {% endblock %}
+    </div>
+</div>
+<!-- Kết thúc vertical navbar -->
