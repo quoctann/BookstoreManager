@@ -1,0 +1,98 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+    <div class="container col-md-9 ">
+        <h2 class="text-center">ĐĂNG KÝ TÀI KHOẢN</h2>
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            <h5>{{ err_msg }}</h5>
+        </div>
+        {% endif %}
+        <form method="post" action="" enctype="multipart/form-data">
+        <!--    enctype="multipart/form-data"       hỗ trợ lấy file ảnh    -->
+
+            <!--    form điền thông tin     -->
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group col-md-8">
+                <label for="name">Họ tên</label>
+                <input type="text"
+                       required
+                       id="name"
+                       name="name"
+                       class="form-control" />
+            </div>
+                    <div class="form-group col-md-8">
+                <label for="username">Username</label>
+                <input type="text"
+                       required
+                       id="username"
+                       name="username"
+                       class="form-control" />
+            </div>
+                    <div class="form-group col-md-8">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password"
+                                   required
+                                   id="password"
+                                   name="password"
+                                   class="form-control" />
+                        </div>
+                    <div class="form-group col-md-8">
+                <label for="confirm">Xác nhận mật khẩu</label>
+                <input type="password"
+                       required
+                       id="confirm"
+                       name="confirm"
+                       class="form-control" />
+            </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-group col-md-9">
+                        <label for="email">Email</label>
+                        <input type="email"
+                               required
+                               id="email"
+                               name="email"
+                               class="form-control" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="number"
+                               required
+                               id="phone"
+                               name="phone"
+                               class="form-control" />
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="address">Địa chỉ</label>
+                        <input type="text"
+                               required
+                               id="address"
+                               name="address"
+                               class="form-control" />
+                    </div>
+                    <div class="form-group col-md-7">
+                        <label for="avatar">Ảnh đại diện</label>
+                        <input type="file"
+                               required
+                               id="avatar"
+                               name="avatar"
+                               class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!--    Các nút     -->
+            <div class="form-group" >
+                <input type="submit" value="Đăng ký"
+                       class="btn btn-danger" style="margin: 0 7rem; padding: 7px 30px;"/>
+                <a class="btn btn-danger" href="{{ url_for('login_customer') }} "
+                   style="padding: 7px 30px;">Đăng nhập</a>
+                <a class="btn btn-danger" href="{{ url_for('forgot_password') }}"
+                   style="padding: 7px 30px; margin-left: 3rem">Quên mật khẩu</a>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="text-info">Đặt lại mật khẩu</h2>
+        <p>Vui lòng đặt lại mật khẩu cho {{ user_email }} để tiếp tục sử dụng:</p>
+        <form method="post">
+        <div class="form-group">
+                <input type="password" placeholder="Mật khẩu"
+                       name="password" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Xác nhận mật khẩu"
+                       name="confirm" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <input class="btn btn-danger" type="submit" value="Xác nhận thay đổi"/>
+            </div>
+        </form>
+    </div>
+{% endblock %}

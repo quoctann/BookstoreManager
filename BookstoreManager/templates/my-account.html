@@ -1,0 +1,159 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
+                    <li class="breadcrumb-item active">Tài khoảng của tôi</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- My Account Start -->
+        <div class="my-account">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <!--    Thẻ tap     -->
+                    <div class="col-md-3">
+                        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoảng chi tiết</a>
+                            <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-shopping-bag"></i>Đặt hàng</a>
+                            <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab"><i class="fa fa-credit-card"></i>Thanh Toán</a>
+                        </div>
+                    </div>
+
+                    <!--    Tap hiển thị   -->
+                    <div class="col-md-8">
+                        <div class="tab-content">
+
+                            <!--    Nơi cập nhập thông tin khách hàng   -->
+                            <div class="tab-pane fade show active" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                                <h4>Thông tin chi tiết</h4>
+                                <div class="row">
+
+                                    <!--    Nơi cập nhập thông tin   -->
+                                    <div class="col-md-5">
+                                        <!--    Tên   -->
+                                        <div class="form-group col-md-12">
+                                            <label for="name">Họ tên</label>
+                                            <input type="text" id="name" name="name" class="form-control" value="{{  current_user.name }}"/>
+                                        </div>
+
+                                        <!--    Số điện thoại   -->
+                                        <div class="form-group col-md-12">
+                                            <label for="phone">Số điện thoại</label>
+                                            <input type="number" id="phone" name="phone" class="form-control" value="{{ current_user.phone }}"/>
+                                        </div>
+
+                                        <!--    Nút cập nhập thông tin - nên chỉnh về input  -->
+                                        <div class="col-md-12">
+                                        <button class="btn">Cập nhập</button>
+                                        <br><br>
+                                    </div>
+
+                                    </div>
+
+                                    <div class="col-md-7 ">
+                                        <!--    Email   -->
+                                        <div class="form-group col-md-9">
+                                            <label for="email">Email</label>
+                                            <input type="email" value="{{ current_user.email }}" id="email" name="email" class="form-control" />
+                                        </div>
+
+                                        <!--    Address   -->
+                                        <div class="form-group col-md-12">
+                                            <label for="address">Địa chỉ</label>
+                                            <input type="text" value="{{ current_user.address }}" id="address" name="address" class="form-control" />
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!--    Thay đổi mật khẩu   -->
+                                <h4>Thay đổi mật khẩu</h4>
+                                <!--    Mật khẩu hiện tại   -->
+                                <div class="col-md-8 row">
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="password" placeholder="Mật khẩu hiện tại. . .">
+                                    </div>
+                                </div>
+
+                                <!--    Mật khẩu Mới   -->
+                                <div class="col-md-8 row ">
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="text" placeholder="Mật khẩu mới. . .">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="text" placeholder="Nhập lại mật khẩu. . .">
+                                    </div>
+
+                                    <!--    Nút cập nhập pass - nên chỉnh về input  -->
+                                    <div class="col-md-12">
+                                        <button class="btn">Thay đổi</button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Product</th>
+                                                <th>Date</th>
+                                                <th>Price</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Product Name</td>
+                                                <td>01 Jan 2020</td>
+                                                <td>$99</td>
+                                                <td>Approved</td>
+                                                <td><button class="btn">View</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Product Name</td>
+                                                <td>01 Jan 2020</td>
+                                                <td>$99</td>
+                                                <td>Approved</td>
+                                                <td><button class="btn">View</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>Product Name</td>
+                                                <td>01 Jan 2020</td>
+                                                <td>$99</td>
+                                                <td>Approved</td>
+                                                <td><button class="btn">View</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
+                                <h4>Payment Method</h4>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non. Praesent in faucibus tellus, sed gravida lacus. Vivamus eu diam eros. Aliquam et sapien eget arcu rhoncus scelerisque.
+                                </p> 
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- My Account End -->
+
+{% endblock %}
