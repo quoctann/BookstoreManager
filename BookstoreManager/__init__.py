@@ -2,14 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_login import LoginManager
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-from flask_mail import Mail  
-
->>>>>>> 974f5fb6b309adcd507256796c115eb5c8433bfe
-=======
->>>>>>> 9e40ad3082a183b55f4850480996dcd840df27f6
+from flask_mail import Mail
 
 app = Flask(__name__)
 app.secret_key = "y1478whdbh1183132qwchda"

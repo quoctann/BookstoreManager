@@ -1,7 +1,7 @@
 from BookstoreManager import app, login, utils
 from BookstoreManager.admin import *
 from BookstoreManager.models import *
-from flask import render_template, request, redirect, session, url_for
+from flask import render_template, request, redirect, session, url_for, jsonify
 from flask_login import login_user
 import hashlib
 import json
@@ -16,11 +16,7 @@ import os
 # Điều hướng tới trang chủ mặc định
 @app.route("/")
 def index():
-    session['valid_debt'] = 'init'
-    # Session lưu thuộc tính nhân viên đã kiểm tra nợ của KH chưa
-    session['debt_checking_status'] = 'init'
-    # Lưu tạm thời tên của khách hàng
-    session['sell_for'] = 'init'
+    utils.reset_value()
     return render_template("index.html")
 
 
@@ -41,7 +37,6 @@ def user_load(user_id):
 @app.route("/login-admin", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
 def login_admin():
-    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if request.method == "POST":
         # Lấy dữ liệu từ form (thông qua request)
         username = request.form.get("loginUsername")
@@ -61,11 +56,9 @@ def login_admin():
 # Xử lý action thêm nhân viên
 @app.route("/register-employee/", defaults={'err_msg': None}, methods=["GET", "POST"])
 @app.route("/register-employee/<err_msg>", methods=["GET", "POST"])
-# Phương thức này được gọi từ login.html
 def register_employee(err_msg):
-    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if not err_msg:
-        # Nếu không có lỗi và bút submit được trigger
+        # Nếu không có lỗi và nút submit được trigger
         if request.method == "POST":
             # Lấy dữ liệu từ form (thông qua request)
             username = request.form.get("registerUsername")
@@ -94,6 +87,10 @@ def register_employee(err_msg):
 # Xử lý action bán sách
 @app.route('/admin/sellview/', methods=["GET", "POST"])
 def check_debt():
+    # valid_debt lưu trạng thái của tác vụ với các giá trị:
+    # init: khởi tạo, bắt đầu bán hàng
+    # violated: vi phạm quy định, xuất thông báo lỗi
+    # OK: khách hàng hợp lệ, cho phép bán
     if request.method == "POST" and \
             (session['valid_debt'] == 'init' or session['valid_debt'] == 'violated'):
         customer_id = request.form.get('customer_id')
@@ -112,6 +109,17 @@ def check_debt():
         session['valid_debt'] = 'init'
 
     if request.method == "POST" and (session['valid_debt'] == 'OK'):
+        # Input name: quantity-số là số lượng sản phẩm tương ứng với input name 'số' mã id sản phẩm
+        # request.form sẽ lấy tất cả các request từ form
+        # request.form sẽ trả về ImmutableMultiDict, parse sang dict bằng to_dict để sử dụng len()
+        # arg là trường key của một phần tử dict tương đương với input name
+        for arg in request.form:
+            for count in range(len(request.form.to_dict())):
+                if arg == ('quantity-' + str(count)):
+                    print('quantity is', request.form.get(arg))
+                elif arg == str(count):
+                    print('product is', request.form.get(arg))
+        print('OK')
         pass
 
     # Gọi phương thức index(self) từ admin.py

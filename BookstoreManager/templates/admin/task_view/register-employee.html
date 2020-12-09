@@ -16,4 +16,7 @@
         </div>
         <div><button type="submit" value="Login" class="btn btn-danger">Thêm nhân viên</button></div>
     </form>
+    {% if err_msg %}
+    <div class="alert alert-warning my-2">{{ err_msg }}</div>
+    {% endif %}
 {% endblock %}

@@ -37,7 +37,7 @@
         </div>
         <div class="row">
             <p class="col-sm-3">Ngày bán</p>
-            <p class="col-sm-9" id="invoice-date">`$(Date().toString())`</p>
+            <p class="col-sm-9" id="invoice-date"></p>
         </div>
         <button class="btn btn-primary my-2" onclick="addProduct()">Thêm sản phẩm</button>
         <form action="{{ url_for('check_debt') }}" method="post">
