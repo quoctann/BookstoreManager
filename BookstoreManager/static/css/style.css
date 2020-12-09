@@ -2478,3 +2478,6 @@ background-size: cover;
   background-size: cover;
 }
 
+body > div.checkout > div > form > div > div.col-lg-4.alert.alert-warning {
+    margin-bottom: 30px;
+}

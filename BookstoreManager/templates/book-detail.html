@@ -17,6 +17,8 @@
         </div>
         <!-- Breadcrumb End -->
 
+
+
         <!-- Product Detail Start -->
         <div class="product-detail">
             <div class="container-fluid">
@@ -59,55 +61,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-                        <!--    nơi hiển tin sách liên quan cùng thể loại -->
-                        <div class="product">
-                            <div class="section-header">
-                                <h1>Sản phẩm liên quan</h1>
-                            </div>
-
-                            <div class="row align-items-center product-slider product-slider-3">
-                                {% for b in book_relate %}
-                                <div class="col-lg-3">
-                                    <div class="product-item">
-                                    <div class="product-title">
-                                        <a href="#">{{ b.name }}</a>
-                                        <div class="ratting">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                    </div>
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="javascript:;"
-                                               onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                <i class="fa fa-cart-plus"></i>
-                                            </a>
-                                            <a href="javascript:;"
-                                               onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                <i class="fa fa-heart"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="product-price">
-                                        <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
-                                        <a class="btn" href="{{ url_for('checkout') }}"
-                                               onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                <i class="fa fa-shopping-cart"></i>Mua ngay</a>
-                                    </div>
-                                </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
                     </div>
 
                     <!-- Side Bar Start -->
@@ -138,5 +91,65 @@
             </div>
         </div>
         <!-- Product Detail End -->
+
+
+
+        <!-- Featured Product Start -->
+                                        <!--    container hiển thị sách có trong db    -->
+        <div class="featured-product product">
+            <div class="container-fluid">
+                <div class="section-header">
+                    <h1>Sản phẩm liên quan</h1>
+                </div>
+
+                    <!--    View ngắn gọn mô tả về sách, hiển thị bằng vòng lặp for query xuống db  -->
+                <div class="grid-container">
+                    {% for b in book_relate %}
+                    <div class="">
+                        <div class="product-item">
+
+                            <!--    Tên, mô tả đánh giá bằng sao    -->
+                            <div class="product-title">
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+
+                            <!--    Ảnh về sách, các thao tác tiện lợi  -->
+                            <div class="product-image">
+                                <a href="product-detail.html">
+                                    <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                </a>
+                                <div class="product-action">
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!--    Giá sách, thao tác mua  -->
+                            <div class="product-price">
+                                <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                <a class="btn" href="{{ url_for('checkout') }}"
+                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                    <i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Featured Product End -->
 
 {% endblock %}

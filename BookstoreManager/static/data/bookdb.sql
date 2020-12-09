@@ -1,5 +1,7 @@
-INSERT INTO `webstoredb`.`system_user` (`name`, `username`, `password`) VALUES ('vin', 'admin', '202cb962ac59075b964b07152d234b70');
-INSERT INTO `webstoredb`.`employee` (`name`, `username`, `password`, `role`) VALUES ('auto', 'may', '202cb962ac59075b964b07152d234b70', 'nhanvien');
+INSERT INTO `webstoredb`.`system_user` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Admin', 'images/admin/vin.peg', 'admin', '202cb962ac59075b964b07152d234b70', 'Admin');
+INSERT INTO `webstoredb`.`employee` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Nhân viên', 'images/admin/vin.peg', 'nhanvien', '202cb962ac59075b964b07152d234b70', 'Admin');
+
+
 
 
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Con Chim Xanh Biếc', '30', 'Nguyễn Nhật Ánh', 'Tiểu Thuyết', '97500', 'images/conchimxanh.jpg');

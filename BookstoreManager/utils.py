@@ -57,14 +57,18 @@ def check_mail(email):
     return Customer.query.filter(Customer.email == email).first()
 
 
-# Chức năng lọc dữ liệu theo 1 từ khóa - bar-footer
-# chức năng này cần kết bảng, và tạo thêm bảng BookCate
-def read_books(kw=None):
-    books = BookStorage.query
+# Chức năng lọc dự liệu bằng kw - thanh tìm kiếm trên menu
+def search_by_kw(kw=None):
     if kw:
-        books = books.filter(BookStorage.name.contains(kw))
+        books = get_book_by_cate(kw)
+        if books:
+            return books
+        else:
+            books = BookStorage.query.filter(BookStorage.name.contains(kw))
+            if books:
+                return books
 
-    return books.all()
+        # return BookStorage.query.filter(BookStorage.author.contains(kw))
 
 
 # Chức năng lọc dữ liệu - book-list
@@ -92,7 +96,7 @@ def get_book_by_id(book_id):
 
 
 def get_book_by_cate(cate_id):
-    return BookStorage.query.filter(BookStorage.category == cate_id).all()
+    return BookStorage.query.filter(BookStorage.category.contains(cate_id)).all()
 
 
 #   ----------------------    Phần xử lý chức năng giỏ hàng -------------------
@@ -170,7 +174,7 @@ def read_wish():
 
 # Lấy dữ liệu sách theo book_id trong wishlist
 def get_wish(book_id):
-    return WishDetail.query.filter(book_id  == WishDetail.book_id).first()
+    return WishDetail.query.filter(book_id == WishDetail.book_id).first()
 
 
 # Xóa sách ra khỏi danh sách yêu thích - có cập nhập xuống db

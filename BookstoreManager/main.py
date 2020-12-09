@@ -24,6 +24,7 @@ randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
 # đến đối tượng đang đăng nhập
 @login.user_loader
 def user_load(user_id):
+    # return SystemUser.query.get(user_id)
     return Customer.query.get(user_id)
 
 
@@ -31,8 +32,10 @@ def user_load(user_id):
 
 
 
+
+
 # |=====================|
-# | XỬ LÝ PHÂN HỆ ADMIN |
+    # | XỬ LÝ PHÂN HỆ ADMIN |
 # |=====================|
 
 
@@ -47,11 +50,12 @@ def login_admin():
         # Dùng thuật toán MD5 băm mã ra dưới dạng hexa
         password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
         # Strip() dùng để bỏ khoảng trắng ở hai đầu chuỗi ký tự
-        user = SystemUser.query.filter(SystemUser.username == username.strip(),
+        user = SystemUser.query.filter(SystemUser.username == username,
                                        SystemUser.password == password).first()
         # Nếu không giá trị thì trả về null
         if user:
             login_user(user=user)
+
     # Thực tế là chuyển đến trang admin -> index.html
     return redirect("/admin")
 
@@ -100,7 +104,7 @@ def check_debt():
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
-            debt = int(customer.debt)
+            debt = int(customer.debt_amout)
             # Kiểm tra nghiệp vụ
             if debt and debt <= 20000:
                 session['valid_debt'] = 'OK'
@@ -285,6 +289,7 @@ def recovery_account(token, user_email):
 # Điều hướng tới trang chủ mặc định
 @app.route('/')
 def index():
+    utils.reset_value()
     booknew = BookStorage.query.filter(BookStorage.instock > 0).limit(10).all()
     book_tieuthuyet = BookStorage.query.filter(BookStorage.category.startswith("Tieu Thuyet")).limit(10).all()
     return render_template('index.html', booknew=booknew, book_tieuthuyet=book_tieuthuyet)
@@ -292,22 +297,41 @@ def index():
 
 # Xem các thể loại sách
 @app.route('/book-list')
-def book_list(cate_id=None):
+def book_list():
+    kw = request.form.get('kw2')
+    search = utils.search_by_kw(kw)
+
     author = request.args.get('author')
     cate_id = request.args.get('category_id')
-    kw = request.args.get('kw')
+    kw2 = request.args.get('kw2')
     from_price = request.args.get('from_price')
     to_price = request.args.get('to_price')
-    books = utils.read_books(cate_id=cate_id, kw=kw, from_price=from_price, to_price=to_price, author=author)
+    books = utils.read_books(cate_id=cate_id, kw=kw2, from_price=from_price, to_price=to_price, author=author)
 
-    return render_template('book-list.html', books=books, cate_id=cate_id)
+    return render_template('book-list.html', books=books, cate_id=cate_id, search=search)
+
+
+
+
+
+
+
+
+@app.route('/bar-footer')
+def bar():
+    kw = request.args.get('kw')
+    search = utils.search_by_kw(kw)
+    return render_template('bar-footer.html', search=search)
 
 
 # list sách theo category đường dẫn
 @app.route('/book-list/<cate_id>')
 def book_list_by_cate(cate_id):
+    kw = request.args.get('kw')
+    search = utils.search_by_kw(kw)
+
     books = utils.get_book_by_cate(cate_id)
-    return render_template('book-list.html', books=books, cate_id=cate_id)
+    return render_template('book-list.html', books=books, cate_id=cate_id, search=search)
 
 
 # Xem thông tin sách cụ thể

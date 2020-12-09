@@ -84,14 +84,15 @@ class CustomerView(AuthenticatedView):
 # Template thông thường
 class AdminView(AuthenticatedView):
     def is_accessible(self):
+        # return current_user.is_authenticated        # change
         return current_user.is_authenticated and current_user.role == 'Admin'
 
 
 # Model view dành riêng cho admin
 class AdminModelView(CustomModelView):
     def is_accessible(self):
+        # return current_user.is_authenticated        # change
         return current_user.is_authenticated and current_user.role == 'Admin'
-
 
 # View của form đăng ký thêm nhân viên
 class RegisterView(AdminView):
