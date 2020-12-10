@@ -141,11 +141,11 @@ def check_debt():
 def login_customer():
     err_msg = ""
     if request.method == 'POST':
-        # lấy thông tin đăng nhập
+        # Lấy thông tin đăng nhập
         username = request.form.get('username')
         password = request.form.get('password', '')
 
-        # kiểm tra đăng nhập
+        # Kiểm tra đăng nhập, query từ bảng Customer
         customer = utils.check_login(username=username, password=password)
         if customer:
             login_user(user=customer)
@@ -159,6 +159,7 @@ def login_customer():
     return render_template("login.html", err_msg=err_msg)
 
 
+# Đăng xuất
 @app.route("/logout")
 def logout():
     logout_user()
@@ -167,9 +168,11 @@ def logout():
         del session['cart']
     if 'wish' in session:
         del session['wish']
+    utils.reset_value()
     return redirect(url_for("index"))
 
-# Xử lý action register-Customer
+
+# Xử lý action register khách hàng
 @app.route('/register', methods=['get', 'post'])
 def register():
     err_msg = ""
@@ -187,6 +190,7 @@ def register():
             address = request.form.get('address')
 
             avatar = request.files["avatar"]
+            # Tạo đường dẫn lưu vào /static/images/upload/tên_file
             avatar_path = 'images/upload/%s' % avatar.filename
             avatar.save(os.path.join(app.root_path,
                                      'static/',
@@ -443,9 +447,9 @@ def delete_wish():
         })
 
 
-# |===================================|
-# | APPLICATION PROGRAMMING INTERFACE |
-# |===================================|
+# |=====================|
+# | API SỬ DỤNG Ở ADMIN |
+# |=====================|
 
 # Test lấy giá trị
 @app.route('/api/get_value', methods=['post'])
@@ -458,6 +462,11 @@ def get_value():
         })
     else:
         pass
+
+
+# |==========================|
+# | API SỬ DỤNG Ở KHÁCH HÀNG |
+# |==========================|
 
 
 # Phần xử lý chức năng giỏ hàng
