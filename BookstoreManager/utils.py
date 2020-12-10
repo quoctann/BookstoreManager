@@ -194,7 +194,6 @@ def del_wish(book_id):
 
 # --------------    my-acc    -------------
 
-############################################################ sửa thông tin khách hàng  - chưa xong
 #   Thay đổi thông tin của khách hàng
 def change_info(name, phone, email, address, avatar_path=None):
     user = Customer.query.get(current_user.id)
@@ -225,7 +224,7 @@ def change_password(new_password):
     except Exception as ex:
         print(ex)
         return False
-####################################
+
 
 #   Xem lịch sử hóa đơn của khách hàng: khách hàng có thể có nhiều hóa đơn
 #   có current_user.id trong Invoice        : danh sách hóa đơn đã thanh toán của người dùng hiện thời
@@ -234,13 +233,13 @@ def read_my_invoice():
 
 
 #   Lấy id của hóa đơn
-#   từ ds hóa đơn của người dùng - xem chi tiết từng hóa đơn 1:  Lấy tổng tiền         ############## dùng
+#   từ ds hóa đơn của người dùng - xem chi tiết từng hóa đơn 1:  Lấy tổng tiền
 def get_invoice_by_id(invoice_id):
     return Invoice.query.filter(Invoice.invoice_id == invoice_id).first()
 
 
 #   Từ hóa đơn truy vấn để xem thông tin sách đã mua
-#   Từ book_id có trong ds InvoiceDetail đã lọc, kết bảng để lấy thông tin sách đã mua          ############### dùng
+#   Từ book_id có trong ds InvoiceDetail đã lọc, kết bảng để lấy thông tin sách đã mua
 def read_invoice_get_info_book(invoice_id):
     return db.session.query(BookStorage.name, InvoiceDetail.price, InvoiceDetail.quantity).join(InvoiceDetail).\
                             filter(InvoiceDetail.invoice_id == invoice_id).all()
@@ -256,28 +255,3 @@ def invoice_info(invoice_id):
         total_price = total_price + b.quantity * b.price
 
     return total_quantity, total_price, id
-
-
-
-
-
-##################################################################
-
-
-
-
-# isouter=True : Kết trái
-
-def read_join():
-    WishDetail.query.filter(WishDetail.wish_id == current_user.id)
-
-    # Có nhiêu lấy hết, trùng dữ liệu: theo wishdetail
-    # return db.session.query(BookStorage).join(WishDetail)
-
-    # return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == current_user.id)
-
-    # return db.session.query(WishDetail, WishDetail.wish_id == current_user.id).join(BookStorage.wish_id)
-
-    # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
-
-    return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == current_user.id).all()

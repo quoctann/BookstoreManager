@@ -1851,8 +1851,9 @@ h2 {
 }
 
 .my-account .tab-content {
+/*  change  */
     padding: 30px;
-    background: #ffffff;
+    background: #b7f7d4;
 }
 
 .my-account .tab-content .table {

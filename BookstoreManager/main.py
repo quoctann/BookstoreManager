@@ -681,10 +681,9 @@ def read_invoice_by_id(invoice_id):
     return render_template('invoice-detail.html', invoice_detail=invoice_detail, total=total)
 
 
-#######################################################################
 # ---------------------- test chức năng mới ------------------------
-@app.route('/test', methods=["get", "post"])
-def test():
+@app.route('/change-password', methods=["get", "post"])
+def change_password():
     err_msg = ""
     if request.method == 'POST':
         password = request.form.get('password')
@@ -698,7 +697,7 @@ def test():
                 err_msg = "Mật khẩu mới không khớp"
         else:
             err_msg = "Mật khẩu bận nhập sai!"
-    return render_template('test.html', err_msg=err_msg)
+    return render_template('change-password.html', err_msg=err_msg)
 
 
 if __name__ == "__main__":
