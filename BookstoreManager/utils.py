@@ -49,7 +49,7 @@ def check_login(username, password):
                                  Customer.password == password).first()
 
 
-def check_Customer(username):
+def check_customer(username):
     return Customer.query.filter(Customer.username == username).first()
 
 
@@ -194,15 +194,75 @@ def del_wish(book_id):
 
 # --------------    my-acc    -------------
 
-# sửa thông tin khách hàng  - chưa xong
-def change_info(user_id, name, phone, email, address):
-    user = Customer.query.filter(Customer.id == user_id).first()
-    return user_id
+############################################################ sửa thông tin khách hàng  - chưa xong
+#   Thay đổi thông tin của khách hàng
+def change_info(name, phone, email, address, avatar_path=None):
+    user = Customer.query.get(current_user.id)
+    user.name = name
+    user.phone = phone
+    user.email = email
+    user.address = address
+    if avatar_path:
+        user.avatar = avatar_path
+    try:
+        db.session.add(user)
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
 
 
-# view lịch sử hóa đơn của khách hàng
+#   thay đổi password
+def change_password(new_password):
+    new_password = str(hashlib.md5(new_password.strip().encode('utf-8')).hexdigest())
+    user = Customer.query.get(current_user.id)
+    user.password = new_password
+    try:
+        db.session.add(user)
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
+####################################
+
+#   Xem lịch sử hóa đơn của khách hàng: khách hàng có thể có nhiều hóa đơn
+#   có current_user.id trong Invoice        : danh sách hóa đơn đã thanh toán của người dùng hiện thời
 def read_my_invoice():
-    return Invoice.query.filter(Invoice.customer_id == current_user.id)
+    return Invoice.query.filter(Invoice.customer_id == current_user.id).all()
+
+
+#   Lấy id của hóa đơn
+#   từ ds hóa đơn của người dùng - xem chi tiết từng hóa đơn 1:  Lấy tổng tiền         ############## dùng
+def get_invoice_by_id(invoice_id):
+    return Invoice.query.filter(Invoice.invoice_id == invoice_id).first()
+
+
+#   Từ hóa đơn truy vấn để xem thông tin sách đã mua
+#   Từ book_id có trong ds InvoiceDetail đã lọc, kết bảng để lấy thông tin sách đã mua          ############### dùng
+def read_invoice_get_info_book(invoice_id):
+    return db.session.query(BookStorage.name, InvoiceDetail.price, InvoiceDetail.quantity).join(InvoiceDetail).\
+                            filter(InvoiceDetail.invoice_id == invoice_id).all()
+
+
+#
+def invoice_info(invoice_id):
+    total_quantity, total_price = 0, 0
+    info = read_invoice_get_info_book(invoice_id)
+    id = invoice_id
+    for b in info:
+        total_quantity = total_quantity + b.quantity
+        total_price = total_price + b.quantity * b.price
+
+    return total_quantity, total_price, id
+
+
+
+
+
+##################################################################
+
 
 
 

@@ -340,7 +340,6 @@ def search_by_kw(kw):
 #     return render_template('bar-footer.html', search=search)
 
 
-
 # Xem các thể loại sách
 @app.route('/book-list')
 def book_list():
@@ -636,7 +635,7 @@ def wishlist():
 
 
 # ------------------    Các view: lịch sử đặt hàng, chỉnh sửa thông tin của khách hàng ----------------
-@app.route('/my-account')
+@app.route('/my-account', methods=['get', 'post'])
 @login_required
 def my_account():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -644,15 +643,62 @@ def my_account():
     if kw:
         return redirect(url_for('search_by_kw', kw=kw))
 
+    err_msg = ""
+    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+
+        avatar = request.files["avatar"]
+        if avatar:
+            avatar_path = 'images/upload/%s' % avatar.filename
+            avatar.save(os.path.join(app.root_path, 'static/', avatar_path))
+        else:
+            avatar_path = None
+        if name and phone and email and address:
+            if utils.change_info(name, phone, email, address, avatar_path):
+                err_msg = "Bạn đã thay đổi thông tin thành công"
+            else:
+                err_msg = "Fails - Something Wrong!"
+
     invoice = utils.read_my_invoice()
-    return render_template('my-account.html', invoice=invoice)
+    return render_template('my-account.html', err_msg=err_msg, invoice=invoice)
 
 
+# Xem lịch xử hóa đơn
+@app.route('/invoice-detail/<int:invoice_id>')
+@login_required
+def read_invoice_by_id(invoice_id):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
+    invoice_detail = utils.read_invoice_get_info_book(invoice_id)
+    total = utils.invoice_info(invoice_id)
+    return render_template('invoice-detail.html', invoice_detail=invoice_detail, total=total)
+
+
+#######################################################################
 # ---------------------- test chức năng mới ------------------------
-@app.route('/test')
-def get_book():
-    book = utils.read_books()
-    return render_template('test.html', book=book)
+@app.route('/test', methods=["get", "post"])
+def test():
+    err_msg = ""
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if utils.check_login(current_user.username, password):
+            new = request.form.get('new')
+            confirm = request.form.get('confirm')
+            if confirm.strip() == new.strip():
+                if utils.change_password(new):
+                    return redirect(url_for('index'))
+            else:
+                err_msg = "Mật khẩu mới không khớp"
+        else:
+            err_msg = "Mật khẩu bận nhập sai!"
+    return render_template('test.html', err_msg=err_msg)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,81 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('my_account') }}">Tài khoảng của tôi</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Chi tiết hóa đơn</a></li>
+                    <li class="breadcrumb-item active">mã id: {{ total[2] }}</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+
+        <!-- Cart Start -->
+        <div class="cart-page">
+            <div class="">
+                <div class="row">
+                    <!--    list sách có trong giỏ    -->
+                    <div class="col-lg-8">
+                        <div class="cart-page-inner">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <!--    Tiêu đề   -->
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Tên sách</th>
+                                            <th>Giá</th>
+                                            <th>Số lượng</th>
+                                            <th>Tổng</th>
+                                        </tr>
+                                    </thead>
+
+                                    <!--   Thông tin sách trong giỏ  -->
+                                    <tbody class="align-middle">
+                                    <!--    Vòng lặp for   -->
+                                    {% for b in invoice_detail %}
+                                        <!--    Tên sách   -->
+                                        <tr>
+                                            <td>{{ b.name }}</td>
+
+                                            <!--   giá   price là key của từ điển cart   -->
+                                            <td>{{ "{:,}".format(b.price) }} VNĐ</td>
+
+                                            <!--    Số lượng  -->
+                                            <td>{{ b.quantity }}</td>
+
+                                            <!--    Tổng giá: giá * số lượng   -->
+                                            <td>{{ "{:,}".format(b.price * b.quantity) }} VNĐ</td>
+                                        </tr>
+                                    {% endfor %}
+                                    <!--    kết thúc vòng lặp   -->
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="cart-page-inner">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning">
+                                        <div class="cart-content">
+                                            <h1 class="text-center">- - - HÓA ĐƠN - - -</h1>
+                                            <h2>Số lượng: {{ total[0] }}</h2>
+                                            <h2>Tổng tiền: {{ "{:,}".format(total[1]) }} VNĐ</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Cart End -->
+
+{% endblock %}
