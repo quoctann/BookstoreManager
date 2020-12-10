@@ -6,7 +6,11 @@ from BookstoreManager.models import *
 from flask_login import current_user, logout_user
 
 
-# VIEW CƠ SỞ
+# |============|
+# | VIEW CƠ SỞ |
+# |============|
+
+
 # Tùy chỉnh lại model view cho phù hợp với layout
 class CustomModelView(ModelView):
     list_template = 'admin/model/model_list.html'
@@ -19,7 +23,6 @@ class CustomModelView(ModelView):
     column_exclude_list = ['password', ]
 
 
-# View của nhân viên
 # Khi đăng nhập mới xem được view này, dùng cho view tùy chỉnh
 class AuthenticatedView(BaseView):
     __abstract__ = True
@@ -42,8 +45,16 @@ class LogoutView(AuthenticatedView):
         return redirect("/admin")
 
 
-# VIEW TÁC VỤ
-# Các view của tác vụ thông thường
+# |=============|
+# | VIEW TÁC VỤ |
+# |=============|
+
+
+# |--------------------------------------------|
+# | CÁC VIEW TÁC VỤ THÔNG THƯỜNG CỦA NHÂN VIÊN |
+# |--------------------------------------------|
+
+
 class SellView(AuthenticatedView):
     @expose('/')
     def index(self):
@@ -80,7 +91,10 @@ class CustomerView(AuthenticatedView):
         return self.render('admin/task_view/customer.html')
 
 
-# VIEW ADMIN
+# |------------------------------------------|
+# | CÁC VIEW TÁC VỤ CHỈ ADMIN ĐƯỢC THỰC HIỆN |
+# |------------------------------------------|
+
 # Template thông thường
 class AdminView(AuthenticatedView):
     def is_accessible(self):
@@ -93,6 +107,7 @@ class AdminModelView(CustomModelView):
     def is_accessible(self):
         # return current_user.is_authenticated        # change
         return current_user.is_authenticated and current_user.role == 'Admin'
+
 
 # View của form đăng ký thêm nhân viên
 class RegisterView(AdminView):
@@ -114,7 +129,11 @@ class CanCreate(AdminModelView):
     column_display_pk = True
 
 
-# THÊM VIEW VÀO TRANG CHỦ
+# |=========================|
+# | THÊM VIEW VÀO TRANG CHỦ |
+# |=========================|
+
+
 # Tác vụ
 admin.add_view(SellView(name="Bán sách"))
 admin.add_view(DebtCollectionView(name="Thu nợ"))

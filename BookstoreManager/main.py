@@ -8,15 +8,13 @@ import hashlib, os, json
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
-randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
-
 
 # |=============|
 # | XỬ LÝ CHUNG |
 # |=============|
 
 
-# Điều hướng tới trang chủ mặc định
+randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
 
 
 # Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
@@ -24,7 +22,9 @@ randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
 # đến đối tượng đang đăng nhập
 @login.user_loader
 def user_load(user_id):
-    # return SystemUser.query.get(user_id)
+    # if current_user.role == 'Admin' or current_user.role == 'Employee':
+    #     print(current_user.role)
+    #     return Employee.query.get(user_id)
     return Customer.query.get(user_id)
 
 
@@ -44,8 +44,8 @@ def login_admin():
         # Dùng thuật toán MD5 băm mã ra dưới dạng hexa
         password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
         # Strip() dùng để bỏ khoảng trắng ở hai đầu chuỗi ký tự
-        user = SystemUser.query.filter(SystemUser.username == username,
-                                       SystemUser.password == password).first()
+        user = Employee.query.filter(Employee.username == username,
+                                       Employee.password == password).first()
         # Nếu không giá trị thì trả về null
         if user:
             login_user(user=user)
@@ -98,7 +98,7 @@ def check_debt():
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
-            debt = int(customer.debt_amout)
+            debt = int(customer.debt)
             # Kiểm tra nghiệp vụ
             if debt and debt <= 20000:
                 session['valid_debt'] = 'OK'
@@ -127,9 +127,9 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
-# |===================================|
-# | APPLICATION PROGRAMMING INTERFACE |
-# |===================================|
+# |================|
+# | API PHÍA ADMIN |
+# |================|
 
 # Test lấy giá trị
 @app.route('/api/get_value', methods=['post'])
@@ -144,9 +144,12 @@ def get_value():
         pass
 
 
-# ----------------------------------------------------------- Customer ------------------------------------------------
+# |===========================|
+# | CHỨC NĂNG PHÍA KHÁCH HÀNG |
+# |===========================|
 
-# Xử lý action login-Customer
+
+# Xử lý action đăng nhập cho khách hàng
 @app.route('/login', methods=["get", "post"])
 def login_customer():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -156,11 +159,11 @@ def login_customer():
 
     err_msg = ""
     if request.method == 'POST':
-        # lấy thông tin đăng nhập
+        # Lấy thông tin đăng nhập
         username = request.form.get('username')
         password = request.form.get('password', '')
 
-        # kiểm tra đăng nhập
+        # Kiểm tra đăng nhập
         customer = utils.check_login(username=username, password=password)
         if customer:
             login_user(user=customer)
@@ -174,6 +177,7 @@ def login_customer():
     return render_template("login.html", err_msg=err_msg)
 
 
+# Xử lý chức năng đăng xuất
 @app.route("/logout")
 def logout():
     logout_user()
@@ -182,10 +186,13 @@ def logout():
         del session['cart']
     if 'wish' in session:
         del session['wish']
+    # Reset bộ nhớ tạm của admin
+    utils.reset_value()
+
     return redirect(url_for("index"))
 
 
-# Xử lý action register-Customer
+# Xử lý action đăng ký tài khoản của khách hàng
 @app.route('/register', methods=['get', 'post'])
 def register():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -206,12 +213,13 @@ def register():
             username = request.form.get('username')
             phone = request.form.get('phone')
             address = request.form.get('address')
-
+            # Xử lý đường dẫn lưu hình vào ./static/images/upload/tên_file
             avatar = request.files["avatar"]
             avatar_path = 'images/upload/%s' % avatar.filename
             avatar.save(os.path.join(app.root_path,
                                      'static/',
                                      avatar_path))
+            # Thêm khách hàng vào hệ thống (lưu csdl)
             if utils.add_customer(username=username, password=password, avatar_path=avatar_path, name=name,
                                   email=email, address=address, phone=phone):
                 return redirect('/')
@@ -223,7 +231,7 @@ def register():
     return render_template('register.html', err_msg=err_msg)
 
 
-# Xử lý action ForgotPassword-Customer
+# Xử lý action quên mật khẩu của khách hàng
 @app.route("/forgot_password", methods=['GET', 'POST'])
 def forgot_password():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -235,16 +243,20 @@ def forgot_password():
     if request.method == 'POST':
         try:
             email = request.form.get("email")
+            # Nếu check có email của khách hàng trong db
             if utils.check_mail(email=email):
+                # Thì chuyển đến trang thông báo đã gửi yêu cầu khôi phục
                 return redirect(url_for("request_sent", user_email=email))
             else:
                 err_msg = "Nhập sai email"
         except IntegrityError:
             err_msg = "Nhập sai email"
 
+    # Render trang báo đã gửi mail khôi phục
     return render_template("forgot-password.html", err_msg=err_msg)
 
 
+# Xác thực email người dùng
 @app.route('/email-verification/<user_email>', methods=["GET", "POST"])
 def email_verify(user_email):
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -252,14 +264,23 @@ def email_verify(user_email):
     if kw:
         return redirect(url_for('search_by_kw', kw=kw))
 
+    # Tạo mã xác thực và gửi mail xác thực
+    # Tạo token, dumps salt để tham chiếu với loads salt khi cần xác thực token
     token = randomToken.dumps(user_email, salt="email_confirm")
+    # Tạo nội dung email
     msg = Message('Thư xác nhận', sender='emailverifywebapp@gmail.com', recipients=[user_email])
     link = url_for('confirm_email', token=token, _external=True)
     msg.body = 'Vui lòng nhấn vào liên kết sau để xác nhận email. Liên kết của bạn là: {}'.format(link)
+    # Gửi
     mail.send(msg)
+
+    # Thông báo người dùng là đã gửi email
     return render_template("verify-email.html", user_email=user_email, )
 
 
+# Xác thực email người dùng
+# Khi người dùng nhấn vào liên kết xác thực gửi kèm mail, điều hướng đến đây
+# Xác thực email
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -268,12 +289,15 @@ def confirm_email(token):
         return redirect(url_for('search_by_kw', kw=kw))
 
     try:
+        # Check email loads salt có email dumps salt lúc gửi không
         email = randomToken.loads(token, salt='email_confirm', max_age=900)
     except SignatureExpired:
         return render_template('verify-expired.html')
     return render_template('verify-success.html', email=email)
 
 
+# Chức năng khôi phục tài khoản qua email
+# Thực hiện khi người dùng nhập đúng email có tồn tại trong db
 @app.route('/request_sent/<user_email>', methods=["GET", "POST"])
 def request_sent(user_email):
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -281,15 +305,23 @@ def request_sent(user_email):
     if kw:
         return redirect(url_for('search_by_kw', kw=kw))
 
+    # Tạo mã xác thực và gửi mail xác thực
+    # Tạo token, dumps salt để tham chiếu với loads salt khi cần xác thực token
     token = randomToken.dumps(user_email, salt="recovery_account")
+    # Tạo nội dung email
     msg = Message('Khôi phục tài khoản', sender='emailverifywebapp@gmail.com', recipients=[user_email])
     link = url_for('recovery_account', token=token, user_email=user_email, _external=True)
     msg.body = 'Bạn đang tiến hành đặt lại mật khẩu, liên kết sẽ hết hạn sau 15 phút. Nhấn vào liên kết sau ' \
                'để đặt lại mật khẩu: {}'.format(link)
+    # Tiến hành gửi mail
     mail.send(msg)
+
+    # Thông báo với khách hàng là đã gửi email khôi phục
     return render_template("recovery-sent.html", user_email=user_email)
 
 
+# Chức năng khôi phục tài khoản qua email
+# Khi khách hàng nhấn vào liên kết được gửi kèm mail, điều hướng đến đây
 @app.route('/recovery_account/<token>/<user_email>', methods=['GET', 'POST'])
 def recovery_account(token, user_email):
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -298,9 +330,12 @@ def recovery_account(token, user_email):
         return redirect(url_for('search_by_kw', kw=kw))
 
     try:
+        # Kiểm tra token loads salt có bằng với dumps salt lúc gửi hay không, max_age=15phút
         e = randomToken.loads(token, salt='recovery_account', max_age=3600)
+    # Nếu token hết hạn trả thông báo cho khách hàng
     except SignatureExpired:
         return render_template('verify-expired.html')
+    # Nếu token hơp lệ tiến hành cho người dùng đặt lại mật khẩu
     if request.method == 'POST':
         password = request.form.get("password")
         user = utils.check_mail(user_email)
@@ -308,19 +343,21 @@ def recovery_account(token, user_email):
             user.password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
             db.session.add(user)
             db.session.commit()
+            # Hiển thị thông báo khôi phục thành công, yêu cầu đăng nhập lại
             return render_template('password-reset.html')
+
     return render_template('recovery-account.html')
 
 
 # Điều hướng tới trang chủ mặc định
 @app.route('/')
 def index():
+    # Đặt lại bộ nhớ tạm của admin
+    utils.reset_value()
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
     if kw:
         return redirect(url_for('search_by_kw', kw=kw))
-
-    utils.reset_value()
     booknew = BookStorage.query.filter(BookStorage.instock > 0).limit(10).all()
     book_tieuthuyet = BookStorage.query.filter(BookStorage.category.startswith("Tieu Thuyet")).limit(10).all()
     return render_template('index.html', booknew=booknew, book_tieuthuyet=book_tieuthuyet)
@@ -338,7 +375,6 @@ def search_by_kw(kw):
 #     kw = request.args.get('kw')
 #     search = utils.search_by_kw(kw)
 #     return render_template('bar-footer.html', search=search)
-
 
 
 # Xem các thể loại sách
@@ -359,7 +395,7 @@ def book_list():
     return render_template('book-list.html', books=books, cate_id=cate_id)
 
 
-# list sách theo category đường dẫn
+# List sách theo category đường dẫn
 @app.route('/book-list/<cate_id>')
 def book_list_by_cate(cate_id):
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -384,8 +420,12 @@ def book_detail(book_id):
     return render_template('book-detail.html', book=book, book_relate=book_relate)
 
 
-# --------------------- Phần xử lý chức năng giỏ hàng -----------------------------
-# xử lý theo main.js    addToCart()
+# |------------------------------|
+# | XỬ LÝ CÁC CHỨC NĂNG GIỎ HÀNG |
+# |------------------------------|
+
+# Được gọi từ main.js > addToCart()
+# Thêm một sản phẩm vào giỏ sẽ gọi api này
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
     if not current_user.is_authenticated:
@@ -395,29 +435,31 @@ def add_to_cart():
         session['cart'] = {}
 
     cart = session['cart']
-
+    # Nạp request được gửi dưới dạng string từ js
     data = json.loads(request.data)
-
     id = str(data.get("id"))
     name = data.get("name")
-    price = data.get("selling_price")  # từ khóa "selling_price" chỉ qua main.js
+    price = data.get("selling_price")   # Từ khóa "selling_price" chỉ qua main.js
     path = data.get("path")
 
+    # Nếu có tồn tại id sản phẩm trong giỏ hàng
     if id in cart:
-        cart[id]["quantity"] = cart[id]["quantity"] + 1
+        cart[id]["quantity"] += 1
     else:
         cart[id] = {
             "id": id,
             "name": name,
-            "price": price,  # từ khóa "price" trỏ tới utils
+            "price": price,     # Từ khóa "price" trỏ tới utils
             "path": path,
             "quantity": 1
         }
 
     session['cart'] = cart
 
+    # Quantity, price
     quan, price = utils.cart_stats(cart)
 
+    # Trả các giá trị ra js > un-asynchronous js
     return jsonify({
         "total_amount": price,
         "total_quantity": quan,
@@ -425,15 +467,14 @@ def add_to_cart():
     })
 
 
+# Xóa một sản phẩm ra khỏi giỏ sẽ gọi api này
 @app.route('/api/subtractcart', methods=['post'])
 def subtract_cart():
     if 'cart' not in session:
         session['cart'] = {}
 
     cart = session['cart']
-
     data = json.loads(request.data)
-
     id = str(data.get("id"))
 
     if id in cart:
@@ -448,15 +489,14 @@ def subtract_cart():
     })
 
 
+# Xóa toàn bộ giỏ hàng
 @app.route('/api/deletecart', methods=['post'])
 def delete_cart():
     if 'cart' not in session:
         session['cart'] = {}
 
     cart = session['cart']
-
     data = json.loads(request.data)
-
     id = str(data.get("id"))
 
     if id in cart:
@@ -474,6 +514,7 @@ def delete_cart():
     })
 
 
+# Xử lý chức năng khi bấm nút 'Mua ngay'
 @app.route('/api/buy', methods=['post'])
 def buy_now():
     if not current_user.is_authenticated:
@@ -483,9 +524,7 @@ def buy_now():
         session['cart'] = {}
 
     cart = session['cart']
-
     data = json.loads(request.data)
-
     id = str(data.get("id"))
     name = data.get("name")
     price = data.get("selling_price")  # từ khóa "selling_price" chỉ qua main.js
@@ -507,7 +546,7 @@ def buy_now():
     return redirect('/checkout')
 
 
-# dữ liệu nhận được từ utils thông qua session cart
+# Dữ liệu nhận được từ utils thông qua session cart
 @app.route('/cart')
 @decorator.login_required_cart
 def cart():
@@ -524,7 +563,9 @@ def cart():
     return render_template('cart.html', cart_info=cart_info)
 
 
-# -------------------------- Xử lý thanh toán -------------------------------------
+# |----------------------------|
+# | XỬ LÝ CHỨC NĂNG THANH TOÁN |
+# |----------------------------|
 
 # Xử lý thanh toán, ghi thông tin người nhận hàng, địa chỉ nhận
 @app.route('/checkout', methods=['get', 'post'])
@@ -561,7 +602,9 @@ def checkout():
     return render_template('checkout.html', cart_info=cart_info, err_msg=err_msg)
 
 
-# ----------------------- Danh sách yêu thích  ---------------------------
+# |-------------------------------------|
+# | XỬ LÝ CHỨC NĂNG DANH SÁCH YÊU THÍCH |
+# |-------------------------------------|
 
 # Đăng nhập thành công mới có thể thêm sách vào wishlist, chưa đăng nhập hiện thông báo
 @app.route('/api/wish', methods=['post'])
@@ -573,21 +616,17 @@ def add_to_wish():
         session['wish'] = {}
 
     wish = session['wish']
-
     data = json.loads(request.data)
-
     id = str(data.get("id"))
     name = data.get("name")
     price = data.get("selling_price")
     path = data.get("path")
 
-    # nếu book_id mới thêm vào có trong ds, thì xóa bỏ
+    # Nếu book_id mới thêm vào có trong ds, thì xóa bỏ
     if id in wish:
         return jsonify({'message': 'Đã có trong danh sách yêu thích'})
-
-
-    #   Sách yêu thích mới được thêm vào cuối ds
-    #   thêm book_id vào trong ds yêu thích của người dùng hiện thời
+    #   Sách yêu thích mới được thêm vào cuối danh sách
+    #   Thêm book_id vào trong ds yêu thích của người dùng hiện thời
     else:
         wish[id] = {
             "id": id,
@@ -604,7 +643,7 @@ def add_to_wish():
     return jsonify({'message': 'failed'})
 
 
-# Xóa sách trong ds yêu thích
+# Xóa sách trong danh sách yêu thích
 @app.route('/api/deletewish', methods=['post'])
 def delete_wish():
     data = json.loads(request.data)
@@ -635,7 +674,10 @@ def wishlist():
     return render_template('wishlist.html', bookwish=bookwish)
 
 
-# ------------------    Các view: lịch sử đặt hàng, chỉnh sửa thông tin của khách hàng ----------------
+# |----------------------------------------------------------------|
+# | CÁC VIEW: LỊCH SỬ ĐẶT HÀNG, CHỈNH SỬA THÔNG TIN CỦA KHÁCH HÀNG |
+# |----------------------------------------------------------------|
+
 @app.route('/my-account')
 @login_required
 def my_account():
@@ -648,12 +690,19 @@ def my_account():
     return render_template('my-account.html', invoice=invoice)
 
 
-# ---------------------- test chức năng mới ------------------------
+# |--------------------|
+# | TEST CHỨC NĂNG MỚI |
+# |--------------------|
+
 @app.route('/test')
 def get_book():
     book = utils.read_books()
     return render_template('test.html', book=book)
 
+
+# |-------------------------|
+# | CHẠY CHƯƠNG TRÌNH CHÍNH |
+# |-------------------------|
 
 if __name__ == "__main__":
     app.run(debug=True)

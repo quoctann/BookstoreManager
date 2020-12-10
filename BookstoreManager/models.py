@@ -5,14 +5,20 @@ from flask_login import UserMixin
 from datetime import datetime
 
 
+# |==================================|
+# | MODEL TRỪU TƯỢNG, TRÁNH LẶP CODE |
+# |==================================|
+
+
+# Các thông tin thông dụng như id, name dùng chung
 class CommonIdentityBase(db.Model):
     __abstract__ = True
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-
     avatar = Column(String(50))
 
 
+# Các thông tin hỗ trợ việc xác thực như username, password
 class AuthIndentityBase(db.Model, UserMixin):
     __abstract__ = True
     username = Column(String(20), nullable=False)
@@ -21,6 +27,11 @@ class AuthIndentityBase(db.Model, UserMixin):
 
     def __str__(self):
         return self.name
+
+
+# |=============================|
+# | MODEL CHÍNH MÔ TẢ NGHIỆP VỤ |
+# |=============================|
 
 
 # Danh sách tài khoản đăng nhập (demo)
@@ -32,8 +43,8 @@ class SystemUser(CommonIdentityBase, AuthIndentityBase):
 # Thông tin nhân viên và vai trò trong hệ thống
 class Employee(CommonIdentityBase, AuthIndentityBase):
     __tablename__ = 'employee'
+    avatar = Column(String(50), default='images/admin/su.png')
     role = Column(String(10), nullable=False, default='Employee')
-
     # Chịu trách nhiệm cho nhiều phiếu thu nợ
     collect_debt = relationship('DebtCollection', backref='employee', lazy=True)
     # Chịu trách nhiệm cho nhiều phiếu nhập sách
@@ -49,8 +60,8 @@ class Customer(CommonIdentityBase, AuthIndentityBase):
     address = Column(String(100))
     phone = Column(Integer)
     role = Column(String(10), nullable=False, default='guest')
-    debt_amout = Column(Float, default=0)
-
+    # Lưu số nợ hiện tại
+    debt = Column(Float, default=0)
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
@@ -85,7 +96,7 @@ class BookStorage(CommonIdentityBase):
     wish_id = relationship('WishDetail', backref='book_storage', lazy=True)
 
 
-# thông tin phiếu sách
+# Thông tin phiếu nhập sách
 class BookImport(db.Model):
     __tablename__ = 'book_import'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -97,7 +108,7 @@ class BookImport(db.Model):
     import_detail = relationship('ImportDetail', backref='book_import', lazy=True)
 
 
-# thông tin chi tiết về phiếu nhập sách
+# Thông tin chi tiết về phiếu nhập sách
 class ImportDetail(db.Model):
     __tablename__ = 'import_detail'
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
@@ -119,6 +130,7 @@ class Invoice(db.Model):
     # Truy vấn đến bảng lưu thông tin nơi nhận
     shipping = relationship('ShippingDetail', backref='invoice', lazy=True, uselist=False)
 
+
 # Chi tiết hóa đơn
 class InvoiceDetail(db.Model):
     invoice_id = Column(Integer, ForeignKey(Invoice.invoice_id), primary_key=True, nullable=False)
@@ -127,7 +139,7 @@ class InvoiceDetail(db.Model):
     price = Column(Float, nullable=False)
 
 
-# Đơn hàng
+# Thông tin đơn hàng được giao
 class ShippingDetail(db.Model):
     __tablename__ = 'shipping_detail'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -136,15 +148,11 @@ class ShippingDetail(db.Model):
     address = Column(String(100))
     phone = Column(Integer)
 
+
+# Thông tin danh sách yêu thích (wishlist)
 class WishDetail(db.Model):
     wish_id = Column(Integer, ForeignKey(Customer.id), primary_key=True, nullable=False)
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
