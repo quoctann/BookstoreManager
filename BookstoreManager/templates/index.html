@@ -12,21 +12,21 @@
             <div class="carousel-inner" style="height: 400px;" role="listbox">
               <!-- Slide One - Set the background image for this slide in the line below -->
               <div class="carousel-item active"
-                   style="background-image: url('{{ url_for('static', filename='images/yournamewall.jpg') }}')" >
+                   style="background-image: url('{{ url_for(`static`, filename=`images/yournamewall.jpg`) }}')" >
                 <div class="carousel-caption d-none d-md-block">
                   <h2 class="display-4">First Slide</h2>
                   <p class="lead">This is a description for the first slide.</p>
                 </div>
               </div>
               <!-- Slide Two - Set the background image for this slide in the line below -->
-              <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/5cmwall.jpg') }}')">
+              <div class="carousel-item" style="background-image: url('{{ url_for(`static`, filename=`images/5cmwall.jpg`) }}')">
                 <div class="carousel-caption d-none d-md-block">
                   <h2 class="display-4">Second Slide</h2>
                   <p class="lead">This is a description for the second slide.</p>
                 </div>
               </div>
               <!-- Slide Three - Set the background image for this slide in the line below -->
-              <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/dietquywall.jpg') }}')">
+              <div class="carousel-item" style="background-image: url('{{ url_for(`static`, filename=`images/dietquywall.jpg`) }}')">
                 <div class="carousel-caption d-none d-md-block">
                   <h2 class="display-4">Third Slide</h2>
                   <p class="lead">This is a description for the third slide.</p>
@@ -81,11 +81,11 @@
                                 </a>
                                 <div class="product-action">
                                     <a href="javascript:;"
-                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                       onclick="addToCart('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')">
                                         <i class="fa fa-cart-plus"></i>
                                     </a>
                                     <a href="javascript:;"
-                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                       onclick="addToWishlist('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')">
                                         <i class="fa fa-heart"></i>
                                     </a>
                                 </div>
@@ -95,7 +95,7 @@
                             <div class="product-price">
                                 <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
                                 <a class="btn" href="{{ url_for('checkout') }}"
-                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                   onclick="buyNow('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')">
                                     <i class="fa fa-shopping-cart"></i>Mua ngay</a>
                             </div>
                         </div>
@@ -107,6 +107,24 @@
         <!-- Featured Product End -->
 
 
+<<<<<<< HEAD
+=======
+        <!-- Brand Start -->
+        <div class="brand">
+            <div class="container-fluid">
+                <div class="brand-slider">
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-1.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-2.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-3.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-4.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-5.png') }}" alt=""></div>
+                    <div class="brand-item"><img src="{{ url_for('static', filename='img/brand-6.png') }}" alt=""></div>
+                </div>
+            </div>
+        </div>
+        <!-- Brand End -->
+
+>>>>>>> 7d872c15354e66b7b265d24630de7718164e1b2e
 
         <!-- Featured Product Start -->
                                         <!--    container hiển thị sách có trong db    -->
@@ -141,11 +159,11 @@
                                 </a>
                                 <div class="product-action">
                                     <a href="javascript:;"
-                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                       onclick="addToCart('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')">
                                         <i class="fa fa-cart-plus"></i>
                                     </a>
                                     <a href="javascript:;"
-                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                       onclick="addToWishlist('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')">
                                         <i class="fa fa-heart"></i>
                                     </a>
                                 </div>
@@ -155,7 +173,7 @@
                             <div class="product-price">
                                 <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
                                 <a class="btn" href="{{ url_for('checkout') }}"
-                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                   onclick="buyNow('{{ b.id }}', '{{ b.name }}',' {{ b.selling_price }}', '{{ b.path }}')">
                                     <i class="fa fa-shopping-cart"></i>Mua ngay</a>
                             </div>
                         </div>

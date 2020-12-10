@@ -31,7 +31,7 @@
                     <div class="col-md-8">
                         <div class="tab-content">
 
-                            <!--    Nơi cập nhập thông tin khách hàng   -->
+                            <!--    Form cập nhập thông tin khách hàng   -->
                             <div class="tab-pane fade show active" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
                                 <h4>Thông tin chi tiết</h4>
                                 <div class="row">
@@ -100,48 +100,57 @@
                                 </div>
                             </div>
 
+                            <!--    View xem các đơn hàng   -->
                             <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
+
+                                        <!--    tiêu đề   -->
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th>No</th>
-                                                <th>Product</th>
-                                                <th>Date</th>
-                                                <th>Price</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th>STT</th>
+                                                <th>Mã id hoá đơn</th>
+                                                <th>Ngày đặt</th>
+                                                <th>Giá</th>
+                                                <th>Trạng thái</th>
+                                                <th>Chi tiết</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+
+                                        <!--    list đơn hàng   -->
+                                        <tbody id="ivo">
+                                            <!--    Vòng lặp for    -->
+
+                                            {% if invoice %}
+                                            {% for i in invoice %}
+
                                             <tr>
-                                                <td>1</td>
-                                                <td>Product Name</td>
-                                                <td>01 Jan 2020</td>
-                                                <td>$99</td>
+
+                                                <td id="{{ i.invoice_id }}"></td>
+                                                <td>{{ i.invoice_id }}</td>
+                                                <td>{{ i.date }}</td>
+                                                <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
                                                 <td>Approved</td>
-                                                <td><button class="btn">View</button></td>
+                                                <td><button class="btn">xem</button></td>
                                             </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Product Name</td>
-                                                <td>01 Jan 2020</td>
-                                                <td>$99</td>
-                                                <td>Approved</td>
-                                                <td><button class="btn">View</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>3</td>
-                                                <td>Product Name</td>
-                                                <td>01 Jan 2020</td>
-                                                <td>$99</td>
-                                                <td>Approved</td>
-                                                <td><button class="btn">View</button></td>
-                                            </tr>
+                                            <script type="text/javascript">
+                                                   function increment({{ i.invoice_id }}) {
+                                                   document.getElementById("{{i.invoice_id}}").innerHTML = 'test';
+                                                   console.log('get success');
+                                                   }
+                                            </script>
+                                            {% endfor %}
+                                            {% else %}
+                                             <tr>
+                                                 <td colspan="6" class="text-center"><h2>Chưa có sản phẩm!</h2></td>
+                                             </tr>
+                                            {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+
+                            <!--    Nơi cập nhập thông tin khách hàng   -->
                             <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
                                 <h4>Payment Method</h4>
                                 <p>

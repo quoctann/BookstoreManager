@@ -2,7 +2,11 @@
 <div class="vertical-nav bg-white" id="sidebar">
     <!-- Thông tin user, avatar -->
     <div class="py-4 px-3 mb-4 bg-light ">
-        <div class="media d-flex align-items-center"><img src="{{ url_for('static', filename='images/admin/avt.jpg') }}" alt="user avatar" width="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
+        {% if current_user.is_authenticated %}
+        <div class="media d-flex align-items-center"><img src="{{ url_for('static', filename=current_user.avatar) }}" alt="user avatar" width="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
+        {% else %}
+        <div class="media d-flex align-items-center"><img src="{{ url_for('static', filename='images/admin/default.png') }}" alt="user avatar" width="65" class="mr-3 rounded-circle img-thumbnail shadow-sm">
+        {% endif %}
             <div class="media-body">
                 {% if current_user.is_authenticated %}
                     <h4 class="m-0  text-decor font-weight-bold">{{ current_user.name }}</h4>

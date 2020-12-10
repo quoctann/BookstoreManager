@@ -84,14 +84,15 @@ class CustomerView(AuthenticatedView):
 # Template thông thường
 class AdminView(AuthenticatedView):
     def is_accessible(self):
+        # return current_user.is_authenticated        # change
         return current_user.is_authenticated and current_user.role == 'Admin'
 
 
 # Model view dành riêng cho admin
 class AdminModelView(CustomModelView):
     def is_accessible(self):
+        # return current_user.is_authenticated        # change
         return current_user.is_authenticated and current_user.role == 'Admin'
-
 
 # View của form đăng ký thêm nhân viên
 class RegisterView(AdminView):
@@ -115,7 +116,7 @@ class CanCreate(AdminModelView):
 
 # THÊM VIEW VÀO TRANG CHỦ
 # Tác vụ
-admin.add_view(SellView(name="Bán sách", endpoint='sellview'))
+admin.add_view(SellView(name="Bán sách"))
 admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
 admin.add_view(ImportView(name="Nhập sách"))

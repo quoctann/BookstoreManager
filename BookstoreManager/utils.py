@@ -1,9 +1,10 @@
 from flask_login import current_user
 from flask import session
+from flask_login import current_user
+
 from BookstoreManager import app, db
 from BookstoreManager.models import *
 import hashlib
-
 
 def add_employee(name, username, password):
     user = SystemUser(name=name, username=username,
@@ -21,6 +22,13 @@ def reset_value():
     # Lưu tạm thời tên của khách hàng
     session['sell_for'] = 'init'
 
+
+class TaskRules:
+    pass
+
+
+
+# ------------------------------------------------------------ Customer --------------------------------------
 
 def add_customer(name, email, username, password, avatar_path, phone, address):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
@@ -57,6 +65,20 @@ def read_books(kw=None):
         books = books.filter(BookStorage.name.contains(kw))
 
     return books.all()
+# Chức năng lọc dự liệu bằng kw - thanh tìm kiếm trên menu
+def search_by_kw(kw=None):
+    books = BookStorage.query
+    if kw:
+
+        books = books.filter(BookStorage.category.contains(kw)).all()
+        if books:
+            return books
+        else:
+            books = BookStorage.query.filter(BookStorage.name.contains(kw))
+            if books:
+                return books
+
+        # return BookStorage.query.filter(BookStorage.author.contains(kw))
 
 
 # Chức năng lọc dữ liệu - book-list
@@ -84,7 +106,7 @@ def get_book_by_id(book_id):
 
 
 def get_book_by_cate(cate_id):
-    return BookStorage.query.filter(BookStorage.category == cate_id).all()
+    return BookStorage.query.filter(BookStorage.category.contains(cate_id)).all()
 
 
 #   ----------------------    Phần xử lý chức năng giỏ hàng -------------------
@@ -155,12 +177,14 @@ def add_wishlist(wishlist):
 
 
 # kết theo bảng bên trái
+# Đọc dữ liệu lấy thông tin sách mà khách hàng đã yêu thích
 def read_wish():
     return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == current_user.id).all()
 
 
+# Lấy dữ liệu sách theo book_id trong wishlist
 def get_wish(book_id):
-    return WishDetail.query.filter(book_id  == WishDetail.book_id).first()
+    return WishDetail.query.filter(book_id == WishDetail.book_id).first()
 
 
 # Xóa sách ra khỏi danh sách yêu thích - có cập nhập xuống db
@@ -182,6 +206,7 @@ def del_wish(book_id):
 
 
 # --------------    Chỉnh sửa thông tin khách hàng  -------------
+# --------------    my-acc    -------------
 
 # sửa thông tin khách hàng  - chưa xong
 def change_info(user_id, name, phone, email, address):
@@ -193,6 +218,16 @@ def change_info(user_id, name, phone, email, address):
 
 # def read_join():
     # WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+# view lịch sử hóa đơn của khách hàng
+def read_my_invoice():
+    return Invoice.query.filter(Invoice.customer_id == current_user.id)
+
+
+
+# isouter=True : Kết trái
+
+def read_join():
+    WishDetail.query.filter(WishDetail.wish_id == current_user.id)
 
     # Có nhiêu lấy hết, trùng dữ liệu: theo wishdetail
     # return db.session.query(BookStorage).join(WishDetail)
@@ -202,3 +237,5 @@ def change_info(user_id, name, phone, email, address):
     # return db.session.query(WishDetail, WishDetail.wish_id == current_user.id).join(BookStorage.wish_id)
 
     # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
+
+    return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == current_user.id).all()

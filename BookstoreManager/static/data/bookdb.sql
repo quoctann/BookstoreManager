@@ -1,5 +1,7 @@
-INSERT INTO `webstoredb`.`system_user` (`name`, `username`, `password`) VALUES ('vin', 'admin', '202cb962ac59075b964b07152d234b70');
-INSERT INTO `webstoredb`.`employee` (`name`, `username`, `password`, `role`) VALUES ('auto', 'may', '202cb962ac59075b964b07152d234b70', 'nhanvien');
+INSERT INTO `webstoredb`.`system_user` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Admin', 'images/admin/vin.peg', 'admin', '202cb962ac59075b964b07152d234b70', 'Admin');
+INSERT INTO `webstoredb`.`employee` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Nhân viên', 'images/admin/vin.peg', 'nhanvien', '202cb962ac59075b964b07152d234b70', 'Admin');
+
+
 
 
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Con Chim Xanh Biếc', '30', 'Nguyễn Nhật Ánh', 'Tiểu Thuyết', '97500', 'images/conchimxanh.jpg');
@@ -26,7 +28,6 @@ INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Colorful', '15', 'Mori Eto', 'Light novel', '47900', 'images/Colorful.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Bên Kia Mây Trời', '22', 'Shinkai Makoto', 'Light novel', '101900', 'images/benkia.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Ở Một Góc Nhân Gian', '24', 'Fumiyo Kono, Maita Yohei', 'Light novel', '38900', 'images/omotgoc.jpg');
-INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Làm Bạn Với Bầu Trời', '27', 'Nguyễn Nhật Ánh', 'Truyện Dài', '339000', 'images/banbautroi.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Sự Im Lặng Của Bầy Cừu', '25', 'Thomas Harris', 'Trinh Thám', '95450', 'images/baycuuimlang.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Khúc Ca Tú Cầu Của Ác Quỷ', '14', 'Yokomizo Seishi', 'Trinh Thám', '88000', 'images/khucca.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Biến Thân', '11', 'Keigo Higashino', 'Trinh Thám', '76300', 'images/bienthan.jpg');
@@ -39,6 +40,4 @@ INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Tự Thương Mình', '11', 'Trí', 'Truyện Ngắn', '62400', 'images/thuongminh.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Một Mảnh Trăng', '20', 'Ha Hyun', 'Truyện Ngắn', '79200', 'images/manhtrang.jpg');
 INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Quên Một Người', '29', 'a Tòn', 'Truyện Ngắn', '71200', 'images/quennguoi.jpg');
-INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Mộ Đom Đóm', '30', 'Nosaka Akiyuki', 'Light novel', '59520', 'images/domdom.jpg');
-INSERT INTO `webstoredb`.`book_storage` (`name`, `instock`, `author`, `category`, `selling_price`, `path`) VALUES ('Lũ Trẻ Đường Tàu', '10', 'E.Nesbit', 'Tiểu Thuyết', '57600', 'images/lutre.jpg');
 

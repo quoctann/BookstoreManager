@@ -89,6 +89,22 @@ function myFunction(id) {
 // | PHÂN HỆ KHÁCH HÀNG |
 // |====================|
 
+
+
+
+//  ------------------------------------------------------------------------ Customer   -----------------------------------
+var globalCounter = 0;
+function inc() {
+    globalCounter++;
+    return globalCounter;
+}
+
+ function increment(id) {
+    document.getElementById("id").innerHTML = globalCounter++;
+    console.log('get success');
+}
+// ------------------ xử lý thêm sách vào giỏ ---------------------------
+
 function addToCart(id, name, price, path) {
     fetch('/api/cart', {
         method: "post",
@@ -189,6 +205,7 @@ function buyNow(id, name, price, path) {
         }
     }).then(res => res.json()).then(data => {
         console.info(data);
+//        alert(data.message);
     }).catch(err => {
         console.log(err);
     })
@@ -278,3 +295,7 @@ function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 }
+
+
+
+// ------------------------
