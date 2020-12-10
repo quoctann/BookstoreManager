@@ -14,7 +14,6 @@ def login_required_cart(f):
     return decorated_function
 
 
-
 def login_required_wishlist(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
