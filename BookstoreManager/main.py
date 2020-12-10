@@ -28,14 +28,8 @@ def user_load(user_id):
     return Customer.query.get(user_id)
 
 
-
-
-
-
-
-
 # |=====================|
-    # | XỬ LÝ PHÂN HỆ ADMIN |
+# | XỬ LÝ PHÂN HỆ ADMIN |
 # |=====================|
 
 
@@ -112,7 +106,7 @@ def check_debt():
             else:
                 session['valid_debt'] = 'violated'
             return redirect(url_for('sellview.index'))
-    # Sau khi bán xong trả lại trạng thái ban đầu
+        # Sau khi bán xong trả lại trạng thái ban đầu
         session['valid_debt'] = 'init'
 
     if request.method == "POST" and (session['valid_debt'] == 'OK'):
@@ -150,14 +144,16 @@ def get_value():
         pass
 
 
-
-
-
 # ----------------------------------------------------------- Customer ------------------------------------------------
 
 # Xử lý action login-Customer
 @app.route('/login', methods=["get", "post"])
 def login_customer():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     err_msg = ""
     if request.method == 'POST':
         # lấy thông tin đăng nhập
@@ -192,6 +188,11 @@ def logout():
 # Xử lý action register-Customer
 @app.route('/register', methods=['get', 'post'])
 def register():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     err_msg = ""
     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if request.method == 'POST':
@@ -225,6 +226,11 @@ def register():
 # Xử lý action ForgotPassword-Customer
 @app.route("/forgot_password", methods=['GET', 'POST'])
 def forgot_password():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     err_msg = ""
     if request.method == 'POST':
         try:
@@ -241,6 +247,11 @@ def forgot_password():
 
 @app.route('/email-verification/<user_email>', methods=["GET", "POST"])
 def email_verify(user_email):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     token = randomToken.dumps(user_email, salt="email_confirm")
     msg = Message('Thư xác nhận', sender='emailverifywebapp@gmail.com', recipients=[user_email])
     link = url_for('confirm_email', token=token, _external=True)
@@ -251,6 +262,11 @@ def email_verify(user_email):
 
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     try:
         email = randomToken.loads(token, salt='email_confirm', max_age=900)
     except SignatureExpired:
@@ -260,6 +276,11 @@ def confirm_email(token):
 
 @app.route('/request_sent/<user_email>', methods=["GET", "POST"])
 def request_sent(user_email):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     token = randomToken.dumps(user_email, salt="recovery_account")
     msg = Message('Khôi phục tài khoản', sender='emailverifywebapp@gmail.com', recipients=[user_email])
     link = url_for('recovery_account', token=token, user_email=user_email, _external=True)
@@ -271,6 +292,11 @@ def request_sent(user_email):
 
 @app.route('/recovery_account/<token>/<user_email>', methods=['GET', 'POST'])
 def recovery_account(token, user_email):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     try:
         e = randomToken.loads(token, salt='recovery_account', max_age=3600)
     except SignatureExpired:
@@ -289,17 +315,39 @@ def recovery_account(token, user_email):
 # Điều hướng tới trang chủ mặc định
 @app.route('/')
 def index():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     utils.reset_value()
     booknew = BookStorage.query.filter(BookStorage.instock > 0).limit(10).all()
     book_tieuthuyet = BookStorage.query.filter(BookStorage.category.startswith("Tieu Thuyet")).limit(10).all()
     return render_template('index.html', booknew=booknew, book_tieuthuyet=book_tieuthuyet)
 
 
+# Trang trả về kết quả tìm kiếm theo kw bất kì: hiện tại chỉ lọc được theo book.name và book.category
+@app.route('/search/<kw>')
+def search_by_kw(kw):
+    search = utils.search_by_kw(kw)
+    return render_template('bar-footer.html', search=search)
+
+
+# @app.route('/search')
+# def search():
+#     kw = request.args.get('kw')
+#     search = utils.search_by_kw(kw)
+#     return render_template('bar-footer.html', search=search)
+
+
+
 # Xem các thể loại sách
 @app.route('/book-list')
 def book_list():
-    kw = request.form.get('kw2')
-    search = utils.search_by_kw(kw)
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
 
     author = request.args.get('author')
     cate_id = request.args.get('category_id')
@@ -308,35 +356,29 @@ def book_list():
     to_price = request.args.get('to_price')
     books = utils.read_books(cate_id=cate_id, kw=kw2, from_price=from_price, to_price=to_price, author=author)
 
-    return render_template('book-list.html', books=books, cate_id=cate_id, search=search)
-
-
-
-
-
-
-
-
-@app.route('/bar-footer')
-def bar():
-    kw = request.args.get('kw')
-    search = utils.search_by_kw(kw)
-    return render_template('bar-footer.html', search=search)
+    return render_template('book-list.html', books=books, cate_id=cate_id)
 
 
 # list sách theo category đường dẫn
 @app.route('/book-list/<cate_id>')
 def book_list_by_cate(cate_id):
+    # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
-    search = utils.search_by_kw(kw)
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
 
     books = utils.get_book_by_cate(cate_id)
-    return render_template('book-list.html', books=books, cate_id=cate_id, search=search)
+    return render_template('book-list.html', books=books, cate_id=cate_id)
 
 
 # Xem thông tin sách cụ thể
 @app.route('/book-detail/<int:book_id>')
 def book_detail(book_id):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     book = utils.get_book_by_id(book_id=book_id)
     book_relate = BookStorage.query.filter(BookStorage.category == book.category).limit(5).all()
     return render_template('book-detail.html', book=book, book_relate=book_relate)
@@ -469,6 +511,11 @@ def buy_now():
 @app.route('/cart')
 @decorator.login_required_cart
 def cart():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     quantity, price = utils.cart_stats(session.get('cart'))
     cart_info = {
         "total_amount": price,
@@ -483,6 +530,11 @@ def cart():
 @app.route('/checkout', methods=['get', 'post'])
 @login_required
 def checkout():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     err_msg = ""
     quantity, price = utils.cart_stats(session.get('cart'))
     cart_info = {
@@ -574,6 +626,11 @@ def delete_wish():
 @decorator.login_required_wishlist
 @login_required
 def wishlist():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     bookwish = utils.read_wish()
     return render_template('wishlist.html', bookwish=bookwish)
 
@@ -582,6 +639,11 @@ def wishlist():
 @app.route('/my-account')
 @login_required
 def my_account():
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
+
     invoice = utils.read_my_invoice()
     return render_template('my-account.html', invoice=invoice)
 
@@ -591,16 +653,6 @@ def my_account():
 def get_book():
     book = utils.read_books()
     return render_template('test.html', book=book)
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

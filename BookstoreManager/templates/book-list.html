@@ -22,7 +22,6 @@
         <div class="product-view">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="">
                         <div class="row">
                             <!--    điều kiện lọc    -->
                             <div class="col-md-12">
@@ -78,59 +77,6 @@
                                     </div>
                                 </form>
                             </div>
-                            {% if search %}
-                            <div class="container">
-                                <div>Kết quả tìm kiếm</div>
-                                {% for b in search %}
-                                <div class="grid-container">
-                                    <div class="product-item">
-
-                                        <!--    Tên, mô tả đánh giá bằng sao, chưa xây dựng    -->
-                                        <div class="product-title">
-                                            <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
-                                            <div class="ratting">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-
-                                        <!--    Ảnh về sách, các thao tác tiện lợi  -->
-                                        <div class="product-image">
-                                            <!--    Ảnh về sách  -->
-                                            <a href="">
-                                                <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
-                                            </a>
-
-                                            <!--    gọi chức năng thêm sách vào giỏ-->
-                                            <div class="product-action">
-                                                <a href="javascript:;"
-                                                   onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                    <i class="fa fa-cart-plus"></i>
-                                                </a>
-                                                <a href="javascript:;"
-                                                   onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                    <i class="fa fa-heart"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <!--    Giá sách, thao tác mua  -->
-                                        <div class="product-price">
-                                            <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
-                                            <a class="btn" href="{{ url_for('checkout') }}"
-                                               onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
-                                                <i class="fa fa-shopping-cart"></i>Mua ngay</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-
-                            
-                            {% else %}
                             <!-- vòng lặp for -->
                             <div class="grid-container">
                                 {% for b in books %}
@@ -181,7 +127,6 @@
                                 {% endfor %}
                             </div>
                             <!-- kết thúc for -->
-                            {% endif %}
                         </div>
 
                         <!-- Pagination Start -->
@@ -202,7 +147,6 @@
                             </nav>
                         </div>
                         <!-- Pagination Start -->
-                    </div>
 
                 </div>
             </div>

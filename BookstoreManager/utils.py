@@ -59,8 +59,10 @@ def check_mail(email):
 
 # Chức năng lọc dự liệu bằng kw - thanh tìm kiếm trên menu
 def search_by_kw(kw=None):
+    books = BookStorage.query
     if kw:
-        books = get_book_by_cate(kw)
+
+        books = books.filter(BookStorage.category.contains(kw)).all()
         if books:
             return books
         else:

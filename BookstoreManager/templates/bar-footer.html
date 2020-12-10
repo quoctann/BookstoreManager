@@ -108,6 +108,7 @@
                             <form>
                                 <input type="text" placeholder="Tìm kiếm" name="kw">
                                 <button type="submit"><i class="fa fa-search"></i></button>
+
                             </form>
                         </div>
                     </div>
@@ -132,11 +133,16 @@
         {% block body %}
 
 
-{% if search %}
-                            <div class="container">
-                                <div>Kết quả tìm kiếm</div>
+        {% if search %}
+                <!-- Product List Start -->
+                <div class=" text-center"><h1>Kết quả tìm kiếm</h1></div>
+                <div class="product-view">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <!-- vòng lặp for -->
+                            <div class="grid-container">
                                 {% for b in search %}
-                                <div class="grid-container">
+                                <div class="">
                                     <div class="product-item">
 
                                         <!--    Tên, mô tả đánh giá bằng sao, chưa xây dựng    -->
@@ -182,6 +188,11 @@
                                 </div>
                                 {% endfor %}
                             </div>
+                            <!-- kết thúc for -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Product List End -->
         {% endif%}
 
 
