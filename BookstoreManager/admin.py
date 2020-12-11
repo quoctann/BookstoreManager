@@ -51,7 +51,7 @@ class LogoutView(AuthenticatedView):
 
 
 # |--------------------------------------------|
-# | CÁC VIEW TÁC VỤ THÔNG THƯỜNG CỦA NHÂN VIÊN |
+# | Các view tác vụ thông thường của nhân viên |
 # |--------------------------------------------|
 
 
@@ -92,7 +92,7 @@ class CustomerView(AuthenticatedView):
 
 
 # |------------------------------------------|
-# | CÁC VIEW TÁC VỤ CHỈ ADMIN ĐƯỢC THỰC HIỆN |
+# | Các view tác vụ chỉ admin được thực hiện |
 # |------------------------------------------|
 
 # Template thông thường

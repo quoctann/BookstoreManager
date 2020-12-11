@@ -7,7 +7,7 @@
             <div class="container-fluid">
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
-                    <li class="breadcrumb-item active">Tài khoảng của tôi</li>
+                    <li class="breadcrumb-item active">Tài khoản của tôi</li>
                 </ul>
             </div>
         </div>
@@ -21,7 +21,7 @@
                     <!--    Thẻ tap     -->
                     <div class="col-md-3">
                         <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoảng chi tiết</a>
+                            <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoản chi tiết</a>
                             <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-shopping-bag"></i>Đặt hàng</a>
                             <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab"><i class="fa fa-credit-card"></i>Thanh Toán</a>
                         </div>
@@ -41,13 +41,13 @@
                                         <!--    Tên   -->
                                         <div class="form-group col-md-12">
                                             <label for="name">Họ tên</label>
-                                            <input type="text" id="name" name="name" class="form-control" value="{{  current_user.name }}"/>
+                                            <input type="text" id="name" name="name" class="form-control" value="{{  session['user'].name }}"/>
                                         </div>
 
                                         <!--    Số điện thoại   -->
                                         <div class="form-group col-md-12">
                                             <label for="phone">Số điện thoại</label>
-                                            <input type="number" id="phone" name="phone" class="form-control" value="{{ current_user.phone }}"/>
+                                            <input type="number" id="phone" name="phone" class="form-control" value="{{ session['user'].phone }}"/>
                                         </div>
 
                                         <!--    Nút cập nhập thông tin - nên chỉnh về input  -->
@@ -62,13 +62,13 @@
                                         <!--    Email   -->
                                         <div class="form-group col-md-9">
                                             <label for="email">Email</label>
-                                            <input type="email" value="{{ current_user.email }}" id="email" name="email" class="form-control" />
+                                            <input type="email" value="{{ session['user'].email }}" id="email" name="email" class="form-control" />
                                         </div>
 
                                         <!--    Address   -->
                                         <div class="form-group col-md-12">
                                             <label for="address">Địa chỉ</label>
-                                            <input type="text" value="{{ current_user.address }}" id="address" name="address" class="form-control" />
+                                            <input type="text" value="{{ session['user'].address }}" id="address" name="address" class="form-control" />
                                         </div>
 
                                     </div>
@@ -126,8 +126,8 @@
 
                                             <tr>
 
-                                                <td id="{{ i.invoice_id }}"></td>
-                                                <td>{{ i.invoice_id }}</td>
+                                                <td id="{{ i['invoice_id'] }}"></td>
+                                                <td>{{ i['invoice_id'] }}</td>
                                                 <td>{{ i.date }}</td>
                                                 <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
                                                 <td>Approved</td>

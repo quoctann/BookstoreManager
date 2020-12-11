@@ -1,13 +1,13 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message, Mail
-from BookstoreManager import app, login, utils, mail, decorator
+from BookstoreManager import app, login, utils, mail
+from BookstoreManager.decorator import *
 from BookstoreManager.admin import *
 from BookstoreManager.models import *
 import hashlib, os, json
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-
 
 # |=============|
 # | XỬ LÝ CHUNG |
@@ -17,20 +17,18 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 randomToken = URLSafeTimedSerializer('this_is_a_secret_key')
 
 
-# Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
-# dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
-# đến đối tượng đang đăng nhập
-@login.user_loader
-def user_load(user_id):
-    # if current_user.role == 'Admin' or current_user.role == 'Employee':
-    #     print(current_user.role)
-    #     return Employee.query.get(user_id)
-    return Customer.query.get(user_id)
-
-
 # |=====================|
 # | XỬ LÝ PHÂN HỆ ADMIN |
 # |=====================|
+
+
+# Khi đăng nhập mặc định chỉ lưu ID, nhưng khi muốn truy xuất
+# dữ liệu của đối tượng thì hàm này sẽ được gọi để tham chiếu
+# đến đối tượng đang đăng nhập
+# CHỈ DÙNG FLASK LOGIN CHO ADMIN, USER XÁC THỰC ĐĂNG NHẬP BẰNG SESSION
+@login.user_loader
+def user_load(user_id):
+    return Employee.query.get(user_id)
 
 
 # Xử lý action login của admin
@@ -45,7 +43,7 @@ def login_admin():
         password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
         # Strip() dùng để bỏ khoảng trắng ở hai đầu chuỗi ký tự
         user = Employee.query.filter(Employee.username == username,
-                                       Employee.password == password).first()
+                                     Employee.password == password).first()
         # Nếu không giá trị thì trả về null
         if user:
             login_user(user=user)
@@ -166,7 +164,27 @@ def login_customer():
         # Kiểm tra đăng nhập
         customer = utils.check_login(username=username, password=password)
         if customer:
-            login_user(user=customer)
+            print('OK OK OK', customer, type(customer))
+            # login_user(user=customer)
+            auth_user = {
+                'name': customer.name,
+                'username': customer.username,
+                'password': customer.password,
+                'id': customer.id,
+                'email': customer.email,
+                'address': customer.address,
+                'phone': customer.phone,
+                'role': customer.role,
+                'debt': customer.debt,
+                'avatar': customer.avatar,
+                'active': customer.active,
+                # 'paid_debt': customer.paid_debt,
+                # 'paid_invoice': customer.paid_invoice,
+                # 'wish_id': customer.wish_id,
+            }
+
+            # session["user"] = auth_user
+            session["user"] = customer
             if "next" in request.args:
                 return redirect(request.args["next"])
 
@@ -180,12 +198,14 @@ def login_customer():
 # Xử lý chức năng đăng xuất
 @app.route("/logout")
 def logout():
-    logout_user()
+    # logout_user()
     # Xóa hết các bộ nhớ tạm của session
     if 'cart' in session:
         del session['cart']
     if 'wish' in session:
         del session['wish']
+    if 'user' in session:
+        del session['user']
     # Reset bộ nhớ tạm của admin
     utils.reset_value()
 
@@ -421,14 +441,15 @@ def book_detail(book_id):
 
 
 # |------------------------------|
-# | XỬ LÝ CÁC CHỨC NĂNG GIỎ HÀNG |
+# | Xử lý các chức năng giỏ hàng |
 # |------------------------------|
 
 # Được gọi từ main.js > addToCart()
 # Thêm một sản phẩm vào giỏ sẽ gọi api này
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
-    if not current_user.is_authenticated:
+    # if not current_user.is_authenticated:
+    if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
     if 'cart' not in session:
@@ -439,7 +460,7 @@ def add_to_cart():
     data = json.loads(request.data)
     id = str(data.get("id"))
     name = data.get("name")
-    price = data.get("selling_price")   # Từ khóa "selling_price" chỉ qua main.js
+    price = data.get("selling_price")  # Từ khóa "selling_price" chỉ qua main.js
     path = data.get("path")
 
     # Nếu có tồn tại id sản phẩm trong giỏ hàng
@@ -449,7 +470,7 @@ def add_to_cart():
         cart[id] = {
             "id": id,
             "name": name,
-            "price": price,     # Từ khóa "price" trỏ tới utils
+            "price": price,  # Từ khóa "price" trỏ tới utils
             "path": path,
             "quantity": 1
         }
@@ -517,7 +538,8 @@ def delete_cart():
 # Xử lý chức năng khi bấm nút 'Mua ngay'
 @app.route('/api/buy', methods=['post'])
 def buy_now():
-    if not current_user.is_authenticated:
+    # if not current_user.is_authenticated:
+    if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
     if 'cart' not in session:
@@ -548,7 +570,8 @@ def buy_now():
 
 # Dữ liệu nhận được từ utils thông qua session cart
 @app.route('/cart')
-@decorator.login_required_cart
+# @decorator.login_required_cart
+@client_login_required
 def cart():
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
@@ -564,12 +587,13 @@ def cart():
 
 
 # |----------------------------|
-# | XỬ LÝ CHỨC NĂNG THANH TOÁN |
+# | Xử lý chức năng thanh toán |
 # |----------------------------|
 
 # Xử lý thanh toán, ghi thông tin người nhận hàng, địa chỉ nhận
 @app.route('/checkout', methods=['get', 'post'])
-@login_required
+# @login_required
+@client_login_required
 def checkout():
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
@@ -603,13 +627,14 @@ def checkout():
 
 
 # |-------------------------------------|
-# | XỬ LÝ CHỨC NĂNG DANH SÁCH YÊU THÍCH |
+# | Xử lý chức năng danh sách yêu thích |
 # |-------------------------------------|
 
 # Đăng nhập thành công mới có thể thêm sách vào wishlist, chưa đăng nhập hiện thông báo
 @app.route('/api/wish', methods=['post'])
 def add_to_wish():
-    if not current_user.is_authenticated:
+    # if not current_user.is_authenticated:
+    if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
     if 'wish' not in session:
@@ -662,8 +687,9 @@ def delete_wish():
 
 # Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích
 @app.route('/wishlist')
-@decorator.login_required_wishlist
-@login_required
+# @decorator.login_required_wishlist
+# @login_required
+@client_login_required
 def wishlist():
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
@@ -675,11 +701,13 @@ def wishlist():
 
 
 # |----------------------------------------------------------------|
-# | CÁC VIEW: LỊCH SỬ ĐẶT HÀNG, CHỈNH SỬA THÔNG TIN CỦA KHÁCH HÀNG |
+# | Các view: lịch sử đặt hàng, chỉnh sửa thông tin của khách hàng |
 # |----------------------------------------------------------------|
 
+
 @app.route('/my-account')
-@login_required
+# @login_required
+@client_login_required
 def my_account():
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
@@ -687,11 +715,21 @@ def my_account():
         return redirect(url_for('search_by_kw', kw=kw))
 
     invoice = utils.read_my_invoice()
+    # invoice = {
+    #     'invoice_id': model_invoice.invoice_id,
+    #     'employee_id': model_invoice.employee_id,
+    #     'customer_id': model_invoice.customer_id,
+    #     'date': model_invoice.date,
+    #     'total_price': model_invoice.total_price,
+    #     'invoice_detail': model_invoice.invoice_detail,
+    #     'shipping': model_invoice.shipping,
+    # }
+    print(invoice)
     return render_template('my-account.html', invoice=invoice)
 
 
 # |--------------------|
-# | TEST CHỨC NĂNG MỚI |
+# | Test chức năng mới |
 # |--------------------|
 
 @app.route('/test')
@@ -700,9 +738,9 @@ def get_book():
     return render_template('test.html', book=book)
 
 
-# |-------------------------|
+# |=========================|
 # | CHẠY CHƯƠNG TRÌNH CHÍNH |
-# |-------------------------|
+# |=========================|
 
 if __name__ == "__main__":
     app.run(debug=True)
