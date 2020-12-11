@@ -48,7 +48,7 @@
                         <div class="navbar-nav mr-auto">
                             <a href="{{ url_for('index') }}" class="nav-item nav-link active">Trang chủ</a>
                             <a href="{{ url_for('book_list') }}" class="nav-item nav-link">Sách</a>
-                        {% if current_user.is_authenticated %}
+                        {% if session.get("user") %}
                             <a href="{{ url_for('cart') }}" class="nav-item nav-link">Giỏ hàng</a>
                             <a href="{{ url_for('checkout') }}" class="nav-item nav-link">Thanh toán</a>
                             <a href="{{ url_for('my_account') }}" class="nav-item nav-link">Tài khoản</a>
@@ -56,7 +56,7 @@
                         {% endif %}
                         </div>
 
-                        {% if not current_user.is_authenticated %}
+                        {% if not session["user"] %}
                         <div class="navbar-nav ml-auto">
                             <div class="nav-item">
                                 <a class="nav-link" href="{{ url_for('login_customer') }}">Đăng nhập</a>
@@ -69,7 +69,7 @@
                         <div class="navbar-nav ml-auto">
                             <div class="nav-item">
                                 <a href="{{ url_for('my_account') }}">
-                                    <img src="{{ url_for('static', filename=current_user.avatar) }}" alt="{{ current_user.name }}"
+                                    <img src="{{ url_for('static', filename=session['user']['avatar']) }}" alt="{{ session['user']['name'] }}"
                                      style="border-radius: 1rem; width: 35px; margin-top: 2px; margin-right: 15px;"/>
                                 </a>
                             </div>
@@ -207,7 +207,7 @@
                             <h2>Liên hệ</h2>
                             <div class="contact-info">
                                 <p><i class="fa fa-map-marker"></i>371 Nguyễn Kiệm, Gò Vấp, TP.HCM</p>
-                                <p><i class="fa fa-envelope"></i>support@Vinbook.com</p>
+                                <p><i class="fa fa-envelope"></i>support@vinbook.com</p>
                                 <p><i class="fa fa-phone"></i>19008178</p>
                             </div>
                         </div>
@@ -272,7 +272,7 @@
                     </div>
 
                     <div class="col-md-6 template-by">
-                        <p>Powered by <a href="https://htmlcodex.com">HTML Codex</a></p>
+                        <p>Template by <a href="https://htmlcodex.com">HTML Codex</a></p>
                     </div>
                 </div>
             </div>

@@ -49,7 +49,7 @@ class Customer(CommonIdentityBase, AuthIndentityBase):
     address = Column(String(100))
     phone = Column(Integer)
     role = Column(String(10), nullable=False, default='guest')
-    debt_amout = Column(Float, default=0)
+    debt = Column(Float, default=0)
 
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)

@@ -23,31 +23,53 @@ function init() {
 }
 
 // Thêm một trường mới để nhập mã sản phẩm, số lượng ở sellview
+/////////////////////////////////////////////////////////////////////////////////////
 function addProduct() {
   const div = document.createElement('div');
   div.className = 'form-group d-flex';
   div.innerHTML = `
-        <label for=
-        ` + inputID + `
-        >Mã sản phẩm: </label>
-        <input type="text" class="form-control mx-2" name=
-        ` + inputID + `
-        placeholder="Ví dụ: 1234">
-        <label for=
-        ` + ('quantity-' + inputID) + `
-        >Mã sản phẩm: </label>
-        <input type="number" class="form-control mx-2" name=
-        ` + ('quantity-' + inputID) + `
-        min=1 max=5 value=1 placeholder="Tối đa 5">
-        <input type="text" class="form-control mr-2" name=` +
-        inputID +
-        ` placeholder="Mã sản phẩm">
+        <div>Mã sản phẩm: </div>
+        <input type="text" class="form-control mx-2" name= ` + inputID + ` placeholder="Ví dụ: 1234">
+
+        <div>Số lượng sản phẩm: </div>
+        <input type="number" class="form-control mx-2" name= ` + ('quantity-' + inputID) + ` min=1 max=5 value=1 placeholder="Tối đa 5">
+
         <input type="button" class="btn btn-secondary" value="Xóa" onclick="removeRow(this)" />
   `;
   inputID++;
   totalItem++;
   document.getElementById('sell_form').appendChild(div);
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//function addProduct() {
+//  const div = document.createElement('div');
+//  div.className = 'form-group d-flex';
+//  div.innerHTML = `
+//        <label for=
+//        ` + inputID + `
+//        >Mã sản phẩm: </label>
+//        <input type="text" class="form-control mx-2" name=
+//        ` + inputID + `
+//        placeholder="Ví dụ: 1234">
+//        <label for=
+//        ` + ('quantity-' + inputID) + `
+//        >Mã sản phẩm: </label>
+//        <input type="number" class="form-control mx-2" name=
+//        ` + ('quantity-' + inputID) + `
+//        min=1 max=5 value=1 placeholder="Tối đa 5">
+//        <input type="text" class="form-control mr-2" name=` +
+//        inputID +
+//        ` placeholder="Mã sản phẩm">
+//        <input type="button" class="btn btn-secondary" value="Xóa" onclick="removeRow(this)" />
+//  `;
+//  inputID++;
+//  totalItem++;
+//  document.getElementById('sell_form').appendChild(div);
+//}
+//
+
 
 // Xóa phần tử input được tạo bên trên
 function removeRow(input) {
@@ -274,18 +296,7 @@ function deleteWish(id) {
 
 
 // ---------------------    back to top     ---------------------------
-var btnTop = document.getElementById("btnTop");
-window.onscroll = function() {scrollFunction()};
 
-
-function scrollFunction() {
-    var btnTop = document.getElementById("btnTop");
-    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 500) {
-        btnTop.style.display = "block";
-    } else {
-        btnTop.style.display = "none";
-    }
-}
 
 
 function topFunction() {
