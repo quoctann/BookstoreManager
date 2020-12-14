@@ -9,6 +9,7 @@ import hashlib, os, json
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
+
 # |=============|
 # | XỬ LÝ CHUNG |
 # |=============|
@@ -96,9 +97,10 @@ def check_debt():
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
-            debt = int(customer.debt)
+            customer_debt = customer.debt
+            max_debt = (SystemRule.query.filter_by(rule='max_debt').first()).value
             # Kiểm tra nghiệp vụ
-            if debt and debt <= 20000:
+            if max_debt >= customer_debt >= 0:
                 session['valid_debt'] = 'OK'
                 session['sell_for'] = customer.name
             else:
@@ -108,18 +110,64 @@ def check_debt():
         session['valid_debt'] = 'init'
 
     if request.method == "POST" and (session['valid_debt'] == 'OK'):
-        # Input name: quantity-số là số lượng sản phẩm tương ứng với input name 'số' mã id sản phẩm
+        # Input name: 'quantity-số' là số lượng sản phẩm tương ứng với ô input có name là: 'số'
+        # Input name 'số' là id của sản phẩm
         # request.form sẽ lấy tất cả các request từ form
         # request.form sẽ trả về ImmutableMultiDict, parse sang dict bằng to_dict để sử dụng len()
-        # arg là trường key của một phần tử dict tương đương với input name
+        # arg là trường key của một phần tử dict, ở đây tương đương với input name
+        quantity = 0
+        product_id = 0
+        total_quan = 0
+        total_price = 0
+        invoice_temp = {}
+        step = 0
         for arg in request.form:
+            # Duyệt qua từng ô input
             for count in range(len(request.form.to_dict())):
+                # Nếu đó là số lượng sản phẩm: 'quantity-số'
                 if arg == ('quantity-' + str(count)):
-                    print('quantity is', request.form.get(arg))
+                    # Lấy giá trị
+                    quantity = request.form.get(arg)
+                    step = 1
+                # Nếu đó là ID sản phẩm: 'số'
                 elif arg == str(count):
-                    print('product is', request.form.get(arg))
-        print('OK')
-        pass
+                    # Lấy giá trị
+                    product_id = request.form.get(arg)
+                    step = 2
+                total_quan += int(quantity)
+                total_price += BookStorage.query.filter_by(id=product_id).first().selling_price
+
+                # Step 2 là đã lấy được giá trị cần thiết 1 ô input
+                if step == 2:
+                    step = 0
+                    # Nếu có id đó rồi thì tăng số lượng thôi
+                    if product_id in invoice_temp:
+                        invoice_temp[product_id]["quantity"] += 1
+                    # Chưa có thì thêm mới
+                    else:
+                        invoice_temp[product_id] = {
+                            "product_id": product_id,
+                            "quantity": quantity
+                        }
+
+        # Nếu hóa đơn tạm có sản phẩm
+        if invoice_temp != {}:
+            invoice = Invoice(customer_id=int(session['user']['id']))
+            db.session.add(invoice)
+            for item in list(invoice_temp.values()):
+                price = BookStorage.query.filter_by(id=item['product_id']).first().selling_price
+                price = item['quantity'] * price
+                detail = InvoiceDetail(invoice=invoice,
+                                       book_id=int(item[product_id]),
+                                       quantity=item[quantity],
+                                       price=price)
+                db.session.add(detail)
+
+            try:
+                db.session.commit()
+                print('Commit successfully')
+            except Exception as ex:
+                print(ex)
 
     # Gọi phương thức index(self) từ admin.py
     return redirect(url_for('sellview.index'))
@@ -165,7 +213,6 @@ def login_customer():
         customer = utils.check_login(username=username, password=password)
         if customer:
             print('OK OK OK', customer, type(customer))
-            # login_user(user=customer)
             auth_user = {
                 'name': customer.name,
                 'username': customer.username,
@@ -178,13 +225,13 @@ def login_customer():
                 'debt': customer.debt,
                 'avatar': customer.avatar,
                 'active': customer.active,
-                # 'paid_debt': customer.paid_debt,
-                # 'paid_invoice': customer.paid_invoice,
-                # 'wish_id': customer.wish_id,
+                'paid_debt': customer.paid_debt,
+                'paid_invoice': customer.paid_invoice,
+                'wish_id': customer.wish_id,
             }
 
-            # session["user"] = auth_user
-            session["user"] = customer
+            session["user"] = auth_user
+            # session["user"] = customer
             if "next" in request.args:
                 return redirect(request.args["next"])
 
@@ -448,7 +495,6 @@ def book_detail(book_id):
 # Thêm một sản phẩm vào giỏ sẽ gọi api này
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
-    # if not current_user.is_authenticated:
     if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
@@ -538,7 +584,6 @@ def delete_cart():
 # Xử lý chức năng khi bấm nút 'Mua ngay'
 @app.route('/api/buy', methods=['post'])
 def buy_now():
-    # if not current_user.is_authenticated:
     if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
@@ -613,7 +658,7 @@ def checkout():
         if phone and address and name:
             if 'cart' in session:
                 utils.add_invoice(session.get('cart'))
-                utils.add_shipping(invoice_id=current_user.id, name=name, phone=phone, address=address)
+                utils.add_shipping(invoice_id=session['user']['id'], name=name, phone=phone, address=address)
 
                 del session['cart']
                 err_msg = "Bạn đã thanh toán thành công!"
@@ -633,7 +678,6 @@ def checkout():
 # Đăng nhập thành công mới có thể thêm sách vào wishlist, chưa đăng nhập hiện thông báo
 @app.route('/api/wish', methods=['post'])
 def add_to_wish():
-    # if not current_user.is_authenticated:
     if not session.get("user"):
         return jsonify({'message': 'Bạn cần đăng nhập để sử dụng tính năng này!'})
 
@@ -687,8 +731,6 @@ def delete_wish():
 
 # Khi đăng nhập thành công, query xuống db để hiện thị danh sách yêu thích
 @app.route('/wishlist')
-# @decorator.login_required_wishlist
-# @login_required
 @client_login_required
 def wishlist():
     # Chức năng tìm kiếm trên thanh menu seacrh

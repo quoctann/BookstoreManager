@@ -25,24 +25,22 @@ function init() {
 // Thêm một trường mới để nhập mã sản phẩm, số lượng ở sellview
 function addProduct() {
   const div = document.createElement('div');
-  div.className = 'form-group d-flex';
+  div.className = 'form-group row d-flex align-items-center';
   div.innerHTML = `
-        <label for=
+        <label class='col-2' for=
         ` + inputID + `
         >Mã sản phẩm: </label>
-        <input type="text" class="form-control mx-2" name=
+        <input type="text" class="form-control col-3" name=
         ` + inputID + `
-        placeholder="Ví dụ: 1234">
-        <label for=
+        placeholder="ID sản phẩm">
+        <label class='col-1' for=
         ` + ('quantity-' + inputID) + `
-        >Mã sản phẩm: </label>
-        <input type="number" class="form-control mx-2" name=
+        >SL: </label>
+        <input type="number" class="form-control col-1" name=
         ` + ('quantity-' + inputID) + `
         min=1 max=5 value=1 placeholder="Tối đa 5">
-        <input type="text" class="form-control mr-2" name=` +
-        inputID +
-        ` placeholder="Mã sản phẩm">
-        <input type="button" class="btn btn-secondary" value="Xóa" onclick="removeRow(this)" />
+        <span class='col-3 mx-1'>{{ items_price }} đ</span>
+        <input type="button" class="btn btn-secondary form-control col-1" value="Xóa" onclick="removeRow(this)" />
   `;
   inputID++;
   totalItem++;

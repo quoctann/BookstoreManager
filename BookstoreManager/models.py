@@ -35,9 +35,9 @@ class AuthIndentityBase(db.Model, UserMixin):
 
 
 # Danh sách tài khoản đăng nhập (demo)
-class SystemUser(CommonIdentityBase, AuthIndentityBase):
-    __tablename__ = 'system_user'
-    role = Column(String(10), nullable=False, default='Employee')
+# class SystemUser(CommonIdentityBase, AuthIndentityBase):
+#     __tablename__ = 'system_user'
+#     role = Column(String(10), nullable=False, default='Employee')
 
 
 # Thông tin nhân viên và vai trò trong hệ thống
@@ -61,7 +61,7 @@ class Customer(CommonIdentityBase, AuthIndentityBase):
     phone = Column(Integer)
     role = Column(String(10), nullable=False, default='guest')
     # Lưu số nợ hiện tại
-    debt = Column(Float, default=0)
+    debt = Column(Integer, default=0)
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
@@ -153,6 +153,18 @@ class ShippingDetail(db.Model):
 class WishDetail(db.Model):
     wish_id = Column(Integer, ForeignKey(Customer.id), primary_key=True, nullable=False)
     book_id = Column(Integer, ForeignKey(BookStorage.id), primary_key=True, nullable=False)
+
+
+# Bảng quy tắc nghiệp vụ của Quản lý
+class SystemRule(db.Model):
+    rule_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    # Tên nghiệp vụ > sử dụng trong main.py
+    rule = Column(String(10), nullable=False)
+    # Giá trị tham chiếu
+    value = Column(Integer, nullable=False)
+    # Mô tả
+    description = Column(String(50))
+    # Ví dụ rule = max_debt, value = 20000 > hạn mức nợ của khách không được quá 20k để mua sách
 
 
 if __name__ == '__main__':

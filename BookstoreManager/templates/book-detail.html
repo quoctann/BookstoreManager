@@ -53,7 +53,7 @@
                                             <a class="btn" href="javascript:;"
                                                 onclick="addToCart({{ book.id }}, '{{ book.name }}', {{ book.selling_price }}, '{{ book.path }}')">
                                                 <i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</a>
-                                            {% if current_user.is_authenticated %}
+                                            {% if session.get('user') %}
                                             <a class="btn" href="{{ url_for('checkout') }}"
                                                onclick="buyNow({{ book.id }}, '{{ book.name }}', {{ book.selling_price }}, '{{ book.path }}')">
                                                 <i class="fa fa-shopping-cart"></i>Mua ngay</a>

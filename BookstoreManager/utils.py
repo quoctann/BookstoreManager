@@ -14,7 +14,7 @@ import hashlib
 
 # Tiện ích thêm nhân viên vào hệ thống (Admin)
 def add_employee(name, username, password):
-    user = SystemUser(name=name, username=username,
+    user = Employee(name=name, username=username,
                       password=str(hashlib.md5(password.strip().encode("utf-8")).hexdigest()))
     db.session.add(user)
     db.session.commit()
@@ -139,7 +139,7 @@ def add_invoice(cart):
     # if cart and current_user.is_authenticated:
     if cart and session.get("user"):
         total_quantity, total_amount = cart_stats(cart)
-        invoice = Invoice(customer_id=session['user']['id'], total_price=total_amount)
+        invoice = Invoice(customer_id=int(session['user']['id']), total_price=total_amount)
         db.session.add(invoice)
 
         for b in list(cart.values()):
@@ -180,7 +180,7 @@ def add_wishlist(wishlist):
         # Thêm các sách mới được yêu thích xuống db
         book = None
         for b in list(wishlist.values()):
-            book = WishDetail(wish_id=session['user']['id'],
+            book = WishDetail(wish_id=int(session['user']['id']),
                               book_id=b["id"])
         db.session.add(book)
 
@@ -196,7 +196,7 @@ def add_wishlist(wishlist):
 # Kết theo bảng bên trái
 # Đọc dữ liệu lấy thông tin sách mà khách hàng đã yêu thích
 def read_wish():
-    return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == session['user']['id']).all()
+    return db.session.query(BookStorage).join(WishDetail).filter(WishDetail.wish_id == int(session['user']['id'])).all()
 
 
 # Lấy dữ liệu sách theo book_id trong wishlist
@@ -206,7 +206,7 @@ def get_wish(book_id):
 
 # Xóa sách ra khỏi danh sách yêu thích - có cập nhập xuống db
 def del_wish(book_id):
-    w = WishDetail.query.filter(WishDetail.book_id == book_id and WishDetail.wish_id == session['user'].id).first()
+    w = WishDetail.query.filter(WishDetail.book_id == book_id and WishDetail.wish_id == int(session['user']['id'])).first()
     try:
         db.session.delete(w)
         db.session.commit()
@@ -230,13 +230,13 @@ def change_info(user_id, name, phone, email, address):
 
 # View lịch sử hóa đơn của khách hàng
 def read_my_invoice():
-    return Invoice.query.filter(Invoice.customer_id == session["user"]["id"])
+    return Invoice.query.filter(Invoice.customer_id == int(session["user"]["id"]))
 
 # isouter=True : Kết trái
 
 
 def read_join():
-    WishDetail.query.filter(WishDetail.wish_id == session['user'].id)
+    WishDetail.query.filter(WishDetail.wish_id == int(session['user']['id']))
 
     # Có nhiêu lấy hết, trùng dữ liệu: theo wishdetail
     # return db.session.query(BookStorage).join(WishDetail)
@@ -247,23 +247,4 @@ def read_join():
 
     # return WishDetail.query.filter(WishDetail.wish_id == current_user.id)
 
-    return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == session['user'].id).all()
-
-
-def object_to_dict(obj, found=None):
-    if found is None:
-        found = set()
-    mapper = class_mapper(obj.__class__)
-    columns = [column.key for column in mapper.columns]
-    get_key_value = lambda c: (c, getattr(obj, c).isoformat()) if isinstance(getattr(obj, c), datetime) else (c, getattr(obj, c))
-    out = dict(map(get_key_value, columns))
-    for name, relation in mapper.relationships.items():
-        if relation not in found:
-            found.add(relation)
-            related_obj = getattr(obj, name)
-            if related_obj is not None:
-                if relation.uselist:
-                    out[name] = [object_to_dict(child, found) for child in related_obj]
-                else:
-                    out[name] = object_to_dict(related_obj, found)
-    return out
+    return db.session.query(BookStorage).join(WishDetail).filter(Invoice.customer_id == int(session['user']['id'])).all()
