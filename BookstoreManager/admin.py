@@ -1,7 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView, expose
 from flask import redirect, url_for, request, session
-from BookstoreManager import admin, db
+from BookstoreManager import admin, db, utils
 from BookstoreManager.models import *
 from flask_login import current_user, logout_user
 
@@ -53,7 +53,24 @@ class SellView(AuthenticatedView):
 class ImportView(AuthenticatedView):
     @expose('/')
     def index(self):
-        return self.render('admin/task_view/import.html')
+        books = BookStorage.query.all()
+        quantity, price = utils.import_stats(session.get('import_book'))
+        import_info = {
+            "total_amount": price,
+            "total_quantity": quantity
+        }
+        return self.render('admin/task_view/import.html', books=books, import_info=import_info)
+
+
+class SubmitImportView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        quantity, price = utils.import_stats(session.get('import_book'))
+        import_info = {
+            "total_amount": price,
+            "total_quantity": quantity
+        }
+        return self.render('admin/task_view/submit-import.html', import_info=import_info)
 
 
 class DebtCollectionView(AuthenticatedView):
@@ -120,6 +137,7 @@ admin.add_view(SellView(name="Bán sách"))
 admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
 admin.add_view(ImportView(name="Nhập sách"))
+admin.add_view(SubmitImportView(name="Xác nhận đơn nhập sách"))
 admin.add_view(StorageView(name="Xem kho"))
 admin.add_view(CustomerView(name="Khách hàng"))
 admin.add_view(AdminModelView(BookStorage, db.session,

@@ -18,7 +18,6 @@ def add_employee(name, username, password):
                       password=str(hashlib.md5(password.strip().encode("utf-8")).hexdigest()))
     db.session.add(user)
     db.session.commit()
-
     return user
 
 
@@ -29,10 +28,55 @@ def reset_value():
     session['debt_checking_status'] = 'init'
     # Lưu tạm thời tên của khách hàng
     session['sell_for'] = 'init'
-
+    if 'import_book' in session:
+        del session['import_book']
 
 class TaskRules:
     pass
+
+##########################################################
+# Nếu là sách mới, chưa có trong kho, thì cập nhập dữ liệu sách mới vào kho
+def import_book(name, quantity, author, category, price):
+    book = BookStorage(name=name, instock=quantity, author=author, category=category, selling_price=price)
+    try:
+        db.session.add(book)
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
+
+
+# Lấy tổng số lượng và tổng hóa đơn phiếu nhập
+def import_stats(import_book):
+    total_quantity, total_amount = 0, 0
+    if import_book:
+        for b in import_book.values():
+            total_quantity = total_quantity + b["quantity"]
+            total_amount = total_amount + b["quantity"] * b["price"]
+
+    return total_quantity, total_amount
+
+
+
+# Tạo 3 bảng song song độc lập (1 : 2)
+def add_import(import_book):
+    if import_book and current_user.is_authenticated:
+        total_quantity, total_amount = import_stats(import_book)
+        bookImport = BookImport(employee_incharge=current_user.id, total_cost=total_amount)
+        db.session.add(bookImport)
+
+        for b in list(import_book.values()):
+            detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
+            db.session.add(detail)
+
+        try:
+            db.session.commit()
+            return True
+        except Exception as ex:
+            print(ex)
+    return False
+#########################################################
 
 
 # |==============================|
@@ -87,6 +131,14 @@ def search_by_kw(kw=None):
         # return BookStorage.query.filter(BookStorage.author.contains(kw))
 
 
+# Lấy tất cả sách có trong db
+def get_book_by_name(name=None):
+    book = BookStorage.query
+    if name:
+        book = book.filter(BookStorage.name.contains(name))
+    return book.first()
+
+
 # Chức năng lọc dữ liệu - book-list
 def read_books(cate_id=None, kw=None, from_price=None, to_price=None, author=None):
     books = BookStorage.query
@@ -134,7 +186,7 @@ def cart_stats(cart):
 # |------------------|
 
 
-# Test tạo 3 bảng song song độc lập (1 : 2)
+# Tạo 3 bảng song song độc lập (1 : 2)
 def add_invoice(cart):
     # if cart and current_user.is_authenticated:
     if cart and session.get("user"):

@@ -6,6 +6,7 @@ body {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     background: #f3f6ff;
+    counter-reset: Count-Value;
 }
 
 a {
@@ -2470,3 +2471,21 @@ background-size: cover;
 body > div.checkout > div > form > div > div.col-lg-4.alert.alert-warning {
     margin-bottom: 30px;
 }
+
+
+/*************************************************************/
+/******** Hiện số thứ tự của bảng có class='stt' *******/
+/*************************************************************/
+
+
+tbody.stt tr.stt td:first-child:before
+{
+  counter-increment: Count-Value;
+  content: counter(Count-Value);
+}
+
+
+/*************************************************************/
+/******** test chức năng mới *******/
+/*************************************************************/
+

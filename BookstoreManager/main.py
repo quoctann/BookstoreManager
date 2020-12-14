@@ -127,6 +127,89 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
+# Xử lý action nhập sách mới từ form
+@app.route('/admin/importview/', methods=["GET", "POST"])
+def import_book():
+    err_msg = ""
+    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
+    if request.method == 'POST':
+        if 'import_book' not in session:
+            session['import_book'] = {}
+
+        import_book = session['import_book']
+
+        id = request.form.get('id')
+        name = request.form.get('name')
+        quantity = request.form.get('quantity')
+        price = request.form.get('price')
+        author = request.form.get('author')
+        category = request.form.get('category')
+        if not quantity and not price:
+            quantity = price = 0
+        import_book[id] = {
+            'id': id,
+            'name': name,
+            'quantity': int(quantity),
+            'price': float(price),
+            'author': author,
+            'category': category
+        }
+        # cập nhập thông tin xuống db
+        # book = utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
+        print(import_book)
+        session['import_book'] = import_book
+
+
+    return redirect(url_for('importview.index'))
+
+
+
+@app.route('/admin/submitimportview/')
+def submit_import():
+    if utils.add_import(session.get('import_book')):
+        del session['import_book']
+    return redirect(url_for('submitimportview.index'))
+
+
+# Xóa 1 sách ra khỏi ImportDetail
+@app.route('/api/del-one-import', methods=['post'])
+def del_one_import_session():
+    if 'import_book' not in session:
+        session['import_book'] = {}
+
+    import_book = session['import_book']
+    data = json.loads(request.data)
+    id = str(data.get("id"))
+
+    if id in import_book:
+        import_book.pop(id)
+    session['import_book'] = import_book
+    print(import_book)
+
+
+    if not import_book:
+        del session['import_book']
+
+
+    return jsonify({
+
+    })
+
+
+@app.route('/test')
+def test():
+    books = BookStorage.query.all()
+    return render_template('test.html', books=books)
+
+
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
+
+
 # |================|
 # | API PHÍA ADMIN |
 # |================|
@@ -145,7 +228,7 @@ def get_value():
 
 
 # |===========================|
-# | CHỨC NĂNG PHÍA KHÁCH HÀNG |         ################################
+# | CHỨC NĂNG PHÍA KHÁCH HÀNG |         ###############################################################
 # |===========================|
 
 
@@ -166,7 +249,7 @@ def login_customer():
         # Kiểm tra đăng nhập
         customer = utils.check_login(username=username, password=password)
         if customer:
-            print('OK OK OK', customer, type(customer))
+            # print('OK OK OK', customer, type(customer))
             auth_user = {
                 'name': customer.name,
                 'username': customer.username,
@@ -185,7 +268,7 @@ def login_customer():
             }
 
             session["user"] = auth_user
-            # session["user"] = customer        # Lỗi json
+            # session["user"] = customer          # van con loi json
             if "next" in request.args:
                 return redirect(request.args["next"])
 
@@ -590,7 +673,6 @@ def cart():
 
 # Xử lý thanh toán, ghi thông tin người nhận hàng, địa chỉ nhận
 @app.route('/checkout', methods=['get', 'post'])
-# @login_required
 @client_login_required
 def checkout():
     # Chức năng tìm kiếm trên thanh menu seacrh

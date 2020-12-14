@@ -107,27 +107,19 @@
                                             </thead>
 
                                             <!--    list đơn hàng   -->
-                                            <tbody id="ivo">
+                                            <tbody class="stt">
                                                 <!--    Vòng lặp for    -->
 
                                                 {% if invoice %}
                                                 {% for i in invoice %}
 
-                                                <tr>
-                                                    <td id="{{ i.invoice_id }}"></td>
+                                                <tr class="stt">
+                                                    <td></td>
                                                     <td>{{ i.invoice_id }}</td>
                                                     <td>{{ i.date }}</td>
                                                     <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
                                                     <td><a href="{{ url_for('read_invoice_by_id', invoice_id=i.invoice_id) }}"><button class="btn">xem</button></a> </td>
                                                 </tr>
-                                                <script type="">
-                                                       var k = 0
-                                                       function increment() {
-                                                       document.getElementById("{{i.invoice_id}}").innerHTML = 'k';
-                                                       console.log('get success');
-                                                       k++;
-                                                       }
-                                                </script>
                                                 {% endfor %}
                                                 {% else %}
                                                  <tr>
