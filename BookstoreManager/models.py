@@ -87,7 +87,7 @@ class BookStorage(CommonIdentityBase):
     author = Column(String(30), nullable=False)
     category = Column(String(20), nullable=False)
     selling_price = Column(Float, nullable=False)
-    path = Column(String(50), nullable=False)
+    path = Column(String(50), default='images/defaultbook.jpg')
     # Sách được nhập bởi những đơn hàng nào
     imported_by = relationship('ImportDetail', backref='book_storage', lazy=True)
     # Sách được bán trên những hóa đơn nào
@@ -100,7 +100,7 @@ class BookStorage(CommonIdentityBase):
 class BookImport(db.Model):
     __tablename__ = 'book_import'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(Date, nullable=False)
+    date = Column(Date, default=datetime.today())
     total_cost = Column(Float, nullable=False)
     # Nhân viên chịu trách nhiệm nhập sách
     employee_incharge = Column(Integer, ForeignKey(Employee.id))

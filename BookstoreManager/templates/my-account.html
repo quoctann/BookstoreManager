@@ -6,163 +6,137 @@
         <div class="breadcrumb-wrap">
             <div class="container-fluid">
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
-                    <li class="breadcrumb-item active">Tài khoản của tôi</li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Tài khoảng của tôi</li>
                 </ul>
             </div>
         </div>
         <!-- Breadcrumb End -->
         
         <!-- My Account Start -->
-        <div class="my-account">
-            <div class="container-fluid">
-                <div class="row">
 
-                    <!--    Thẻ tap     -->
-                    <div class="col-md-3">
-                        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoản chi tiết</a>
-                            <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-shopping-bag"></i>Đặt hàng</a>
-                            <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab"><i class="fa fa-credit-card"></i>Thanh Toán</a>
+            <div class="my-account">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <!--    Thẻ tap     -->
+                        <div class="col-md-3">
+                            <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                                <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoảng chi tiết</a>
+                                <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-credit-card"></i>Đặt hàng</a>
+                                <div style="padding: 0.5rem;">
+                                    <img src="{{ url_for('static', filename=session['user']['avatar']) }}" style="width:100%; border-radius: 1rem"/>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!--    Tap hiển thị   -->
-                    <div class="col-md-8">
-                        <div class="tab-content">
+                        <!--    Tap hiển thị   -->
+                        <div class="col-md-8">
+                            <div class="tab-content">
 
-                            <!--    Form cập nhập thông tin khách hàng   -->
-                            <div class="tab-pane fade show active" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
-                                <h4>Thông tin chi tiết</h4>
-                                <div class="row">
+                                    <!--    Form cập nhập thông tin khách hàng   -->
+                                {% if err_msg %}
+                                <div class="text-certer text-success"><h1>{{ err_msg }}</h1></div>
+                                {% endif %}
+                                <div class="tab-pane fade show active" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                                <form method="post" action="" enctype="multipart/form-data">
+                                    <h4>Thông tin chi tiết</h4>
+                                    <div class="row">
 
-                                    <!--    Nơi cập nhập thông tin   -->
-                                    <div class="col-md-5">
-                                        <!--    Tên   -->
-                                        <div class="form-group col-md-12">
-                                            <label for="name">Họ tên</label>
-                                            <input type="text" id="name" name="name" class="form-control" value="{{  session['user']['name'] }}"/>
+                                        <!--    Nơi cập nhập thông tin   -->
+                                        <div class="col-md-5">
+                                            <!--    Tên   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="name">Họ tên</label>
+                                                <input type="text" id="name" name="name" class="form-control" value="{{ session['user']['name'] }}" required/>
+                                            </div>
+
+                                            <!--    Số điện thoại   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="phone">Số điện thoại</label>
+                                                <input type="number" id="phone" name="phone" class="form-control" value="{{ session['user']['phone'] }}" required/>
+                                            </div>
+
+                                            <!--    Nút cập nhập thông tin - nên chỉnh về input  -->
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn">Cập nhập</button>
+                                                <a href="{{ url_for('change_password') }}">Thay đổi mật khẩu</a>
+                                            <br><br>
                                         </div>
 
-                                        <!--    Số điện thoại   -->
-                                        <div class="form-group col-md-12">
-                                            <label for="phone">Số điện thoại</label>
-                                            <input type="number" id="phone" name="phone" class="form-control" value="{{ session['user']['phone'] }}"/>
                                         </div>
 
-                                        <!--    Nút cập nhập thông tin - nên chỉnh về input  -->
-                                        <div class="col-md-12">
-                                        <button class="btn">Cập nhập</button>
-                                        <br><br>
-                                    </div>
+                                        <div class="col-md-7 ">
+                                            <!--    Email   -->
+                                            <div class="form-group col-md-9">
+                                                <label for="email">Email</label>
+                                                <input type="email" id="email" name="email" class="form-control" value="{{ session['user']['email'] }}" required/>
+                                            </div>
 
-                                    </div>
+                                            <!--    Address   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="address">Địa chỉ</label>
+                                                <input type="text" id="address" name="address" class="form-control" value="{{ session['user']['address'] }}"required/>
+                                            </div>
 
-                                    <div class="col-md-7 ">
-                                        <!--    Email   -->
-                                        <div class="form-group col-md-9">
-                                            <label for="email">Email</label>
-                                            <input type="email" value="{{ session['user']['email'] }}" id="email" name="email" class="form-control" />
-                                        </div>
+                                            <div class="form-group col-md-12">
+                                                <label for="avatar">Ảnh đại diện</label>
+                                                <input type="file" id="avatar" name="avatar" class="form-control" />
+                                            </div>
 
-                                        <!--    Address   -->
-                                        <div class="form-group col-md-12">
-                                            <label for="address">Địa chỉ</label>
-                                            <input type="text" value="{{ session['user']['address'] }}" id="address" name="address" class="form-control" />
                                         </div>
 
                                     </div>
-                                </div>
-
-                                <!--    Thay đổi mật khẩu   -->
-                                <h4>Thay đổi mật khẩu</h4>
-                                <!--    Mật khẩu hiện tại   -->
-                                <div class="col-md-8 row">
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="password" placeholder="Mật khẩu hiện tại. . .">
-                                    </div>
-                                </div>
-
-                                <!--    Mật khẩu Mới   -->
-                                <div class="col-md-8 row ">
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" placeholder="Mật khẩu mới. . .">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" placeholder="Nhập lại mật khẩu. . .">
-                                    </div>
-
-                                    <!--    Nút cập nhập pass - nên chỉnh về input  -->
-                                    <div class="col-md-12">
-                                        <button class="btn">Thay đổi</button>
-                                    </div>
-
-                                </div>
+                                </form>
                             </div>
 
-                            <!--    View xem các đơn hàng   -->
-                            <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
+                                <!--    View xem các đơn hàng   -->
+                                <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
 
-                                        <!--    tiêu đề   -->
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>STT</th>
-                                                <th>Mã id hoá đơn</th>
-                                                <th>Ngày đặt</th>
-                                                <th>Giá</th>
-                                                <th>Trạng thái</th>
-                                                <th>Chi tiết</th>
-                                            </tr>
-                                        </thead>
+                                            <!--    tiêu đề   -->
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Mã id hoá đơn</th>
+                                                    <th>Ngày đặt</th>
+                                                    <th>Giá</th>
+                                                    <th>Chi tiết</th>
+                                                </tr>
+                                            </thead>
 
-                                        <!--    list đơn hàng   -->
-                                        <tbody id="ivo">
-                                            <!--    Vòng lặp for    -->
+                                            <!--    list đơn hàng   -->
+                                            <tbody class="stt">
+                                                <!--    Vòng lặp for    -->
 
-                                            {% if invoice %}
-                                            {% for i in invoice %}
+                                                {% if invoice %}
+                                                {% for i in invoice %}
 
-                                            <tr>
-
-                                                <td id="{{ i['invoice_id'] }}"></td>
-                                                <td>{{ i['invoice_id'] }}</td>
-                                                <td>{{ i.date }}</td>
-                                                <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
-                                                <td>Approved</td>
-                                                <td><button class="btn">xem</button></td>
-                                            </tr>
-                                            <script type="text/javascript">
-                                                   function increment({{ i.invoice_id }}) {
-                                                   document.getElementById("{{i.invoice_id}}").innerHTML = 'test';
-                                                   console.log('get success');
-                                                   }
-                                            </script>
-                                            {% endfor %}
-                                            {% else %}
-                                             <tr>
-                                                 <td colspan="6" class="text-center"><h2>Chưa có sản phẩm!</h2></td>
-                                             </tr>
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
+                                                <tr class="stt">
+                                                    <td></td>
+                                                    <td>{{ i.invoice_id }}</td>
+                                                    <td>{{ i.date }}</td>
+                                                    <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
+                                                    <td><a href="{{ url_for('read_invoice_by_id', invoice_id=i.invoice_id) }}"><button class="btn">xem</button></a> </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% else %}
+                                                 <tr>
+                                                     <td colspan="5" class="text-center"><h2>Chưa có đơn đặt hàng nào!</h2></td>
+                                                 </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!--    Nơi cập nhập thông tin khách hàng   -->
-                            <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
-                                <h4>Payment Method</h4>
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non. Praesent in faucibus tellus, sed gravida lacus. Vivamus eu diam eros. Aliquam et sapien eget arcu rhoncus scelerisque.
-                                </p> 
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
         <!-- My Account End -->
 
 {% endblock %}

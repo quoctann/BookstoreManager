@@ -36,6 +36,8 @@ def user_load(user_id):
 @app.route("/login-admin", methods=["GET", "POST"])
 # Phương thức này được gọi từ login.html
 def login_admin():
+    # Reset bộ nhớ tạm của admin
+    utils.reset_value()
     if request.method == "POST":
         # Lấy dữ liệu từ form (thông qua request)
         username = request.form.get("loginUsername")
@@ -173,6 +175,89 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
+# Xử lý action nhập sách mới từ form
+@app.route('/admin/importview/', methods=["GET", "POST"])
+def import_book():
+    err_msg = ""
+    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
+    if request.method == 'POST':
+        if 'import_book' not in session:
+            session['import_book'] = {}
+
+        import_book = session['import_book']
+
+        id = request.form.get('id')
+        name = request.form.get('name')
+        quantity = request.form.get('quantity')
+        price = request.form.get('price')
+        author = request.form.get('author')
+        category = request.form.get('category')
+        if not quantity and not price:
+            quantity = price = 0
+        import_book[id] = {
+            'id': id,
+            'name': name,
+            'quantity': int(quantity),
+            'price': float(price),
+            'author': author,
+            'category': category
+        }
+        # cập nhập thông tin xuống db
+        # book = utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
+        print(import_book)
+        session['import_book'] = import_book
+
+
+    return redirect(url_for('importview.index'))
+
+
+
+@app.route('/admin/submitimportview/')
+def submit_import():
+    if utils.add_import(session.get('import_book')):
+        del session['import_book']
+    return redirect(url_for('submitimportview.index'))
+
+
+# Xóa 1 sách ra khỏi ImportDetail
+@app.route('/api/del-one-import', methods=['post'])
+def del_one_import_session():
+    if 'import_book' not in session:
+        session['import_book'] = {}
+
+    import_book = session['import_book']
+    data = json.loads(request.data)
+    id = str(data.get("id"))
+
+    if id in import_book:
+        import_book.pop(id)
+    session['import_book'] = import_book
+    print(import_book)
+
+
+    if not import_book:
+        del session['import_book']
+
+
+    return jsonify({
+
+    })
+
+
+@app.route('/test')
+def test():
+    books = BookStorage.query.all()
+    return render_template('test.html', books=books)
+
+
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
+
+
 # |================|
 # | API PHÍA ADMIN |
 # |================|
@@ -191,7 +276,7 @@ def get_value():
 
 
 # |===========================|
-# | CHỨC NĂNG PHÍA KHÁCH HÀNG |
+# | CHỨC NĂNG PHÍA KHÁCH HÀNG |         ###############################################################
 # |===========================|
 
 
@@ -212,7 +297,7 @@ def login_customer():
         # Kiểm tra đăng nhập
         customer = utils.check_login(username=username, password=password)
         if customer:
-            print('OK OK OK', customer, type(customer))
+            # print('OK OK OK', customer, type(customer))
             auth_user = {
                 'name': customer.name,
                 'username': customer.username,
@@ -245,7 +330,6 @@ def login_customer():
 # Xử lý chức năng đăng xuất
 @app.route("/logout")
 def logout():
-    # logout_user()
     # Xóa hết các bộ nhớ tạm của session
     if 'cart' in session:
         del session['cart']
@@ -255,6 +339,8 @@ def logout():
         del session['user']
     # Reset bộ nhớ tạm của admin
     utils.reset_value()
+    if 'user' in session:
+        del session['user']
 
     return redirect(url_for("index"))
 
@@ -637,7 +723,6 @@ def cart():
 
 # Xử lý thanh toán, ghi thông tin người nhận hàng, địa chỉ nhận
 @app.route('/checkout', methods=['get', 'post'])
-# @login_required
 @client_login_required
 def checkout():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -746,9 +831,7 @@ def wishlist():
 # | Các view: lịch sử đặt hàng, chỉnh sửa thông tin của khách hàng |
 # |----------------------------------------------------------------|
 
-
-@app.route('/my-account')
-# @login_required
+@app.route('/my-account', methods=['get', 'post'])
 @client_login_required
 def my_account():
     # Chức năng tìm kiếm trên thanh menu seacrh
@@ -756,28 +839,60 @@ def my_account():
     if kw:
         return redirect(url_for('search_by_kw', kw=kw))
 
+    err_msg = ""
+    # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+
+        avatar = request.files["avatar"]
+        if avatar:
+            avatar_path = 'images/upload/%s' % avatar.filename
+            avatar.save(os.path.join(app.root_path, 'static/', avatar_path))
+        else:
+            avatar_path = None
+        if name and phone and email and address:
+            if utils.change_info(name, phone, email, address, avatar_path):
+                err_msg = "Bạn đã thay đổi thông tin thành công"
+            else:
+                err_msg = "Fails - Something Wrong!"
+
     invoice = utils.read_my_invoice()
-    # invoice = {
-    #     'invoice_id': model_invoice.invoice_id,
-    #     'employee_id': model_invoice.employee_id,
-    #     'customer_id': model_invoice.customer_id,
-    #     'date': model_invoice.date,
-    #     'total_price': model_invoice.total_price,
-    #     'invoice_detail': model_invoice.invoice_detail,
-    #     'shipping': model_invoice.shipping,
-    # }
-    print(invoice)
-    return render_template('my-account.html', invoice=invoice)
+    return render_template('my-account.html', err_msg=err_msg, invoice=invoice)
 
 
-# |--------------------|
-# | Test chức năng mới |
-# |--------------------|
+# Xem lịch xử hóa đơn
+@app.route('/invoice-detail/<int:invoice_id>')
+@client_login_required
+def read_invoice_by_id(invoice_id):
+    # Chức năng tìm kiếm trên thanh menu seacrh
+    kw = request.args.get('kw')
+    if kw:
+        return redirect(url_for('search_by_kw', kw=kw))
 
-@app.route('/test')
-def get_book():
-    book = utils.read_books()
-    return render_template('test.html', book=book)
+    invoice_detail = utils.read_invoice_get_info_book(invoice_id)
+    total = utils.invoice_info(invoice_id)
+    return render_template('invoice-detail.html', invoice_detail=invoice_detail, total=total)
+
+
+@app.route('/change-password', methods=["get", "post"])
+def change_password():
+    err_msg = ""
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if utils.check_login(session['user']['username'], password):
+            new = request.form.get('new')
+            confirm = request.form.get('confirm')
+            if confirm.strip() == new.strip():
+                if utils.change_password(new):
+                    return redirect(url_for('index'))
+            else:
+                err_msg = "Mật khẩu mới không khớp"
+        else:
+            err_msg = "Mật khẩu bận nhập sai!"
+    return render_template('change-password.html', err_msg=err_msg)
 
 
 # |=========================|

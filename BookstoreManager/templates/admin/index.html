@@ -17,12 +17,14 @@ Quản lý nhà sách
 <link href="{{ url_for('static', filename='css/admin-custom.css') }}" rel="stylesheet">
 <!-- Favicon -->
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 {% endblock %}
 
 
 <!-- Phần quy định layout của trang -->
 {% block page_body %}
-<div class="container{% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}">
+<div class="container col-lg-10 {% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}">
     <!-- Vertical navbar -->
     {% include 'admin/sidebar.html' %}
 
