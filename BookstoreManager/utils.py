@@ -28,11 +28,14 @@ def reset_value():
     session['debt_checking_status'] = 'init'
     # Lưu tạm thời tên của khách hàng
     session['sell_for'] = 'init'
+    session['current_invoice'] = {}
     if 'import_book' in session:
         del session['import_book']
 
+
 class TaskRules:
     pass
+
 
 ##########################################################
 # Nếu là sách mới, chưa có trong kho, thì cập nhập dữ liệu sách mới vào kho
@@ -56,7 +59,6 @@ def import_stats(import_book):
             total_amount = total_amount + b["quantity"] * b["price"]
 
     return total_quantity, total_amount
-
 
 
 # Tạo 3 bảng song song độc lập (1 : 2)

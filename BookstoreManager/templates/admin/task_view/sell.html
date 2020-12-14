@@ -30,7 +30,7 @@
       {% endif %}
 
       {% if valid_debt == 'OK' %}
-        <h2 class="text-center mb-4">HÓA ĐƠN BÁN HÀNG</h2>
+        <h2 class="text-center mb-4">BÁN HÀNG</h2>
         <div class="row">
             <p class="col-sm-3">Tên khách hàng:</p>
             <p class="col-sm-9">{{ sell_for }}</p>
@@ -44,7 +44,61 @@
             <div id="sell_form" class="my-2"></div>
             <div><button type="submit" value="end_session" class="btn btn-danger" onclick="init()">Kết thúc</button></div>
         </form>
-      {% endif%}
+      {% endif %}
+      {% if valid_debt == 'processing' %}
+      <h2 class="text-center mb-4">HÓA ĐƠN BÁN HÀNG</h2>
+      <div><p class="text-center text-muted">< Print section ></p></div>
+      <div class="row">
+          <p class="col-sm-3">Tên khách hàng:</p>
+          <p class="col-sm-9">{{ sell_for }}</p>
+      </div>
+      <div class="row">
+          <p class="col-sm-3">Ngày bán</p>
+          <p class="col-sm-9" id="invoice-date"></p>
+      </div>
+
+
+
+      <div class="table-responsive">
+          <table class="table table-bordered">
+              <!--    Tiêu đề   -->
+              <thead class="thead-dark">
+                  <tr>
+                      <th>Tên sách</th>
+                      <th>Giá</th>
+                      <th>Số lượng</th>
+                      <th>Tổng</th>
+                  </tr>
+              </thead>
+
+              <!--   Thông tin sách trong giỏ  -->
+              <tbody class="align-middle">
+              <!--    Vòng lặp for   -->
+              {% for b in session['current_invoice'] %}
+                  <!--    Tên sách   -->
+                  <tr>
+                      <td>{{ b[0] }}</td>
+
+                      <!--   giá   price là key của từ điển cart   -->
+                      <td>{{ b[1] }} VNĐ</td>
+
+                      <!--    Số lượng  -->
+                      <td>{{ b[2] }}</td>
+
+                      <!--    Tổng giá: giá * số lượng   -->
+                      <td>{{ (int(b[1]) * b[0]) }}</td>
+                  </tr>
+              {% endfor %}
+              <!--    kết thúc vòng lặp   -->
+              </tbody>
+
+          </table>
+      </div>
+
+
+
+
+      {% endif %}
 
     </div>
 

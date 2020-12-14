@@ -117,52 +117,59 @@ def check_debt():
         # request.form sẽ lấy tất cả các request từ form
         # request.form sẽ trả về ImmutableMultiDict, parse sang dict bằng to_dict để sử dụng len()
         # arg là trường key của một phần tử dict, ở đây tương đương với input name
-        quantity = 0
-        product_id = 0
-        total_quan = 0
-        total_price = 0
+        quantity = product_id = total_quan = total_price = step = 0
         invoice_temp = {}
-        step = 0
         for arg in request.form:
             # Duyệt qua từng ô input
             for count in range(len(request.form.to_dict())):
-                # Nếu đó là số lượng sản phẩm: 'quantity-số'
+                # Nếu là ô input có name 'sốID' có nghĩa là mã sản phẩm
+                if arg == str(count):
+                    # Lấy giá trị
+                    product_id = request.form.get(arg)
+                    step = 1
+                # Nếu là ô input có name 'quantity-sốID' có nghĩa là số lượng sp tương ứng
                 if arg == ('quantity-' + str(count)):
                     # Lấy giá trị
                     quantity = request.form.get(arg)
-                    step = 1
-                # Nếu đó là ID sản phẩm: 'số'
-                elif arg == str(count):
-                    # Lấy giá trị
-                    product_id = request.form.get(arg)
                     step = 2
+
                 total_quan += int(quantity)
                 total_price += BookStorage.query.filter_by(id=product_id).first().selling_price
 
-                # Step 2 là đã lấy được giá trị cần thiết 1 ô input
+                # Step 2 là đã lấy được giá trị cần thiết của một ô input
+                # Từ điển mẫu:
+                # invoice_temp = {
+                #     1: {'quantity': 15},
+                #     7: {'quantity': 10},
+                #     3: {'quantity': 2},
+                # }
                 if step == 2:
                     step = 0
                     # Nếu có id đó rồi thì tăng số lượng thôi
-                    if product_id in invoice_temp:
-                        invoice_temp[product_id]["quantity"] += 1
+                    if product_id in invoice_temp.keys():
+                        print('already have a product')
+                        invoice_temp[product_id]['quantity'] += 1
                     # Chưa có thì thêm mới
                     else:
-                        invoice_temp[product_id] = {
-                            "product_id": product_id,
-                            "quantity": quantity
-                        }
+                        print('new product')
+                        invoice_temp[product_id] = {}
+                        invoice_temp[product_id]['quantity'] = quantity
 
         # Nếu hóa đơn tạm có sản phẩm
         if invoice_temp != {}:
-            invoice = Invoice(customer_id=int(session['user']['id']))
+            print('size', len(invoice_temp))
+            # Thêm một trường mới trong bảng hóa đơn
+            invoice = Invoice(customer_id=int(session['user']['id']), total_price=total_price)
             db.session.add(invoice)
-            for item in list(invoice_temp.values()):
-                price = BookStorage.query.filter_by(id=item['product_id']).first().selling_price
-                price = item['quantity'] * price
+            # Duyệt qua từng phần tử (cụm ô input) > chi tiết hóa đơn
+            for pid in invoice_temp.keys():
+                book = BookStorage.query.filter_by(id=pid).first()
+                detail_price = int(invoice_temp[pid]['quantity']) * int(book.selling_price)
+                print(pid, detail_price, 'quantity: ', invoice_temp[pid]['quantity'])
                 detail = InvoiceDetail(invoice=invoice,
-                                       book_id=int(item[product_id]),
-                                       quantity=item[quantity],
-                                       price=price)
+                                       book_id=pid,
+                                       quantity=invoice_temp[pid]['quantity'],
+                                       price=detail_price)
                 db.session.add(detail)
 
             try:
@@ -171,13 +178,20 @@ def check_debt():
             except Exception as ex:
                 print(ex)
 
+            # Lấy hóa đơn mới nhất vừa được ghi xuống db
+            last_invoice = Invoice.query.order_by(Invoice.invoice_id.desc()).first()
+            invoice_detail = utils.read_invoice_get_info_book(last_invoice.invoice_id)
+            # Parse giá tiền sang
+            session['valid_debt'] = 'processing'
+            session['current_invoice'] = invoice_detail
+            print(session['current_invoice'])
+            return redirect(url_for('sellview.index'))
+
+    session['valid_debt'] = 'init'
     # Gọi phương thức index(self) từ admin.py
     return redirect(url_for('sellview.index'))
 
 
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
 # Xử lý action nhập sách mới từ form
 @app.route('/admin/importview/', methods=["GET", "POST"])
 def import_book():
@@ -210,9 +224,7 @@ def import_book():
         print(import_book)
         session['import_book'] = import_book
 
-
     return redirect(url_for('importview.index'))
-
 
 
 @app.route('/admin/submitimportview/')
@@ -237,10 +249,8 @@ def del_one_import_session():
     session['import_book'] = import_book
     print(import_book)
 
-
     if not import_book:
         del session['import_book']
-
 
     return jsonify({
 
@@ -251,11 +261,6 @@ def del_one_import_session():
 def test():
     books = BookStorage.query.all()
     return render_template('test.html', books=books)
-
-
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
 
 
 # |================|
@@ -310,9 +315,9 @@ def login_customer():
                 'debt': customer.debt,
                 'avatar': customer.avatar,
                 'active': customer.active,
-                'paid_debt': customer.paid_debt,
-                'paid_invoice': customer.paid_invoice,
-                'wish_id': customer.wish_id,
+                # 'paid_debt': customer.paid_debt,
+                # 'paid_invoice': customer.paid_invoice,
+                # 'wish_id': customer.wish_id,
             }
 
             session["user"] = auth_user

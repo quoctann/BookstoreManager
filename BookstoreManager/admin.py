@@ -58,7 +58,9 @@ class LogoutView(AuthenticatedView):
 class SellView(AuthenticatedView):
     @expose('/')
     def index(self):
-        return self.render('admin/task_view/sell.html', valid_debt=session['valid_debt'], sell_for=session['sell_for'])
+        return self.render('admin/task_view/sell.html',
+                           valid_debt=session['valid_debt'],
+                           sell_for=session['sell_for'])
 
 
 class ImportView(AuthenticatedView):
@@ -146,6 +148,15 @@ class CanCreate(AdminModelView):
     column_display_pk = True
 
 
+# |------------------|
+# | Các view phụ trợ |
+# |------------------|
+class ExportInvoice(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/task_view/export_invoice.html')
+
+
 # |=========================|
 # | THÊM VIEW VÀO TRANG CHỦ |
 # |=========================|
@@ -169,6 +180,7 @@ admin.add_view(AdminModelView(InvoiceDetail, db.session,
                               category="Xem dữ liệu thô",
                               name="Hóa đơn"))
 # Tính năng bổ sung
+admin.add_view(ExportInvoice(name='Xuất hóa đơn'))
 admin.add_view(RegisterView(name='Thêm nhân viên'))
 admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))
