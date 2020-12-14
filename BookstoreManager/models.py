@@ -60,8 +60,13 @@ class Customer(CommonIdentityBase, AuthIndentityBase):
     address = Column(String(100))
     phone = Column(Integer)
     role = Column(String(10), nullable=False, default='guest')
+<<<<<<< HEAD
     # Lưu số nợ hiện tại
     debt = Column(Float, default=0)
+=======
+    debt = Column(Float, default=0)
+
+>>>>>>> 4d25c56f4ec884525c5d4872fd3b241238750da1
     # Đã trả những khoản nợ nào
     paid_debt = relationship('DebtCollection', backref='customer', lazy=True)
     # Có những hóa đơn nào
@@ -87,7 +92,7 @@ class BookStorage(CommonIdentityBase):
     author = Column(String(30), nullable=False)
     category = Column(String(20), nullable=False)
     selling_price = Column(Float, nullable=False)
-    path = Column(String(50), nullable=False)
+    path = Column(String(50), default='images/defaultbook.jpg')
     # Sách được nhập bởi những đơn hàng nào
     imported_by = relationship('ImportDetail', backref='book_storage', lazy=True)
     # Sách được bán trên những hóa đơn nào
@@ -100,7 +105,7 @@ class BookStorage(CommonIdentityBase):
 class BookImport(db.Model):
     __tablename__ = 'book_import'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(Date, nullable=False)
+    date = Column(Date, default=datetime.today())
     total_cost = Column(Float, nullable=False)
     # Nhân viên chịu trách nhiệm nhập sách
     employee_incharge = Column(Integer, ForeignKey(Employee.id))

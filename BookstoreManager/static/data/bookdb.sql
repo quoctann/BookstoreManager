@@ -1,5 +1,4 @@
-INSERT INTO `webstoredb`.`system_user` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Admin', 'images/admin/vin.peg', 'admin', '202cb962ac59075b964b07152d234b70', 'Admin');
-INSERT INTO `webstoredb`.`employee` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Nhân viên', 'images/admin/vin.peg', 'nhanvien', '202cb962ac59075b964b07152d234b70', 'Admin');
+INSERT INTO `webstoredb`.`employee` (`name`, `avatar`, `username`, `password`, `role`) VALUES ('Nhân viên', 'images/admin/vin.jpg', 'nhanvien', '202cb962ac59075b964b07152d234b70', 'Admin');
 
 
 

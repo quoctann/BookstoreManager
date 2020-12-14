@@ -1,20 +1,50 @@
-{% extends 'bar-footer.html' %}
+<!DOCTYPE html>
+<html>
 
-{% block body %}
+<head>
+    <script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+  </script>
 
-                                {% for b in book %}
-                                     <tr>
-                                            <!--    Tên sách   -->
-                                            <td>{{ b.name }}</td>
+    <script>
+        $(document).ready(function() {
 
-                                            <!--   giá   price là key của từ điển cart   -->
-                                            <td>{{ b.selling_price }} </td>
+            $("button").click(function() {
 
-                                            <!--    Số lượng  -->
+              //here the value is stored in variable.
+                var x = $("input:text").val();
 
-                                        </tr>
-                                {% endfor %}
+                document.getElementById("demo").innerHTML = x;
+            });
 
+        });
+    </script>
 
+</head>
 
-{% endblock %}
+<body style="text-align:center;">
+
+    <h1 style="color:green;">
+            GeeksForGeeks
+        </h1>
+
+    <h2>jquery val() method
+
+</h2>
+    <p>Name:
+
+        <input type="text"
+               name="user"
+               value="geeksforgeeks">
+
+    </p>
+
+    <button>
+      Get the value of the input field
+  </button>
+
+    <p id="demo"></p>
+
+</body>
+
+</html>
