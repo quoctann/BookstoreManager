@@ -68,6 +68,9 @@ def add_import(import_book):
 
         for b in list(import_book.values()):
             detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
+            if int(b["id"]) in BookStorage.query:
+                import_book()
+            increase_instock(int(b["id"]), b["quantity"])
             db.session.add(detail)
 
         try:
@@ -76,12 +79,27 @@ def add_import(import_book):
         except Exception as ex:
             print(ex)
     return False
+
+
+# Kiểm tra instock trước khi nhập
+def check_instock(book_id):
+    return BookStorage.query.get(book_id)
+
+
+# Cập nhập instock mới được bổ sung khi nhập
+# Giảm instock của sách trong kho
+def increase_instock(book_id, quantity):
+    book = BookStorage.query.get(book_id)
+    book.instock += quantity
+    db.session.add(book)
+    db.session.commit()
+
 #########################################################
 
 
-# |==============================|
-# | TIỆN ÍCH DÙNG CHO KHÁCH HÀNG |
-# |==============================|
+# |==============================|      ##################################################################################################################
+# | TIỆN ÍCH DÙNG CHO KHÁCH HÀNG |      ##################################################################################################################
+# |==============================|      ##################################################################################################################
 
 
 # Thêm khách hàng vào db
@@ -185,6 +203,13 @@ def cart_stats(cart):
 # | Xử lý thanh toán |
 # |------------------|
 
+# Giảm instock của sách trong kho
+def subtract_instock(book_id, quantity):
+    book = BookStorage.query.get(book_id)
+    book.instock -= quantity
+    db.session.add(book)
+    db.session.commit()
+
 
 # Tạo 3 bảng song song độc lập (1 : 2)
 def add_invoice(cart):
@@ -199,6 +224,7 @@ def add_invoice(cart):
                                    book_id=int(b["id"]),
                                    quantity=b["quantity"],
                                    price=b["price"])
+            subtract_instock(int(b["id"]), b["quantity"])
             db.session.add(detail)
 
         try:

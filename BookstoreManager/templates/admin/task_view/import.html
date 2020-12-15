@@ -91,6 +91,11 @@ $(document).ready(function(){
                                 </div>
                             </form>
                         </div>
+
+                        {% if session['err_msg'] %}
+                        <h5 class="text-danger">{{ session['err_msg'] }}</h5>
+                        {% endif %}
+
                         <h2 class="text-center">Nhập chi tiết</h2>
                         <!--    Chi tiếc  -->
                         <table class="table table-bordered">
@@ -121,7 +126,7 @@ $(document).ready(function(){
                                         <td><input value="{{ b.category }}" name="category"style="width: 90px"/></td>
                                         <td><input value="{{ b.author }}" name="author" style="width: 120px"/></td>
                                         <td><input value="{{ b.price }}" name="price" style="width: 80px"/></td>
-                                        <td><input value="{{ b.quantity }}" name="quantity" style="width: 50px"/></td>
+                                        <td><input value="{{ b.quantity }}" name="quantity" style="width: 50px"  /></td>
                                         <td style="display: none;"><input class="form-control" type="submit" value="Nhận" ></td>
                                         <td><button onclick="del_one_import({{ b.id }})"><i class="fa fa-trash"></i></button></td>
                                     </tr>
