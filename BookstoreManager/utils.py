@@ -47,6 +47,15 @@ def import_book(name, quantity, author, category, price):
         return False
 
 
+# Kiểm tra id để bổ sung sách mới
+def check_book(book_id):
+    book = get_book_by_id(book_id)
+    if not book:
+        return True
+    else:
+        return False
+
+
 # Lấy tổng số lượng và tổng hóa đơn phiếu nhập
 def import_stats(import_book):
     total_quantity, total_amount = 0, 0
@@ -67,10 +76,13 @@ def add_import(import_book):
         db.session.add(bookImport)
 
         for b in list(import_book.values()):
-            detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
-            if int(b["id"]) in BookStorage.query:
-                import_book()
-            increase_instock(int(b["id"]), b["quantity"])
+            if not get_book_by_id(int(b["id"])):
+                book = BookStorage(name=b["name"], instock=b["quantity"], author=b["author"], category=b["category"], selling_price=(b["price"] + b["price"] * 0.1))
+                db.session.add(book)
+                detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
+            else:
+                detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
+                increase_instock(int(b["id"]), b["quantity"])
             db.session.add(detail)
 
         try:

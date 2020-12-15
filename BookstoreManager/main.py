@@ -164,8 +164,10 @@ def import_book():
             # utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
         book_new = db.session.query(func.max(BookStorage.id)).first()
         # id = str(book_new[0] + 1)
+        print(utils.get_book_by_id(id))
 
-        if not id:     
+
+        if not id:
             id = str(book_new[0] + 1)
 
         # Vì sách mới chưa có trong khi, nên sure kèo thỏa điều kiện này khi nhập
@@ -189,9 +191,14 @@ def import_book():
         }
         # cập nhập thông tin xuống db
         # book = utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
-        print(import_book)
+        # print(import_book)
         session['import_book'] = import_book
 
+        # print(utils.get_book_by_id(id))
+        # (BookStorage.query.filter(BookStorage.id == 1).first()).id
+        # for b in list(import_book.values()):
+        # print((BookStorage.query.map(BookStorage.id).all()))
+            # print(int(b["id"]))
 
     return redirect(url_for('importview.index'))
 
