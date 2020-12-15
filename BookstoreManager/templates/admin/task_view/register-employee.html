@@ -1,6 +1,9 @@
 <!--Admin register form-->
 {% extends 'admin/index.html' %}
 {% block page_content %}
+    {% if err_msg %}
+    <div class="alert alert-warning">{{ err_msg }}</div>
+    {% endif %}
     <h2 class="text-center p-2">Thêm nhân viên</h2>
     <form action="{{ url_for('register_employee') }}" method="post">
         <div class="form-group">

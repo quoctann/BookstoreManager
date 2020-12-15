@@ -86,7 +86,7 @@ class BookStorage(CommonIdentityBase):
     instock = Column(Integer, nullable=False)
     author = Column(String(30), nullable=False)
     category = Column(String(20), nullable=False)
-    selling_price = Column(Float, nullable=False)
+    selling_price = Column(Integer, nullable=False)
     path = Column(String(50), default='images/defaultbook.jpg')
     # Sách được nhập bởi những đơn hàng nào
     imported_by = relationship('ImportDetail', backref='book_storage', lazy=True)
@@ -147,6 +147,12 @@ class ShippingDetail(db.Model):
     invoice_id = Column(Integer, ForeignKey(Invoice.invoice_id), nullable=False)
     address = Column(String(100))
     phone = Column(Integer)
+    # Trạng thái đơn hàng:
+    # > Accepted: ĐH đang được kho xử lý
+    # > Delivering: ĐH đang được giao
+    # > Completed: ĐH giao hoàn tất
+    # > Failed: ĐH có sự cố, hoàn về kho
+    status = Column(String(10), default='Accepted')
 
 
 # Thông tin danh sách yêu thích (wishlist)

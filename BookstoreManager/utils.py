@@ -29,8 +29,11 @@ def reset_value():
     # Lưu tạm thời tên của khách hàng
     session['sell_for'] = 'init'
     session['current_invoice'] = {}
+    session['customer_id'] = 0
     if 'import_book' in session:
         del session['import_book']
+    if 'sell_err' in session:
+        del session['sell_err']
 
 
 class TaskRules:

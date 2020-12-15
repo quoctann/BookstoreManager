@@ -89,13 +89,24 @@ def register_employee(err_msg):
 # Xử lý action bán sách
 @app.route('/admin/sellview/', methods=["GET", "POST"])
 def check_debt():
+    # if ShippingDetail.query.filter_by(status='')
+    # Các session được sử dụng:
+
     # valid_debt lưu trạng thái của tác vụ với các giá trị:
-    # init: khởi tạo, bắt đầu bán hàng
-    # violated: vi phạm quy định, xuất thông báo lỗi
-    # OK: khách hàng hợp lệ, cho phép bán
+    # >> init: khởi tạo, bắt đầu bán hàng
+    # >> violated: vi phạm quy định, xuất thông báo lỗi
+    # >> OK: khách hàng hợp lệ, cho phép bán
+    # >> processing: đã ghi hóa đơn, đang xuất hóa đơn cho khách
+
+    # sell_for: tên khách hàng nhân viên đang bán cho
+    # customer_id: dùng để lấy mã khách hàng hiện đang bán cho
+    # current_invoice: lưu hóa đơn hiện tại để render
+
+    # Các session đều được reset value bằng utils.reset_value
     if request.method == "POST" and \
             (session['valid_debt'] == 'init' or session['valid_debt'] == 'violated'):
         customer_id = request.form.get('customer_id')
+        session['customer_id'] = customer_id
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
@@ -134,8 +145,12 @@ def check_debt():
                     step = 2
 
                 total_quan += int(quantity)
-                total_price += BookStorage.query.filter_by(id=product_id).first().selling_price
-
+                try:
+                    total_price += BookStorage.query.filter_by(id=product_id).first().selling_price
+                except Exception as ex:
+                    print(ex)
+                    session['valid_debt'] = 'sell_err'
+                    return redirect(url_for('sellview.index'))
                 # Step 2 là đã lấy được giá trị cần thiết của một ô input
                 # Từ điển mẫu:
                 # invoice_temp = {
@@ -147,11 +162,11 @@ def check_debt():
                     step = 0
                     # Nếu có id đó rồi thì tăng số lượng thôi
                     if product_id in invoice_temp.keys():
-                        print('already have a product')
-                        invoice_temp[product_id]['quantity'] += 1
+                        vl = invoice_temp[product_id]['quantity']
+                        vl = int(vl) + 1
+                        invoice_temp[product_id]['quantity'] = vl
                     # Chưa có thì thêm mới
                     else:
-                        print('new product')
                         invoice_temp[product_id] = {}
                         invoice_temp[product_id]['quantity'] = quantity
 
@@ -159,19 +174,23 @@ def check_debt():
         if invoice_temp != {}:
             print('size', len(invoice_temp))
             # Thêm một trường mới trong bảng hóa đơn
-            invoice = Invoice(customer_id=int(session['user']['id']), total_price=total_price)
+            invoice = Invoice(customer_id=session['customer_id'], employee_id=current_user.id, total_price=total_price)
             db.session.add(invoice)
-            # Duyệt qua từng phần tử (cụm ô input) > chi tiết hóa đơn
+            # Duyệt qua từng phần tử (cụm ô input) > chi tiết hóa đơn, key là product id
             for pid in invoice_temp.keys():
+                # Lấy sách tương ứng
                 book = BookStorage.query.filter_by(id=pid).first()
+                # Tính thành tiền
                 detail_price = int(invoice_temp[pid]['quantity']) * int(book.selling_price)
-                print(pid, detail_price, 'quantity: ', invoice_temp[pid]['quantity'])
+                # Thêm bảng chi tiết hóa đơn
                 detail = InvoiceDetail(invoice=invoice,
                                        book_id=pid,
                                        quantity=invoice_temp[pid]['quantity'],
                                        price=detail_price)
                 db.session.add(detail)
 
+                # Cập nhật số lượng sách dưới kho
+                book.instock = book.instock - int(invoice_temp[pid]['quantity'])
             try:
                 db.session.commit()
                 print('Commit successfully')
@@ -181,10 +200,8 @@ def check_debt():
             # Lấy hóa đơn mới nhất vừa được ghi xuống db
             last_invoice = Invoice.query.order_by(Invoice.invoice_id.desc()).first()
             invoice_detail = utils.read_invoice_get_info_book(last_invoice.invoice_id)
-            # Parse giá tiền sang
-            session['valid_debt'] = 'processing'
             session['current_invoice'] = invoice_detail
-            print(session['current_invoice'])
+            session['valid_debt'] = 'processing'
             return redirect(url_for('sellview.index'))
 
     session['valid_debt'] = 'init'
@@ -267,12 +284,13 @@ def test():
 # | API PHÍA ADMIN |
 # |================|
 
-# Test lấy giá trị
-@app.route('/api/get_value', methods=['post'])
-def get_value():
+# Kết thúc phiên bán hàng với 1 khách hàng (sau khi xuất hóa đơn)
+@app.route('/api/end_task', methods=['post'])
+def end_task():
+    utils.reset_value()
     if json.loads(request.data):
         data = json.loads(request.data)
-        id = str(data.get("id"))
+        something = str(data.get("something"))
         return jsonify({
             "message": session['valid_debt'],
         })

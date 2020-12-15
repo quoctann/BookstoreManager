@@ -26,57 +26,26 @@ function init() {
 /////////////////////////////////////////////////////////////////////////////////////
 function addProduct() {
   const div = document.createElement('div');
-  div.className = 'form-group row d-flex align-items-center';
+  div.className = 'form-group row d-flex align-items-center justify-content-between';
   div.innerHTML = `
-        <label class='col-2' for=
+        <label class='col' for=
         ` + inputID + `
         >Mã sản phẩm: </label>
-        <input type="text" class="form-control col-3" name=
+        <input type="text" class="form-control col" name=
         ` + inputID + `
         placeholder="ID sản phẩm">
-        <label class='col-1' for=
+        <label class='col' for=
         ` + ('quantity-' + inputID) + `
-        >SL: </label>
-        <input type="number" class="form-control col-1" name=
+        >Số lượng: </label>
+        <input type="number" class="form-control col" name=
         ` + ('quantity-' + inputID) + `
         min=1 max=5 value=1 placeholder="Tối đa 5">
-        <span class='col-3 mx-1'>{{ items_price }} đ</span>
-        <input type="button" class="btn btn-secondary form-control col-1" value="Xóa" onclick="removeRow(this)" />
+        <input type="button" class="btn btn-secondary form-control col ml-4" value="Xóa" onclick="removeRow(this)" />
   `;
   inputID++;
   totalItem++;
   document.getElementById('sell_form').appendChild(div);
 }
-
-
-//////////////////////////////////////////////////////////////////////////////////
-//function addProduct() {
-//  const div = document.createElement('div');
-//  div.className = 'form-group d-flex';
-//  div.innerHTML = `
-//        <label for=
-//        ` + inputID + `
-//        >Mã sản phẩm: </label>
-//        <input type="text" class="form-control mx-2" name=
-//        ` + inputID + `
-//        placeholder="Ví dụ: 1234">
-//        <label for=
-//        ` + ('quantity-' + inputID) + `
-//        >Mã sản phẩm: </label>
-//        <input type="number" class="form-control mx-2" name=
-//        ` + ('quantity-' + inputID) + `
-//        min=1 max=5 value=1 placeholder="Tối đa 5">
-//        <input type="text" class="form-control mr-2" name=` +
-//        inputID +
-//        ` placeholder="Mã sản phẩm">
-//        <input type="button" class="btn btn-secondary" value="Xóa" onclick="removeRow(this)" />
-//  `;
-//  inputID++;
-//  totalItem++;
-//  document.getElementById('sell_form').appendChild(div);
-//}
-//
-
 
 // Xóa phần tử input được tạo bên trên
 function removeRow(input) {
@@ -93,25 +62,25 @@ function printDate() {
     return date;
 }
 
-// Promises, have a catch()
-function myFunction(id) {
-    fetch('/api/get_value', {
+function clickSubmit() {
+    document.getElementById("submit").click()
+}
+
+// Kết thúc phiên bán hàng
+function endTask() {
+    fetch('/api/end_task', {
         method: "post",
         body: JSON.stringify({
-            "id": id,
+            "something": "sometimes",
         }),
         headers: {
             'Content-Type': 'application/json'
         }
     }).then(res => res.json()).then(data => {
-        console.info(data);
-        var sometime = document.getElementById("something");
-        sometime.innerText = `${data.message}`;
+        location.reload();
     }).catch(err => {
         console.log(err);
     })
-
-    // promise --> await/async
 }
 //  ########################################################################################################################################
 //  ########################################################################################################################################

@@ -7,7 +7,7 @@
   <!-- Lựa chọn đối tượng đang bán hàng -->
   <div class="list-group list-group-horizontal-sm text-center py-2" id="sell-option-list" role="tablist">
     <a class="list-group-item list-group-item-dark list-group-item-action active" data-toggle="list" href="#retail-offline" role="tab" onload="printDate()" onclick="printDate()">Bán tại quầy</a>
-    <a class="list-group-item list-group-item-dark list-group-item-action" data-toggle="list" href="#retail-online" role="tab">Bán online</a>
+    <a class="list-group-item list-group-item-dark list-group-item-action" data-toggle="list" href="#retail-online" role="tab">Tracking đơn hàng online</a>
   </div>
 
   <!-- Tab hiển thị tương ứng -->
@@ -29,7 +29,12 @@
       </form>
       {% endif %}
 
-      {% if valid_debt == 'OK' %}
+      {% if valid_debt == 'OK' or valid_debt == 'sell_err' %}
+        {% if valid_debt == 'sell_err' %}
+            <div class="alert alert-warning text-center">Lỗi: mã sản phẩm được nhập sai hoặc không hợp lệ,
+                <a onclick="clickSubmit()" class="text-info">nhập lại</a>
+            </div>
+        {% endif %}
         <h2 class="text-center mb-4">BÁN HÀNG</h2>
         <div class="row">
             <p class="col-sm-3">Tên khách hàng:</p>
@@ -42,7 +47,7 @@
         <button class="btn btn-primary my-2" onclick="addProduct()">Thêm sản phẩm</button>
         <form action="{{ url_for('check_debt') }}" method="post">
             <div id="sell_form" class="my-2"></div>
-            <div><button type="submit" value="end_session" class="btn btn-danger" onclick="init()">Kết thúc</button></div>
+            <div><button id="submit" type="submit" value="end_session" class="btn btn-danger" onclick="init()">Bán - Xuất hóa đơn</button></div>
         </form>
       {% endif %}
       {% if valid_debt == 'processing' %}
@@ -60,14 +65,14 @@
 
 
       <div class="table-responsive">
-          <table class="table table-bordered">
+          <table class="table table-bordered table-striped">
               <!--    Tiêu đề   -->
               <thead class="thead-dark">
                   <tr>
                       <th>Tên sách</th>
-                      <th>Giá</th>
+                      <th>Đơn giá</th>
                       <th>Số lượng</th>
-                      <th>Tổng</th>
+                      <th>Thành tiền</th>
                   </tr>
               </thead>
 
@@ -86,7 +91,7 @@
                       <td>{{ b[2] }}</td>
 
                       <!--    Tổng giá: giá * số lượng   -->
-                      <td>{{ (int(b[1]) * b[0]) }}</td>
+                      <td>{{ b[1] * b[2] }} VNĐ</td>
                   </tr>
               {% endfor %}
               <!--    kết thúc vòng lặp   -->
@@ -95,7 +100,7 @@
           </table>
       </div>
 
-
+        <div><button type="submit" value="end_session" class="btn btn-danger" onclick="endTask()">Hoàn tất đơn hàng</button></div>
 
 
       {% endif %}
@@ -103,7 +108,23 @@
     </div>
 
     <div class="tab-pane bg-light rounded shadow p-4" id="retail-online" role="tabpanel">
-      <p>Tracking các đơn hàng trong hệ thống</p>
+      <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+                <th>Mã vận đơn</th>
+                <th>Mã khách hàng</th>
+                <th>Số lượng</th>
+                <th>Tiền hàng</th>
+                <th>Địa chỉ giao</th>
+                <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td></td>
+            </tr>
+          </tbody>
+      </table>
     </div>
 
   </div>
