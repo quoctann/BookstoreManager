@@ -35,6 +35,10 @@ class TaskRules:
     pass
 
 ##########################################################
+
+
+#########################################################
+
 # Nếu là sách mới, chưa có trong kho, thì cập nhập dữ liệu sách mới vào kho
 def import_book(name, quantity, author, category, price):
     book = BookStorage(name=name, instock=quantity, author=author, category=category, selling_price=price)
@@ -67,7 +71,6 @@ def import_stats(import_book):
     return total_quantity, total_amount
 
 
-
 # Tạo 3 bảng song song độc lập (1 : 2)
 def add_import(import_book):
     if import_book and current_user.is_authenticated:
@@ -82,7 +85,7 @@ def add_import(import_book):
                 detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
             else:
                 detail = ImportDetail(book_import=bookImport, book_id=int(b["id"]), quantity=b["quantity"], cost=b["price"])
-                increase_instock(int(b["id"]), b["quantity"])
+                increase_instock(int(b["id"]), b["quantity"], (b["price"] + b["price"] * 0.1))
             db.session.add(detail)
 
         try:
@@ -100,13 +103,12 @@ def check_instock(book_id):
 
 # Cập nhập instock mới được bổ sung khi nhập
 # Giảm instock của sách trong kho
-def increase_instock(book_id, quantity):
+def increase_instock(book_id, quantity, price):
     book = BookStorage.query.get(book_id)
     book.instock += quantity
+    book.selling_price = price
     db.session.add(book)
     db.session.commit()
-
-#########################################################
 
 
 # |==============================|      ##################################################################################################################
