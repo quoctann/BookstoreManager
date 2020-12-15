@@ -6,6 +6,9 @@
     <!--    Chi tiết phiếu nhập  -->
     <div class="col-lg-12">
         <!--    Hóa đơn  -->
+        {% if session['err_msg'] %}
+        <h5 class="text-success">{{ session['err_msg'] }}</h5>
+        {% endif %}
         <div class="alert alert-warning">
             <form method="post">
                 <h1 class="text-center">- - - - - HÓA ĐƠN - - - - -</h1>

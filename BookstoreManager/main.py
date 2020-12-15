@@ -1,6 +1,8 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message, Mail
+from sqlalchemy import func
+
 from BookstoreManager import app, login, utils, mail
 from BookstoreManager.decorator import *
 from BookstoreManager.admin import *
@@ -212,7 +214,8 @@ def check_debt():
 # Xử lý action nhập sách mới từ form
 @app.route('/admin/importview/', methods=["GET", "POST"])
 def import_book():
-    err_msg = ""
+    if 'err_msg' not in session:
+        session['err_msg'] = ''
     # Chỉ xử lý đăng nhập khi sử dụng phương thức POST
     if request.method == 'POST':
         if 'import_book' not in session:
@@ -226,8 +229,35 @@ def import_book():
         price = request.form.get('price')
         author = request.form.get('author')
         category = request.form.get('category')
-        if not quantity and not price:
-            quantity = price = 0
+
+        check = utils.check_instock(id)
+        if not quantity:
+            quantity = 150
+
+        if float(quantity) < 150:
+            session['err_msg'] = "Số lương nhập nhỏ hơn mức quy định"
+            return redirect(url_for('importview.index'))
+
+        # Xử lý khi nhập sách mới chưa có trong kho
+        # if not id:
+            # utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
+        book_new = db.session.query(func.max(BookStorage.id)).first()
+        # id = str(book_new[0] + 1)
+
+        if not id:     
+            id = str(book_new[0] + 1)
+
+        # Vì sách mới chưa có trong khi, nên sure kèo thỏa điều kiện này khi nhập
+        if check and check.instock > 300:
+            session['err_msg'] = "Sách trong kho còn nhiều "
+            return redirect(url_for('importview.index'))
+        else:
+            del session['err_msg']
+            if not price:
+                price = 0
+
+
+
         import_book[id] = {
             'id': id,
             'name': name,
@@ -244,10 +274,14 @@ def import_book():
     return redirect(url_for('importview.index'))
 
 
-@app.route('/admin/submitimportview/')
+
+@app.route('/admin/submitimportview/',  methods=['post'])
 def submit_import():
+    if 'import_book' not in session:
+        session['import_book'] = {}
     if utils.add_import(session.get('import_book')):
         del session['import_book']
+        session['err_msg'] = "Bạn đã xác nhận phiếu thành công!"
     return redirect(url_for('submitimportview.index'))
 
 
@@ -256,19 +290,18 @@ def submit_import():
 def del_one_import_session():
     if 'import_book' not in session:
         session['import_book'] = {}
-
     import_book = session['import_book']
+
     data = json.loads(request.data)
     id = str(data.get("id"))
 
     if id in import_book:
         import_book.pop(id)
+
     session['import_book'] = import_book
     print(import_book)
-
     if not import_book:
         del session['import_book']
-
     return jsonify({
 
     })
