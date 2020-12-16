@@ -326,13 +326,9 @@ def import_book():
             session['err_msg'] = "Số lương nhập nhỏ hơn mức quy định"
             return redirect(url_for('importview.index'))
 
-        # Xử lý khi nhập sách mới chưa có trong kho
-        # if not id:
-        # utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
-        book_new = db.session.query(func.max(BookStorage.id)).first()
-        # id = str(book_new[0] + 1)
-
+        # Khi nhập sách mới thì khởi tạo biết id cho session
         if not id:
+            book_new = db.session.query(func.max(BookStorage.id)).first()
             id = str(book_new[0] + 1)
 
         # Vì sách mới chưa có trong khi, nên sure kèo thỏa điều kiện này khi nhập
@@ -352,15 +348,12 @@ def import_book():
             'author': author,
             'category': category
         }
-        # cập nhập thông tin xuống db
-        # book = utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
-        print(import_book)
         session['import_book'] = import_book
-
     return redirect(url_for('importview.index'))
 
 
-@app.route('/admin/submitimportview/', methods=['post'])
+# Tạo bản import và import_detail và có bổ xung thông tin sách mới (nến có)
+@app.route('/admin/submitimportview/',  methods=['post'])
 def submit_import():
     if 'import_book' not in session:
         session['import_book'] = {}
@@ -390,12 +383,6 @@ def del_one_import_session():
     return jsonify({
 
     })
-
-
-@app.route('/test')
-def test():
-    books = BookStorage.query.all()
-    return render_template('test.html', books=books)
 
 
 # |================|
