@@ -229,7 +229,7 @@ tbody.stt tr.stt td:first-child:before
     padding: 10px;
 }
 
-/* Style của hình minh họa bán hàng online */
+/* Style của hình minh họa bán hàng online demo.html */
 .grid-image {
    display: grid;
    grid-template-columns: repeat(4, 1fr);

@@ -25,7 +25,7 @@ def add_employee(name, username, password):
 def reset_value():
     session['valid_debt'] = 'init'
     # Session lưu thuộc tính nhân viên đã kiểm tra nợ của KH chưa
-    session['debt_checking_status'] = 'init'
+    # session['debt_checking_status'] = 'init'
     # Lưu tạm thời tên của khách hàng
     session['sell_for'] = 'init'
     session['current_invoice'] = {}

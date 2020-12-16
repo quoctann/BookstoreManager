@@ -98,12 +98,6 @@ class ReportView(AuthenticatedView):
         return self.render('admin/task_view/report.html')
 
 
-class StorageView(AuthenticatedView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/task_view/storage.html')
-
-
 class CustomerView(AuthenticatedView):
     @expose('/')
     def index(self):
@@ -113,6 +107,7 @@ class CustomerView(AuthenticatedView):
 # |------------------------------------------|
 # | Các view tác vụ chỉ admin được thực hiện |
 # |------------------------------------------|
+
 
 # Template thông thường
 class AdminView(AuthenticatedView):
@@ -148,13 +143,12 @@ class CanCreate(AdminModelView):
     column_display_pk = True
 
 
-# |------------------|
-# | Các view phụ trợ |
-# |------------------|
-class ExportInvoice(AuthenticatedView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/task_view/export_invoice.html')
+class CanEdit(AdminModelView):
+    can_edit = True
+
+
+class CanCreateEdit(CanCreate, CanEdit):
+    pass
 
 
 # |=========================|
@@ -168,19 +162,24 @@ admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
 admin.add_view(ImportView(name="Nhập sách"))
 admin.add_view(SubmitImportView(name="Xác nhận đơn nhập sách"))
-admin.add_view(StorageView(name="Xem kho"))
-admin.add_view(CustomerView(name="Khách hàng"))
-admin.add_view(AdminModelView(BookStorage, db.session,
-                              category="Xem dữ liệu thô",
-                              name="Kho sách"))
-admin.add_view(CanCreate(Customer, db.session,
-                         category="Xem dữ liệu thô",
-                         name="Khách hàng"))
-admin.add_view(AdminModelView(InvoiceDetail, db.session,
+admin.add_view(CanEdit(BookStorage, db.session, name="Xem kho"))
+admin.add_view(CanCreate(Customer, db.session, name='Khách hàng'))
+admin.add_view(AdminModelView(Invoice, db.session,
                               category="Xem dữ liệu thô",
                               name="Hóa đơn"))
+admin.add_view(AdminModelView(InvoiceDetail, db.session,
+                              category="Xem dữ liệu thô",
+                              name="Chi tiết hóa đơn"))
+admin.add_view(AdminModelView(BookImport, db.session,
+                              category="Xem dữ liệu thô",
+                              name="Phiếu nhập sách"))
+admin.add_view(AdminModelView(ImportDetail, db.session,
+                              category="Xem dữ liệu thô",
+                              name="Chi tiết nhập sách"))
+admin.add_view(AdminModelView(DebtCollection, db.session,
+                              category="Xem dữ liệu thô",
+                              name="Chi tiết thu nợ"))
 # Tính năng bổ sung
-admin.add_view(ExportInvoice(name='Xuất hóa đơn'))
 admin.add_view(RegisterView(name='Thêm nhân viên'))
 admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))

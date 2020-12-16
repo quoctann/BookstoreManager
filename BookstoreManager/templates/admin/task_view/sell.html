@@ -19,7 +19,7 @@
       </p>
       {% endif %}
 
-      {% if valid_debt == 'init' or valid_debt == 'violated' %}
+      {% if valid_debt in (['init', 'violated', 'exceeded']) %}
       <p>Vui lòng kiểm tra nợ của khách hàng trước khi bán</p>
       <form action="{{ url_for('check_debt') }}" method="post">
         <div class="form-group">
@@ -109,14 +109,8 @@
 
     <div class="tab-pane bg-light rounded shadow p-4" id="retail-online" role="tabpanel">
         <h2>Tracking các đơn hàng đang được giao trên hệ thống</h2>
-        <p><small>Đang phát triển...</small></p>
-        <div class="grid-image">
-          <img loading="lazy" src="https://images.unsplash.com/photo-1457296898342-cdd24585d095?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=967&q=80" alt="" class="image-item" />
-          <img loading="lazy" src="https://images.unsplash.com/photo-1503357960973-aa1599e849dc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="" class="image-item" />
-          <img loading="lazy" src="https://images.unsplash.com/photo-1581375074612-d1fd0e661aeb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80" alt="" class="image-item" />
-          <img loading="lazy" src="https://images.unsplash.com/photo-1587393855524-087f83d95bc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=697&q=80" alt="" class="image-item" />
-          <img loading="lazy" src="https://images.unsplash.com/photo-1552089123-2d26226fc2b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=80" alt="" class="image-item" />
-        </div>
+        <p><small>Tính năng đang phát triển...</small></p>
+        {% include 'admin/demo.html' %}
     </div>
 
   </div>

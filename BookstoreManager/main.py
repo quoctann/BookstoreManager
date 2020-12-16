@@ -116,6 +116,7 @@ def check_debt():
             if max_debt >= customer.debt >= 0:
                 session['valid_debt'] = 'OK'
                 session['sell_for'] = customer.name
+                session['deb_collection_status'] = 'init'
             else:
                 session['valid_debt'] = 'violated'
             return redirect(url_for('sellview.index'))
@@ -204,6 +205,7 @@ def check_debt():
             session['valid_debt'] = 'processing'
             return redirect(url_for('sellview.index'))
 
+    session['debt_collection_status'] = 'init'
     session['valid_debt'] = 'init'
     # Gọi phương thức index(self) từ admin.py
     return redirect(url_for('sellview.index'))
@@ -213,19 +215,29 @@ def check_debt():
 @app.route('/admin/debtcollectionview/', methods=["GET", "POST"])
 def debt_collection():
     # Các session được sử dụng: một số tương tự sellview
+    # valid_debt lưu trạng thái của tác vụ với các giá trị:
+    # >> init: khởi tạo, bắt đầu bán hàng
+    # >> violated: vi phạm quy định, xuất thông báo lỗi
+    # >> OK: khách hàng hợp lệ, cho phép bán
+    # >> processing: đã ghi hóa đơn, đang xuất hóa đơn cho khách
+
+    # sell_for: tên khách hàng nhân viên đang bán cho
+    # customer_id: dùng để lấy mã khách hàng hiện đang bán cho
     # max_debt: ghi hạn mức nợ tối đa được phép của khách hàng
     # debt_collection_status: lưu trạng thái công việc của nhân viên
-    # > exceeded: số tiền nhân viên thu vượt quá nợ hiện có
-    # > valid: thu nợ thành công
+    # >> exceeded: số tiền nhân viên thu vượt quá nợ hiện có
+    # >> collected: thu nợ thành công
 
-    # Kiểm tra khách hàng và trả về kết quả
+    # Kiểm tra khách hàng và trả về kết quả, lúc vừa render lên trang
     if request.method == "POST" and \
-            (session['valid_debt'] == 'init'):
+            (session['valid_debt'] in (['init', 'processing'])):
         customer_id = request.form.get('customer_id')
         session['customer_id'] = customer_id
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
+            if customer.debt == 0:
+                session['debt_collection_status'] = 'none'
             # Lấy tên khách hàng
             session['sell_for'] = customer.name
             # Ghi số nợ hiện tại của khách hàng vào session để sử dụng phía dưới
@@ -234,21 +246,27 @@ def debt_collection():
             session['max_debt'] = max_debt
             # Kiểm tra nghiệp vụ
             if max_debt >= session['current_debt'] >= 0:
+                # Khách hàng nợ phù hợp quy định
                 session['valid_debt'] = 'OK'
             else:
+                # Khách hàng nợ vi phạm quy định
                 session['valid_debt'] = 'violated'
             return redirect(url_for('debtcollectionview.index'))
         # Sau khi bán xong trả lại trạng thái ban đầu
-        session['valid_debt'] = 'init'
 
-    # Nếu khách hàng nợ vượt quá quy định
+    # Tiến hành thu nợ (không quan tâm trạng thái nợ)
     if request.method == "POST" and \
-            (session['valid_debt'] == 'violated'):
-        print('yes yes')
+            (session['valid_debt'] in (['violated', 'OK'])):
         # Lấy dữ liệu nhân viên nhập
-        debt_amount = int(request.form.get('debt_amount'))
+        debt_amount = request.form.get('debt_amount')
+        if debt_amount:
+            debt_amount = int(debt_amount)
+        else:
+            session['debt_collection_status'] = 'syntax_err'
+            return redirect(url_for('debtcollectionview.index'))
         # Nếu số tiền nhân viên yêu cầu thu nhiều hơn nợ KH
         if debt_amount > int(session['current_debt']):
+            # Trả về một ràng buộc để render báo lỗi
             session['debt_collection_status'] = 'exceeded'
             return redirect(url_for('debtcollectionview.index'))
         # Nếu số tiền phù hợp
@@ -267,13 +285,16 @@ def debt_collection():
             except Exception as ex:
                 print(ex)
 
-            session['debt_collection_status'] = 'valid'
+            session['valid_debt'] = 'init'
+            session['debt_collection_status'] = 'collected'
+            return redirect(url_for('debtcollectionview.index'))
 
-    if request.method == "POST" and \
-            (session['valid_debt'] == 'init' and
-             session['debt_collection_status'] == 'valid'):
-        utils.reset_value()
+    # if request.method == "POST" and \
+    #         (session['debt_collection_status'] in (['collected', 'exceeded'])):
+    #     utils.reset_value()
 
+    # Mặc định trạng thái thu nợ là init
+    session['debt_collection_status'] = 'init'
     session['valid_debt'] = 'init'
     return redirect(url_for('debtcollectionview.index'))
 
@@ -625,6 +646,7 @@ def recovery_account(token, user_email):
 # Điều hướng tới trang chủ mặc định
 @app.route('/')
 def index():
+    utils.reset_value()
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
     if kw:
