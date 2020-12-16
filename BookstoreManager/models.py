@@ -76,7 +76,7 @@ class DebtCollection(db.Model):
     debt_id = Column(Integer, primary_key=True, autoincrement=True)
     customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False)
     employee_id = Column(Integer, ForeignKey(Employee.id), nullable=False)
-    date = Column(Date, nullable=False)
+    date = Column(Date, default=datetime.today(),  nullable=False)
     amount = Column(Float, nullable=False)
 
 

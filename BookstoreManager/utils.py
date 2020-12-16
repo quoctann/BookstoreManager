@@ -34,6 +34,12 @@ def reset_value():
         del session['import_book']
     if 'sell_err' in session:
         del session['sell_err']
+    if 'customer_debt' in session:
+        del session['customer_debt']
+    if 'max_debt' in session:
+        del session['max_debt']
+    if 'debt_collection_status' in session:
+        del session['debt_collection_status']
 
 
 class TaskRules:

@@ -11,7 +11,6 @@ import hashlib, os, json
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
-
 # |=============|
 # | XỬ LÝ CHUNG |
 # |=============|
@@ -91,7 +90,6 @@ def register_employee(err_msg):
 # Xử lý action bán sách
 @app.route('/admin/sellview/', methods=["GET", "POST"])
 def check_debt():
-    # if ShippingDetail.query.filter_by(status='')
     # Các session được sử dụng:
 
     # valid_debt lưu trạng thái của tác vụ với các giá trị:
@@ -112,10 +110,10 @@ def check_debt():
         customer = Customer.query.filter_by(id=customer_id).first()
         # Nếu query khách hàng có tồn tại
         if customer:
-            customer_debt = customer.debt
+            session['customer_debt'] = customer.debt
             max_debt = (SystemRule.query.filter_by(rule='max_debt').first()).value
             # Kiểm tra nghiệp vụ
-            if max_debt >= customer_debt >= 0:
+            if max_debt >= customer.debt >= 0:
                 session['valid_debt'] = 'OK'
                 session['sell_for'] = customer.name
             else:
@@ -211,6 +209,75 @@ def check_debt():
     return redirect(url_for('sellview.index'))
 
 
+# Xử lý action thu nợ khách hàng
+@app.route('/admin/debtcollectionview/', methods=["GET", "POST"])
+def debt_collection():
+    # Các session được sử dụng: một số tương tự sellview
+    # max_debt: ghi hạn mức nợ tối đa được phép của khách hàng
+    # debt_collection_status: lưu trạng thái công việc của nhân viên
+    # > exceeded: số tiền nhân viên thu vượt quá nợ hiện có
+    # > valid: thu nợ thành công
+
+    # Kiểm tra khách hàng và trả về kết quả
+    if request.method == "POST" and \
+            (session['valid_debt'] == 'init'):
+        customer_id = request.form.get('customer_id')
+        session['customer_id'] = customer_id
+        customer = Customer.query.filter_by(id=customer_id).first()
+        # Nếu query khách hàng có tồn tại
+        if customer:
+            # Lấy tên khách hàng
+            session['sell_for'] = customer.name
+            # Ghi số nợ hiện tại của khách hàng vào session để sử dụng phía dưới
+            session['current_debt'] = customer.debt
+            max_debt = (SystemRule.query.filter_by(rule='max_debt').first()).value
+            session['max_debt'] = max_debt
+            # Kiểm tra nghiệp vụ
+            if max_debt >= session['current_debt'] >= 0:
+                session['valid_debt'] = 'OK'
+            else:
+                session['valid_debt'] = 'violated'
+            return redirect(url_for('debtcollectionview.index'))
+        # Sau khi bán xong trả lại trạng thái ban đầu
+        session['valid_debt'] = 'init'
+
+    # Nếu khách hàng nợ vượt quá quy định
+    if request.method == "POST" and \
+            (session['valid_debt'] == 'violated'):
+        print('yes yes')
+        # Lấy dữ liệu nhân viên nhập
+        debt_amount = int(request.form.get('debt_amount'))
+        # Nếu số tiền nhân viên yêu cầu thu nhiều hơn nợ KH
+        if debt_amount > int(session['current_debt']):
+            session['debt_collection_status'] = 'exceeded'
+            return redirect(url_for('debtcollectionview.index'))
+        # Nếu số tiền phù hợp
+        if debt_amount <= int(session['current_debt']):
+            customer = Customer.query.filter_by(id=session['customer_id']).first()
+            customer.debt = customer.debt - debt_amount
+            # Tiến hành cập nhật csdl
+            debt_collect = DebtCollection(customer_id=session['customer_id'],
+                                          employee_id=current_user.id,
+                                          amount=debt_amount)
+            db.session.add(debt_collect)
+
+            try:
+                db.session.commit()
+                print('Commit successfully')
+            except Exception as ex:
+                print(ex)
+
+            session['debt_collection_status'] = 'valid'
+
+    if request.method == "POST" and \
+            (session['valid_debt'] == 'init' and
+             session['debt_collection_status'] == 'valid'):
+        utils.reset_value()
+
+    session['valid_debt'] = 'init'
+    return redirect(url_for('debtcollectionview.index'))
+
+
 # Xử lý action nhập sách mới từ form
 @app.route('/admin/importview/', methods=["GET", "POST"])
 def import_book():
@@ -240,11 +307,11 @@ def import_book():
 
         # Xử lý khi nhập sách mới chưa có trong kho
         # if not id:
-            # utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
+        # utils.import_book(name=name, quantity=quantity, author=author, category=category, price=price)
         book_new = db.session.query(func.max(BookStorage.id)).first()
         # id = str(book_new[0] + 1)
 
-        if not id:     
+        if not id:
             id = str(book_new[0] + 1)
 
         # Vì sách mới chưa có trong khi, nên sure kèo thỏa điều kiện này khi nhập
@@ -255,8 +322,6 @@ def import_book():
             del session['err_msg']
             if not price:
                 price = 0
-
-
 
         import_book[id] = {
             'id': id,
@@ -274,8 +339,7 @@ def import_book():
     return redirect(url_for('importview.index'))
 
 
-
-@app.route('/admin/submitimportview/',  methods=['post'])
+@app.route('/admin/submitimportview/', methods=['post'])
 def submit_import():
     if 'import_book' not in session:
         session['import_book'] = {}
@@ -561,8 +625,6 @@ def recovery_account(token, user_email):
 # Điều hướng tới trang chủ mặc định
 @app.route('/')
 def index():
-    # Đặt lại bộ nhớ tạm của admin
-    utils.reset_value()
     # Chức năng tìm kiếm trên thanh menu seacrh
     kw = request.args.get('kw')
     if kw:
