@@ -1,0 +1,32 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+    <div class="container col-md-6">
+        <h2 class="text-center">ĐĂNG NHẬP</h2>
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            <h5>{{ err_msg }}</h5>
+        </div>
+        {% endif %}
+        <form method="post">
+            <div class="form-group">
+                <input type="text" placeholder="Username..."
+                       name="username" class="form-control"
+                       required />
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Password..."
+                       name="password" class="form-control"
+                       required />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Đăng nhập"
+                       class="btn btn-danger" />
+                <a href="{{ url_for('register') }}"><input value="Đăng ký"
+                       class="btn btn-danger" /></a>
+                <a href="{{ url_for('forgot_password') }}"><input value="Quên mật khẩu"
+                       class="btn btn-danger" /></a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

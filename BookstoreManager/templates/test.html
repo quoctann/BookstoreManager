@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+  </script>
+
+    <script>
+        $(document).ready(function() {
+
+            $("button").click(function() {
+
+              //here the value is stored in variable.
+                var x = $("input:text").val();
+
+                document.getElementById("demo").innerHTML = x;
+            });
+
+        });
+    </script>
+
+</head>
+
+<body style="text-align:center;">
+
+    <h1 style="color:green;">
+            GeeksForGeeks
+        </h1>
+
+    <h2>jquery val() method
+
+</h2>
+    <p>Name:
+
+        <input type="text"
+               name="user"
+               value="geeksforgeeks">
+
+    </p>
+
+    <button>
+      Get the value of the input field
+  </button>
+
+    <p id="demo"></p>
+
+</body>
+
+</html>

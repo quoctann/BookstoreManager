@@ -1,0 +1,61 @@
+{% extends 'admin/index.html' %}
+
+{% block page_content %}
+<div class="debt_collection">
+    <h3>Thu nợ khách hàng</h3>
+    <div class="bg-light rounded shadow p-4">
+        {% if session['debt_collection_status'] ==  'none' %}
+        <div class="alert alert-warning">Khách hàng không có nợ, không cần thu</div>
+        {% endif %}
+
+        {% if session['debt_collection_status'] ==  'syntax_err' %}
+        <div class="alert alert-warning">Nhập sai định dạng</div>
+        {% endif %}
+
+        {% if session['debt_collection_status'] ==  'exceeded' %}
+        <div class="alert alert-warning">Số tiền thu vượt quá nợ của khách</div>
+        {% endif %}
+
+        {% if session['debt_collection_status'] ==  'collected' %}
+        <div class="alert alert-success">Thu nợ thành công, khách hàng {{ session['sell_for'] }} còn nợ {{ session['current_debt'] }} VNĐ</div>
+        {% endif %}
+
+        {% if session["valid_debt"] in (['init', 'processing']) %}
+        <p>Vui lòng nhập Mã khách hàng để kiểm tra nợ trong hệ thống:</p>
+        <form action="{{ url_for('debt_collection') }}" method="post">
+            <div class="form-group">
+                <input type="text" class="form-control" name="customer_id" placeholder="Nhập ID Khách hàng">
+            </div>
+            <div><button type="submit" value="Check" class="btn btn-danger" onclick="init()">Kiểm tra</button></div>
+        </form>
+        {% endif %}
+
+        {% if session["valid_debt"] == 'OK' %}
+        <div class="alert alert-info">Khách hàng {{ session['sell_for'] }} nợ phù hợp quy định, số nợ: {{ session['current_debt'] }} VNĐ</div>
+        <p>Hạn mức nợ cho phép: {{ session['max_debt'] }} VNĐ</p>
+        <p>Vẫn tiếp tục thu nợ?</p>
+        <form action="{{ url_for('debt_collection') }}" method="post">
+            <div class="form-group">
+                <label for="debt_col">Vậy thì nhập số tiền cần thu: </label>
+                <input id="debt_col" type="text" class="form-control" name="debt_amount" placeholder="Nhập số tiền cần thu">
+                </div>
+            <div><button type="submit" value="Check" class="btn btn-danger" onclick="init()">Tiến hành thu</button></div>
+        </form>
+        {% endif %}
+
+        {% if session["valid_debt"] == 'violated' %}
+        <div class="alert alert-danger">Khách hàng {{ session['sell_for'] }} nợ: {{ session['current_debt'] }} VNĐ vượt quá hạn mức quy định</div>
+        <p>Hạn mức nợ cho phép: {{ session['max_debt'] }} VNĐ</p>
+        <form action="{{ url_for('debt_collection') }}" method="post">
+            <div class="form-group">
+                <label for="debt_col">Vậy thì nhập số tiền cần thu: </label>
+                <input id="debt_col" type="text" class="form-control" name="debt_amount" placeholder="Nhập số tiền cần thu">
+                </div>
+            <div><button type="submit" value="Check" class="btn btn-danger" onclick="init()">Tiến hành thu</button></div>
+        </form>
+        {% endif %}
+
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
+                    <li class="breadcrumb-item active">Danh sách yêu thích</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- Wishlist Start -->
+        <div class="wishlist-page">
+            <div class="container-fluid">
+                <div class="wishlist-page-inner">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <!--    Tiêu đề   -->
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Tên sách</th>
+                                            <th>Giá</th>
+                                            <th>Thêm vào giỏ</th>
+                                            <th>xóa</th>
+                                        </tr>
+                                    </thead>
+
+                                    <!--    Thông tin sách yêu thích   -->
+
+                                    <!--    Thông tin sách yêu thích của người hiện có  -->
+                                    {% if bookwish %}
+                                    {% for b in bookwish %}
+                                    <tbody class="align-middle">
+                                        <tr>
+                                            <!--    ảnh thu nhỏ   -->
+                                            <td>
+                                                <div class="img">
+                                                    <a href="{{ url_for('book_detail', book_id=b['id']) }}">
+                                                        <img src="{{ url_for('static', filename=b['path']) }}" alt="{{ b[name] }}"/></a>
+                                                    <p>{{ b['name'] }}</p>
+                                                </div>
+                                            </td>
+
+                                            <!--   giá   price là key của từ điển wish   -->
+                                            <td>{{ "{:,}".format(b['selling_price']) }} VNĐ</td>
+
+                                            <td><button onclick="addToCart('{{ b.id }}', '{{ b.name }}', '{{ b.selling_price }}', '{{ b.path }}')" class="btn-cart">Thêm vào giỏ</button></td>
+                                            <td><button onclick="deleteWish('{{ b.id }}')"><i class="fa fa-trash"></i></button></td>
+                                        </tr>
+
+                                    </tbody>
+                                    {% endfor %}
+                                    {% else %}
+                                     <tr>
+                                         <td colspan="5">Không có sách yêu thích!</td>
+                                     </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Wishlist End -->
+{% endblock %}

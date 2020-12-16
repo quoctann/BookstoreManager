@@ -1,0 +1,158 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <form>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('book_list') }}">Sách</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('book_list_by_cate', cate_id=book.category) }}">{{ book.category }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ book.name }}</li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+
+
+
+        <!-- Product Detail Start -->
+        <div class="product-detail">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <!-- View info book -->
+                    <div class="col-lg-8">
+                        <div class="product-detail-top">
+                            <div class="row align-items-center">
+
+                                <!--    nơi hiển thị bìa sách   -->
+                                <div class="col-md-5">
+                                    <img src="{{ url_for('static', filename=book.path) }}" alt="{{ book.name }}"/>
+                                </div>
+
+                                <!--    nơi hiển thị thông tin sách   -->
+                                <div class="col-md-7">
+                                    <div class="product-content">
+                                        <div class="title"><h2>{{ book.name }}</h2></div>
+                                        <div class="title"><h5>Tác giả: {{ book.author }}</h5></div>
+                                        <div class="ratting">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="price">
+                                            <h5>Giá: {{ "{:,}".format(book.selling_price) }} VNĐ</h5>
+                                        </div>
+                                        <div class="action">
+                                            <a class="btn" href="javascript:;"
+                                                onclick="addToCart({{ book.id }}, '{{ book.name }}', {{ book.selling_price }}, '{{ book.path }}')">
+                                                <i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</a>
+                                            {% if session.get('user') %}
+                                            <a class="btn" href="{{ url_for('checkout') }}"
+                                               onclick="buyNow({{ book.id }}, '{{ book.name }}', {{ book.selling_price }}, '{{ book.path }}')">
+                                                <i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Side Bar Start -->
+
+                    <!--    Thanh danh mục -->
+                    <div class="col-lg-4 sidebar">
+                        <div class="sidebar-widget category">
+                            <h2 class="title">Danh mục</h2>
+                            <nav class="navbar bg-light">
+                                <ul class="navbar-nav">
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ url_for('book_list_by_cate', cate_id='Tiểu Thuyết') }}"><i class="fa fa fa-book"></i>Tiểu thuyết</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ url_for('book_list_by_cate', cate_id='Truyện Ngắn') }}"><i class="fa fa fa-book"></i>Truyện ngắn</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ url_for('book_list_by_cate', cate_id='Light novel') }}"><i class="fa fa fa-book"></i>Light novel</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <!-- Side Bar End -->
+
+            </div>
+        </div>
+        <!-- Product Detail End -->
+
+
+
+        <!-- Featured Product Start -->
+                                        <!--    container hiển thị sách có trong db    -->
+        <div class="featured-product product">
+            <div class="container-fluid">
+                <div class="section-header">
+                    <h1>Sản phẩm liên quan</h1>
+                </div>
+
+                    <!--    View ngắn gọn mô tả về sách, hiển thị bằng vòng lặp for query xuống db  -->
+                <div class="grid-container">
+                    {% for b in book_relate %}
+                    <div class="">
+                        <div class="product-item">
+
+                            <!--    Tên, mô tả đánh giá bằng sao    -->
+                            <div class="product-title">
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+
+                            <!--    Ảnh về sách, các thao tác tiện lợi  -->
+                            <div class="product-image">
+                                <a href="product-detail.html">
+                                    <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                </a>
+                                <div class="product-action">
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!--    Giá sách, thao tác mua  -->
+                            <div class="product-price">
+                                <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                <a class="btn" href="{{ url_for('checkout') }}"
+                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                    <i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Featured Product End -->
+        </div>
+
+{% endblock %}

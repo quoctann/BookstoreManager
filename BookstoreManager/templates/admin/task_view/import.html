@@ -1,0 +1,201 @@
+{% extends 'admin/index.html' %}
+{{ super() }}
+
+{% block page_content %}
+<script>
+$(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+});
+</script>
+<div class="sell">
+    <h3 class="py-2">Nhập sách</h3>
+    <!-- Lựa chọn đối tượng đang bán hàng -->
+    <div class="list-group list-group-horizontal-sm text-center py-2" id="sell-option-list" role="tablist">
+        <a class="list-group-item list-group-item-dark list-group-item-action active" data-toggle="list" href="#retail-now" role="tab" onload="printDate()" onclick="printDate()">Nhập sách</a>
+        <a class="list-group-item list-group-item-dark list-group-item-action" data-toggle="list" href="#retail-online" role="tab">Sách mới</a>
+    </div>
+
+    <!-- Tab hiển thị tương ứng -->
+    <div class="tab-content py-4">
+        <!-- Tab nhập sách -->
+        <div class="tab-pane bg-light rounded shadow p-4 active" id="retail-now" role="tabpanel">
+            <form method="post">
+                <!--    Danh sách nhập vào  -->
+                <div class="row">
+                    <!--    Ds gợi ý - sách đã có trong kho - bổ sung số lượng  -->
+
+                    <div class="col-lg-3 bg-light">
+                        <!--    Hỗ trợ tìm kiếm + giá nhập + số lượng  -->
+                        <div class="row">
+                            <!--    Tên sách  --    Sách mới nhập, chưa qua xử lý của nhà sách  - chưa thể lấy mã id ngay -->
+                            <div class="col-md-12 form-group">
+                                <label>Tên sách:</label>
+                                <input class="form-control" type="text" id="myInput" placeholder="Tìm kiếm theo tên . . .">
+                            </div>
+                        </div>
+
+                    <!--    ds gợi ý  -->
+                        <h2 class="text-center">Gợi ý</h2>
+                        <!--    Chi tiếc  -->
+                        <div class="suggestion-scroll">
+
+                        <table class="table table-bordered suggestion">
+                            <!--   Sách trong kho  -->
+                            <tbody class="align-middle" id="myTable">
+                            <!--    Vòng lặp for   -->
+                            {% for b in books %}
+                            <form method="post">
+                                <tr>
+                                    <td style="display: none;"><input class="form-control" name="id" value="{{ b.id }}"></td>
+                                    <!--    Tên sách    -->
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-7">{{ b.name }}</div>
+                                            <div class="col-md-5"><input class="form-control" type="submit" value="Chọn" ></div>
+                                        </div>
+                                    </td>
+                                    <td style="display: none;"><input class="form-control" name="name" value="{{ b.name }}"></td>
+
+                                    <!--    Tác giả   -->
+                                    <td style="display: none;"><input class="form-control" name="author" type="text" value="{{ b.author }}"></td>
+
+                                    <!--    Thể loại     -->
+                                    <td style="display: none;"><input class="form-control" name="category" type="text" value="{{ b.category }}" ></td>
+
+                                </tr>
+                            </form>
+                            {% endfor %}
+
+                            <!--    kết thúc vòng lặp   -->
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+
+                    <!--    Chi tiết phiếu nhập  -->
+                    <div class="col-lg-9" style="overflow: scroll">
+                        <!--    Hóa đơn  -->
+                        <div class="bg-white shadow p-2 rounded">
+                            <form method="post">
+                                <h2 class="text-center">Phiếu nhập sách</h2>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p>Số lượng: {{ import_info.total_quantity }}</p>
+                                        <p>Tổng tiền: {{ "{:,}".format(import_info.total_amount) }} VNĐ</p>
+                                    </div>
+                                    <div class="col-md-4" style="text-align: center">
+                                        <a href="/admin/submitimportview/" class="btn btn-danger">Xem phiếu</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {% if session['err_msg'] %}
+                        <div class="alert alert-info mt-4">{{ session['err_msg'] }}</div>
+                        {% endif %}
+
+                        <h2 class="text-center py-3">Nhập chi tiết</h2>
+                        <!--    Chi tiếc  -->
+                        <table class="table table-bordered">
+                            <!--    Tiêu đề   -->
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>sách</th>
+                                    <th>Thể loại</th>
+                                    <th>Tác giả</th>
+                                    <th>Giá nhập</th>
+                                    <th>Số lượng</th>
+                                    <th>Xóa</th>
+                                </tr>
+                            </thead>
+
+                            <!--   Thông tin sách trong giỏ  -->
+                            <tbody class="align-middle stt" >
+                            <!--    Vòng lặp for   -->
+                                {% if 'import_book' in session %}
+                                {% for b in session['import_book'].values() %}
+                                <form method="post">
+                                    <tr class="stt">
+                                        <!--    Tên sách   -->
+                                        <td class="text-center"></td>
+                                        <td style="display: none;"><input value="{{ b.id }}" name="id"/></td>
+                                        <td><input value="{{ b.name }}" name="name"/></td>
+                                        <td><input value="{{ b.category }}" name="category"style="width: 90px"/></td>
+                                        <td><input value="{{ b.author }}" name="author" style="width: 120px"/></td>
+                                        <td><input value="{{ b.price }}" name="price" style="width: 80px"/></td>
+                                        <td><input value="{{ b.quantity }}" name="quantity" style="width: 50px"  /></td>
+                                        <td style="display: none;"><input class="form-control" type="submit" value="Nhận" ></td>
+                                        <td><button onclick="del_one_import({{ b.id }})"><i class="fa fa-trash"></i></button></td>
+                                    </tr>
+                                </form>
+                                {% endfor %}
+                                {% else %}
+                                 <tr>
+                                     <td colspan="7" class="text-center">Chưa nhập sản phẩm nào!</td>
+                                 </tr>
+                                {% endif %}
+                            <!--    kết thúc vòng lặp   -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- Tab sách mới -->
+        <div class="tab-pane bg-light rounded shadow p-4" id="retail-online" role="tabpanel">
+            <div class="container">
+                <form method="post">
+                    <div class="row">
+                        <!--    Tên sách  -->
+                        <div class="col-md-5 form-group">
+                            <label>Tên:</label>
+                            <input class="form-control" name="name" type="text" required >
+                        </div>
+
+                        <!--    Số lượng  -->
+                        <div class="col-md-2 form-group">
+                            <label >Số lượng:</label>
+                            <input class="form-control" name="quantity" type="number" required >
+                        </div>
+
+                        <!--    Giá  -->       <!--------------------->
+                        <div class="col-md-3 form-group">
+                            <label >Giá nhập:</label>
+                            <input class="form-control" name="price" type="number" required >
+                        </div>
+
+                        <!--    Tác giả -->
+                        <div class="col-md-5 form-group">
+                            <label >Tác giả:</label>
+                            <input class="form-control" name="author" type="text" required >
+                        </div>
+
+                        <!--    Thể loại  -->
+                        <div class="col-md-3 form-group">
+                            <label >Thể loại:</label>
+                            <input class="form-control" name="category" type="text" required >
+                        </div>
+
+                        <!--    button  -->
+                        <div class="col-md-12 form-group">
+                            <div class="col-md-3 form-group p-0">
+                                <input class="form-control btn btn-danger" type="submit" value="Nhập" >
+                            </div>
+                        </div>
+
+                        <!--  Bìa sách cho mặt định - nhân viên sẽ bổ sung sau  -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

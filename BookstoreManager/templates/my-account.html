@@ -1,0 +1,142 @@
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Tài khoảng của tôi</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- My Account Start -->
+
+            <div class="my-account">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <!--    Thẻ tap     -->
+                        <div class="col-md-3">
+                            <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                                <a class="nav-link active" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Tài khoảng chi tiết</a>
+                                <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-credit-card"></i>Đặt hàng</a>
+                                <div style="padding: 0.5rem;">
+                                    <img src="{{ url_for('static', filename=session['user']['avatar']) }}" style="width:100%; border-radius: 1rem"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--    Tap hiển thị   -->
+                        <div class="col-md-8">
+                            <div class="tab-content">
+
+                                    <!--    Form cập nhập thông tin khách hàng   -->
+                                {% if err_msg %}
+                                <div class="text-certer text-success"><h1>{{ err_msg }}</h1></div>
+                                {% endif %}
+                                <div class="tab-pane fade show active" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                                <form method="post" action="" enctype="multipart/form-data">
+                                    <h4>Thông tin chi tiết</h4>
+                                    <div class="row">
+
+                                        <!--    Nơi cập nhập thông tin   -->
+                                        <div class="col-md-5">
+                                            <!--    Tên   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="name">Họ tên</label>
+                                                <input type="text" id="name" name="name" class="form-control" value="{{ session['user']['name'] }}" required/>
+                                            </div>
+
+                                            <!--    Số điện thoại   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="phone">Số điện thoại</label>
+                                                <input type="number" id="phone" name="phone" class="form-control" value="{{ session['user']['phone'] }}" required/>
+                                            </div>
+
+                                            <!--    Nút cập nhập thông tin - nên chỉnh về input  -->
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn">Cập nhập</button>
+                                                <a href="{{ url_for('change_password') }}">Thay đổi mật khẩu</a>
+                                            <br><br>
+                                        </div>
+
+                                        </div>
+
+                                        <div class="col-md-7 ">
+                                            <!--    Email   -->
+                                            <div class="form-group col-md-9">
+                                                <label for="email">Email</label>
+                                                <input type="email" id="email" name="email" class="form-control" value="{{ session['user']['email'] }}" required/>
+                                            </div>
+
+                                            <!--    Address   -->
+                                            <div class="form-group col-md-12">
+                                                <label for="address">Địa chỉ</label>
+                                                <input type="text" id="address" name="address" class="form-control" value="{{ session['user']['address'] }}"required/>
+                                            </div>
+
+                                            <div class="form-group col-md-12">
+                                                <label for="avatar">Ảnh đại diện</label>
+                                                <input type="file" id="avatar" name="avatar" class="form-control" />
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+
+                                <!--    View xem các đơn hàng   -->
+                                <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+
+                                            <!--    tiêu đề   -->
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Mã id hoá đơn</th>
+                                                    <th>Ngày đặt</th>
+                                                    <th>Giá</th>
+                                                    <th>Chi tiết</th>
+                                                </tr>
+                                            </thead>
+
+                                            <!--    list đơn hàng   -->
+                                            <tbody class="stt">
+                                                <!--    Vòng lặp for    -->
+
+                                                {% if invoice %}
+                                                {% for i in invoice %}
+
+                                                <tr class="stt">
+                                                    <td></td>
+                                                    <td>{{ i.invoice_id }}</td>
+                                                    <td>{{ i.date }}</td>
+                                                    <td>{{ "{:,}".format(i.total_price) }} VNĐ</td>
+                                                    <td><a href="{{ url_for('read_invoice_by_id', invoice_id=i.invoice_id) }}"><button class="btn">xem</button></a> </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% else %}
+                                                 <tr>
+                                                     <td colspan="5" class="text-center"><h2>Chưa có đơn đặt hàng nào!</h2></td>
+                                                 </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- My Account End -->
+
+{% endblock %}

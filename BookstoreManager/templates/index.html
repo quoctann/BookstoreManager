@@ -1,10 +1,220 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Quản lý nhà sách</title>
-</head>
-<body>
-    <h1>Quản lý nhà sách</h1>
-</body>
-</html>
+{% extends 'bar-footer.html' %}
+
+{% block body %}
+        <!-- Main Slider Start -->
+        <header>
+          <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+              <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" style="height: 400px;" role="listbox">
+              <!-- Slide One - Set the background image for this slide in the line below -->
+              <div class="carousel-item active"
+                   style="background-image: url('{{ url_for('static', filename='images/yournamewall.jpg') }}')" >
+                <div class="carousel-caption d-none d-md-block">
+                  <h2 class="display-4">First Slide</h2>
+                  <p class="lead">This is a description for the first slide.</p>
+                </div>
+              </div>
+              <!-- Slide Two - Set the background image for this slide in the line below -->
+              <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/5cmwall.jpg') }}')">
+                <div class="carousel-caption d-none d-md-block">
+                  <h2 class="display-4">Second Slide</h2>
+                  <p class="lead">This is a description for the second slide.</p>
+                </div>
+              </div>
+              <!-- Slide Three - Set the background image for this slide in the line below -->
+              <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/dietquywall.jpg') }}')">
+                <div class="carousel-caption d-none d-md-block">
+                  <h2 class="display-4">Third Slide</h2>
+                  <p class="lead">This is a description for the third slide.</p>
+                </div>
+              </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Previous</span>
+                </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Next</span>
+                </a>
+          </div>
+        </header>
+        <!-- Main Slider End -->
+
+
+
+
+        <!-- Featured Product Start -->
+                                        <!--    container hiển thị sách có trong db    -->
+        <div class="featured-product product">
+            <div class="container-fluid">
+                <div class="section-header">
+                    <h1>Sách mới ra</h1>
+                </div>
+
+                    <!--    View ngắn gọn mô tả về sách, hiển thị bằng vòng lặp for query xuống db  -->
+                <div class="grid-container">
+                    {% for b in booknew %}
+                    <div class="">
+                        <div class="product-item">
+
+                            <!--    Tên, mô tả đánh giá bằng sao    -->
+                            <div class="product-title">
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+
+                            <!--    Ảnh về sách, các thao tác tiện lợi  -->
+                            <div class="product-image">
+                                <a href="product-detail.html">
+                                    <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                </a>
+                                <div class="product-action">
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!--    Giá sách, thao tác mua  -->
+                            <div class="product-price">
+                                <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                <a class="btn" href="{{ url_for('checkout') }}"
+                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                    <i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Featured Product End -->
+
+
+
+        <!-- Featured Product Start -->
+                                        <!--    container hiển thị sách có trong db    -->
+        <div class="featured-product product">
+            <div class="container-fluid">
+                <div class="section-header">
+                    <h1>Tiểu thuyết hay</h1>
+                </div>
+
+                    <!--    View ngắn gọn mô tả về sách, hiển thị bằng vòng lặp for query xuống db  -->
+                <div class="grid-container">
+                    {% for b in book_tieuthuyet %}
+                    <div class="">
+                        <div class="product-item">
+
+                            <!--    Tên, mô tả đánh giá bằng sao    -->
+                            <div class="product-title">
+                                <a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.name }}</a>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+
+                            <!--    Ảnh về sách, các thao tác tiện lợi  -->
+                            <div class="product-image">
+                                <a href="product-detail.html">
+                                    <img src="{{ url_for('static', filename=b.path) }}" alt="{{ b.name }}"/>
+                                </a>
+                                <div class="product-action">
+                                    <a href="javascript:;"
+                                       onclick="addToCart({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </a>
+                                    <a href="javascript:;"
+                                       onclick="addToWishlist({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                        <i class="fa fa-heart"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!--    Giá sách, thao tác mua  -->
+                            <div class="product-price">
+                                <h3>{{ "{:,}".format(b.selling_price) }} VNĐ</h3>
+                                <a class="btn" href="{{ url_for('checkout') }}"
+                                   onclick="buyNow({{ b.id }}, '{{ b.name }}', {{ b.selling_price }}, '{{ b.path }}')">
+                                    <i class="fa fa-shopping-cart"></i>Mua ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Featured Product End -->
+
+
+
+        <!-- Feature Start-->
+                            <!--    mô tả nhà sách  -->
+        <div class="feature">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-6 feature-col">
+                        <div class="feature-content">
+                            <i class="fab fa-cc-mastercard"></i>
+                            <h2>Thanh toán linh hoạt</h2>
+                            <p>
+                                Đa dạng phương thức thanh toán với ưu tiên bảo mật cao
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 feature-col">
+                        <div class="feature-content">
+                            <i class="fa fa-truck"></i>
+                            <h2>Vận chuyển tận nơi</h2>
+                            <p>
+                                Bạn chỉ cần chốt đơn, vận chuyển để chúng tôi lo
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 feature-col">
+                        <div class="feature-content">
+                            <i class="fa fa-sync-alt"></i>
+                            <h2>7 ngày đổi trả</h2>
+                            <p>
+                                Hoàn trả tiền khi sản phẩm bị lỗi, miễn phí chuyển hoàn
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 feature-col">
+                        <div class="feature-content">
+                            <i class="fa fa-comments"></i>
+                            <h2>Hỗ trợ 24/7</h2>
+                            <p>
+                                Liên hệ CSKH 19008178 & customer@vinbook.com
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Feature End-->
+
+
+
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% import 'admin/custom_macro.html' as taskcard %}
+
+<div class="grid-container">
+    <a href="/admin/sellview/">{{ taskcard.task('1', 'Bán sách', 'Chọn tác vụ này để bán sách cho khách hàng') }}</a>
+    <a href="/admin/debtcollectionview/">{{ taskcard.task('2', 'Thu nợ', 'Chọn tác vụ này để thu nợ khách hàng') }}</a>
+    <a href="/admin/reportview/">{{ taskcard.task('3', 'Báo cáo', 'Chọn tác vụ này để xuất báo cáo nợ, báo cáo kho') }}</a>
+    <a href="/admin/importview/">{{ taskcard.task('4', 'Nhập sách', 'Chọn tác vụ này để nhập sách vào kho') }}</a>
+    <a href="/admin/bookstorage/">{{ taskcard.task('5', 'Xem kho', 'Chọn tác vụ này để xem sản phẩm tồn trong kho') }}</a>
+    <a href="/admin/customer/">{{ taskcard.task('6', 'Khách hàng', 'Chọn tác vụ này để xem thông tin khách hàng') }}</a>
+    {% if current_user.role == 'Admin' %}
+    <a href="/admin/registerview/">{{ taskcard.task('7', 'Thêm nhân viên', 'Chọn tác vụ này thêm nhân viên vào hệ thống') }}</a>
+    <a href="">{{ taskcard.task('8', 'Đổi quy định', 'Chọn tác vụ này để đổi quy định của hệ thống') }}</a>
+    {% endif %}
+</div>
