@@ -160,8 +160,8 @@ class CanCreateEdit(CanCreate, CanEdit):
 admin.add_view(SellView(name="Bán sách"))
 admin.add_view(DebtCollectionView(name="Thu nợ"))
 admin.add_view(ReportView(name="Báo cáo"))
-admin.add_view(ImportView(name="Nhập sách"))
-admin.add_view(SubmitImportView(name="Xác nhận đơn nhập sách"))
+admin.add_view(ImportView(name="Tạo phiếu nhập sách", category='Nhập sách'))
+admin.add_view(SubmitImportView(name="Xác nhận đơn nhập sách", category='Nhập sách'))
 admin.add_view(CanEdit(BookStorage, db.session, name="Xem kho"))
 admin.add_view(CanCreate(Customer, db.session, name='Khách hàng'))
 admin.add_view(AdminModelView(Invoice, db.session,
@@ -181,5 +181,6 @@ admin.add_view(AdminModelView(DebtCollection, db.session,
                               name="Chi tiết thu nợ"))
 # Tính năng bổ sung
 admin.add_view(RegisterView(name='Thêm nhân viên'))
-admin.add_view(RuleView(name='Đổi quy định'))
+admin.add_view(CanEdit(SystemRule, db.session, name="Đổi quy định"))
+# admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))

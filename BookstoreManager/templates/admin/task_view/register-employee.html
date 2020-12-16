@@ -1,6 +1,7 @@
 <!--Admin register form-->
 {% extends 'admin/index.html' %}
 {% block page_content %}
+<div class="bg-light p-4 rounded shadow">
     {% if err_msg %}
     <div class="alert alert-warning">{{ err_msg }}</div>
     {% endif %}
@@ -22,4 +23,5 @@
     {% if err_msg %}
     <div class="alert alert-warning my-2">{{ err_msg }}</div>
     {% endif %}
+</div>
 {% endblock %}

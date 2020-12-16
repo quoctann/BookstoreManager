@@ -225,7 +225,7 @@ tbody.stt tr.stt td:first-child:before
 }
 
 .import {
-    background: #d9e3c6;
+    background: #F8F9FA;
     padding: 10px;
 }
 
@@ -264,4 +264,9 @@ tbody.stt tr.stt td:first-child:before
       grid-template-rows: 100px 100px;
       grid-gap: 10px;
    }
+}
+
+.suggestion-scroll {
+    height: 60vh;
+    overflow: scroll;
 }

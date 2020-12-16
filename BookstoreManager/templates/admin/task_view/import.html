@@ -29,7 +29,7 @@ $(document).ready(function(){
                 <div class="row">
                     <!--    Ds gợi ý - sách đã có trong kho - bổ sung số lượng  -->
 
-                    <div class="col-lg-3">
+                    <div class="col-lg-3 bg-light">
                         <!--    Hỗ trợ tìm kiếm + giá nhập + số lượng  -->
                         <div class="row">
                             <!--    Tên sách  --    Sách mới nhập, chưa qua xử lý của nhà sách  - chưa thể lấy mã id ngay -->
@@ -42,7 +42,9 @@ $(document).ready(function(){
                     <!--    ds gợi ý  -->
                         <h2 class="text-center">Gợi ý</h2>
                         <!--    Chi tiếc  -->
-                        <table class="table table-bordered">
+                        <div class="suggestion-scroll">
+
+                        <table class="table table-bordered suggestion">
                             <!--   Sách trong kho  -->
                             <tbody class="align-middle" id="myTable">
                             <!--    Vòng lặp for   -->
@@ -72,31 +74,32 @@ $(document).ready(function(){
                             <!--    kết thúc vòng lặp   -->
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
                     <!--    Chi tiết phiếu nhập  -->
-                    <div class="col-lg-9">
+                    <div class="col-lg-9" style="overflow: scroll">
                         <!--    Hóa đơn  -->
-                        <div class="alert alert-warning">
+                        <div class="bg-white shadow p-2 rounded">
                             <form method="post">
-                                <h1 class="text-center">- - - - - HÓA ĐƠN - - - - -</h1>
+                                <h2 class="text-center">Phiếu nhập sách</h2>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <h2>Số lượng: {{ import_info.total_quantity }}</h2>
-                                        <h2>Tổng tiền: {{ "{:,}".format(import_info.total_amount) }} VNĐ</h2>
+                                        <p>Số lượng: {{ import_info.total_quantity }}</p>
+                                        <p>Tổng tiền: {{ "{:,}".format(import_info.total_amount) }} VNĐ</p>
                                     </div>
                                     <div class="col-md-4" style="text-align: center">
-                                        <a href="{{ url_for('submit_import') }}"><button class="btn btn-danger ">Xem phiếu</button></a>
+                                        <a href="/admin/submitimportview/" class="btn btn-danger">Xem phiếu</a>
                                     </div>
                                 </div>
                             </form>
                         </div>
 
                         {% if session['err_msg'] %}
-                        <h5 class="text-danger">{{ session['err_msg'] }}</h5>
+                        <div class="alert alert-info mt-4">{{ session['err_msg'] }}</div>
                         {% endif %}
 
-                        <h2 class="text-center">Nhập chi tiết</h2>
+                        <h2 class="text-center py-3">Nhập chi tiết</h2>
                         <!--    Chi tiếc  -->
                         <table class="table table-bordered">
                             <!--    Tiêu đề   -->

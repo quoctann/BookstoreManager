@@ -24,7 +24,7 @@ Quản lý nhà sách
 
 <!-- Phần quy định layout của trang -->
 {% block page_body %}
-<div class="container col-lg-10 {% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}">
+<div class="container {% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}">
     <!-- Vertical navbar -->
     {% include 'admin/sidebar.html' %}
 
