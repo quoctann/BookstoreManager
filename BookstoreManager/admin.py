@@ -180,7 +180,8 @@ admin.add_view(AdminModelView(DebtCollection, db.session,
                               category="Xem dữ liệu thô",
                               name="Chi tiết thu nợ"))
 # Tính năng bổ sung
-admin.add_view(RegisterView(name='Thêm nhân viên'))
+admin.add_view(RegisterView(category="Nhân viên", name='Thêm nhân viên'))
+admin.add_view(CanEdit(Employee, db.session, category="Nhân viên", name='Danh sách nhân viên'))
 admin.add_view(CanEdit(SystemRule, db.session, name="Đổi quy định"))
 # admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))

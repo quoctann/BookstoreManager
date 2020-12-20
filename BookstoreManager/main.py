@@ -111,11 +111,11 @@ def check_debt():
         # Nếu query khách hàng có tồn tại
         if customer:
             session['customer_debt'] = customer.debt
+            session['sell_for'] = customer.name
             max_debt = (SystemRule.query.filter_by(rule='max_debt').first()).value
             # Kiểm tra nghiệp vụ
             if max_debt >= customer.debt >= 0:
                 session['valid_debt'] = 'OK'
-                session['sell_for'] = customer.name
                 session['deb_collection_status'] = 'init'
             else:
                 session['valid_debt'] = 'violated'
@@ -289,9 +289,6 @@ def debt_collection():
             session['debt_collection_status'] = 'collected'
             return redirect(url_for('debtcollectionview.index'))
 
-    # if request.method == "POST" and \
-    #         (session['debt_collection_status'] in (['collected', 'exceeded'])):
-    #     utils.reset_value()
 
     # Mặc định trạng thái thu nợ là init
     session['debt_collection_status'] = 'init'
@@ -331,7 +328,7 @@ def import_book():
             book_new = db.session.query(func.max(BookStorage.id)).first()
             id = str(book_new[0] + 1)
 
-        # Vì sách mới chưa có trong khi, nên sure kèo thỏa điều kiện này khi nhập
+        # Vì sách mới chưa có trong kho, nên sure kèo thỏa điều kiện này khi nhập
         if check and check.instock > 300:
             session['err_msg'] = "Sách trong kho còn nhiều "
             return redirect(url_for('importview.index'))
