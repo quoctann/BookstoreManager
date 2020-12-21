@@ -42,15 +42,6 @@ def reset_value():
         del session['debt_collection_status']
 
 
-class TaskRules:
-    pass
-
-
-##########################################################
-
-
-#########################################################
-
 # Nếu là sách mới, chưa có trong kho, thì cập nhập dữ liệu sách mới vào kho
 def import_book(name, quantity, author, category, price):
     book = BookStorage(name=name, instock=quantity, author=author, category=category, selling_price=price)

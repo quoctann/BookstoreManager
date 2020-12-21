@@ -1,6 +1,8 @@
 /**********************************/
 /********** General CSS ***********/
 /**********************************/
+
+
 body {
     color: #353535;
     font-family: 'Roboto', sans-serif;
@@ -863,6 +865,7 @@ h2 {
     padding: 20px 30px 15px 30px;
     color: #FF6F61;
     background: #d6edcf;
+    border-radius: 1rem;
 }
 
 .product .slick-prev,
@@ -930,6 +933,7 @@ h2 {
     padding: 30px;
     margin-bottom: 30px;
     background: #ffffff;
+    border-radius: 1rem
 }
 
 .product-view .product-search {
@@ -2424,9 +2428,6 @@ h2 {
 }
 
 
-html {
-  scroll-behavior: smooth;
-}
 
 
 
@@ -2489,3 +2490,21 @@ tbody.stt tr.stt td:first-child:before
 /******** test chức năng mới *******/
 /*************************************************************/
 
+/* Tùy biến thanh cuộn */
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #bdc3c7;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff414d;
+}
