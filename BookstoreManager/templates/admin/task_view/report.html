@@ -49,7 +49,7 @@
 
       </form>
     </div>
-    {% if session['report'] and session['report_msg'] != 'invalid date' %}
+    {% if session['report'] and session['report_msg'] not in ['invalid date', 'developing'] %}
     <div class="display-report">
         <hr>
         <h2 class="my-4 text-center">BÁO CÁO TỒN KHO THÁNG {{ session['report_date'][0] }} NĂM {{ session['report_date'][1] }}</h2>
@@ -116,6 +116,10 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
+    {% if session['report_msg'] == 'developing' %}
+    <div class="alert alert-info">Tính năng đang phát triển</div>
+    {% include 'admin/demo.html' %}
     {% endif %}
 </div>
 {% endblock %}

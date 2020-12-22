@@ -489,6 +489,9 @@ def report():
                 session['report_date'] = report_date
                 print(report)
 
+            # Nếu loại báo cáo là công nợ
+            if report_type == 'debt':
+                session['report_msg'] = 'developing'
             # qry = DBSession.query(User).filter(
             #     and_(User.birthday <= '1988-01-17', User.birthday >= '1985-01-17'))
 
