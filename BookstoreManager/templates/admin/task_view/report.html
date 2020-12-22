@@ -2,8 +2,124 @@
 
 {% block page_content %}
 <div class="bg-white p-4 rounded shadow">
-    <h2>Tạo báo cáo</h2>
-    <p>Tính năng đang phát triển</p>
+    {% if session['report_msg'] == 'invalid date' %}
+    <div class="alert alert-warning">Không có dữ liệu trong hệ thống</div>
+    {% endif %}
+    <h2>Xem báo cáo tháng</h2>
+    <div>
+        <form method="post">
+
+            <div class="form-row d-flex align-items-center my-4">
+                <div class="col-5">
+                    <span>Chọn tháng cần xuất báo cáo: </span>
+                </div>
+                <div class="col-2">
+                    <select name="report_month" class="form-control">
+                        <option value="1" selected>Tháng 1</option>
+                        {% for i in [2,3,4,5,6,7,8,9,10,11,12] %}
+                        <option value="{{ i }}">Tháng {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <select name="report_year" class="form-control">
+                        <option value="2020" selected>Năm 2020</option>
+                        {% for i in [2019,2018] %}
+                        <option value="{{ i }}">Năm {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row d-flex align-items-center my-4">
+                <div class="col-5">
+                    <span>Chọn loại báo cáo: </span>
+                </div>
+                <div class="col-5">
+                    <select name="report_type" class="form-control">
+                        <option value="storage" selected>Báo cáo tồn kho</option>
+                        <option value="debt">Báo cáo công nợ</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button class="btn btn-success my-4" type="submit">Xem báo cáo</button>
+            </div>
+
+      </form>
+    </div>
+    {% if session['report'] and session['report_msg'] not in ['invalid date', 'developing'] %}
+    <div class="display-report">
+        <hr>
+        <h2 class="my-4 text-center">BÁO CÁO TỒN KHO THÁNG {{ session['report_date'][0] }} NĂM {{ session['report_date'][1] }}</h2>
+        <center>
+        <canvas id="myChart" width="600" height="400" class="my-4"></canvas>
+        <script>
+        // session['report_data'] = [data_import, data_export, data_change]
+        var ctx = document.getElementById('myChart');
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tổng nhập', 'Tổng xuất'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: {{ session['report_data'] }},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+        </script>
+        </center>
+
+        <hr>
+        <h3 class="my-4 text-center">Chi tiết hàng tồn</h3>
+        <table class="table table-striped table-border">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Sách</th>
+                    <th>Tồn đầu</th>
+                    <th>Phát sinh</th>
+                    <th>Tồn cuối</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in session['report'].keys() %}
+            <tr>
+                <td>{{ session['report'][item]['id'] }}</td>
+                <td>{{ session['report'][item]['name'] }}</td>
+                <td>{{ session['report'][item]['begin'] }}</td>
+                <td>{{ session['report'][item]['change'] }}</td>
+                <td>{{ session['report'][item]['end'] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    {% if session['report_msg'] == 'developing' %}
+    <div class="alert alert-info">Tính năng đang phát triển</div>
     {% include 'admin/demo.html' %}
+    {% endif %}
 </div>
 {% endblock %}

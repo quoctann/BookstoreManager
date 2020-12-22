@@ -23,7 +23,8 @@ a, a:hover {
 
 /* Tùy biến thanh cuộn */
 ::-webkit-scrollbar {
-  width: 0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -224,11 +225,6 @@ tbody.stt tr.stt td:first-child:before
   content: counter(Count-Value);
 }
 
-.import {
-    background: #F8F9FA;
-    padding: 10px;
-}
-
 /* Style của hình minh họa bán hàng online demo.html */
 .grid-image {
    display: grid;
@@ -267,6 +263,9 @@ tbody.stt tr.stt td:first-child:before
 }
 
 .suggestion-scroll {
-    height: 60vh;
+    height: 10rem;
     overflow: scroll;
+    width: 100%;
+    overflow-x: hidden;
 }
+

@@ -165,12 +165,12 @@ class WishDetail(db.Model):
 class SystemRule(db.Model):
     rule_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     # Tên nghiệp vụ > sử dụng trong main.py
-    rule = Column(String(10), nullable=False)
+    rule = Column(String(20), nullable=False)
     # Giá trị tham chiếu
     value = Column(Integer, nullable=False)
     # Mô tả
-    description = Column(String(50))
-    # Ví dụ rule = max_debt, value = 20000 > hạn mức nợ của khách không được quá 20k để mua sách
+    description = Column(String(255))
+    # Ví dụ rule = max_debt, value = 20000 có nghĩa là hạn mức nợ của khách không được quá 20k để mua sách
 
 
 if __name__ == '__main__':

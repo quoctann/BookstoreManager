@@ -13,7 +13,7 @@ $(document).ready(function(){
 });
 </script>
 <div class="sell">
-    <h3 class="py-2">Nhập sách</h3>
+    <h3 class="py-2">Vui lòng chọn phương thức nhập sách:</h3>
     <!-- Lựa chọn đối tượng đang bán hàng -->
     <div class="list-group list-group-horizontal-sm text-center py-2" id="sell-option-list" role="tablist">
         <a class="list-group-item list-group-item-dark list-group-item-action active" data-toggle="list" href="#retail-now" role="tab" onload="printDate()" onclick="printDate()">Nhập sách</a>
@@ -26,25 +26,24 @@ $(document).ready(function(){
         <div class="tab-pane bg-light rounded shadow p-4 active" id="retail-now" role="tabpanel">
             <form method="post">
                 <!--    Danh sách nhập vào  -->
-                <div class="row">
-                    <!--    Ds gợi ý - sách đã có trong kho - bổ sung số lượng  -->
+                <div class="d-flex flex-row">
 
-                    <div class="col-lg-3 bg-light">
+                    <div class="bg-white p-4 rounded shadow mr-4 w-50">
                         <!--    Hỗ trợ tìm kiếm + giá nhập + số lượng  -->
-                        <div class="row">
                             <!--    Tên sách  --    Sách mới nhập, chưa qua xử lý của nhà sách  - chưa thể lấy mã id ngay -->
-                            <div class="col-md-12 form-group">
-                                <label>Tên sách:</label>
-                                <input class="form-control" type="text" id="myInput" placeholder="Tìm kiếm theo tên . . .">
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-search"></i></span>
+                                </div>
+                                <input class="form-control" type="text" id="myInput" placeholder="Tìm sách">
                             </div>
-                        </div>
+                        <hr>
 
                     <!--    ds gợi ý  -->
-                        <h2 class="text-center">Gợi ý</h2>
                         <!--    Chi tiếc  -->
                         <div class="suggestion-scroll">
 
-                        <table class="table table-bordered suggestion">
+                            <table class="table table-striped table-border suggestion">
                             <!--   Sách trong kho  -->
                             <tbody class="align-middle" id="myTable">
                             <!--    Vòng lặp for   -->
@@ -55,8 +54,8 @@ $(document).ready(function(){
                                     <!--    Tên sách    -->
                                     <td>
                                         <div class="row">
-                                            <div class="col-md-7">{{ b.name }}</div>
-                                            <div class="col-md-5"><input class="form-control" type="submit" value="Chọn" ></div>
+                                            <div class="col">{{ b.name }}</div>
+                                            <div class="col"><input class="form-control text-info" type="submit" value="Chọn" ></div>
                                         </div>
                                     </td>
                                     <td style="display: none;"><input class="form-control" name="name" value="{{ b.name }}"></td>
@@ -78,35 +77,36 @@ $(document).ready(function(){
                     </div>
 
                     <!--    Chi tiết phiếu nhập  -->
-                    <div class="col-lg-9" style="overflow: scroll">
                         <!--    Hóa đơn  -->
-                        <div class="bg-white shadow p-2 rounded">
+                        <div class="bg-white shadow p-4 rounded d-flex align-items-center justify-content-center w-100">
                             <form method="post">
                                 <h2 class="text-center">Phiếu nhập sách</h2>
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p>Số lượng: {{ import_info.total_quantity }}</p>
-                                        <p>Tổng tiền: {{ "{:,}".format(import_info.total_amount) }} VNĐ</p>
-                                    </div>
-                                    <div class="col-md-4" style="text-align: center">
-                                        <a href="/admin/submitimportview/" class="btn btn-danger">Xem phiếu</a>
-                                    </div>
+                                <div class="d-flex flex-row justify-content-center align-items-center">
+                                    <p class="mx-2">Số lượng: {{ import_info.total_quantity }}</p>
+                                    <p class="mx-2">Tổng tiền: {{ "{:,}".format(import_info.total_amount) }} VNĐ</p>
                                 </div>
+                                <div class="d-flex flex-row justify-content-center align-items-center">
+                                    <a href="/admin/submitimportview/" class="btn btn-danger">Tiến hành xác nhận phiếu</a>
+                                </div>
+                                <p class="text-warning text-center mt-3">Chỉ tiến hành xác nhận phiếu khi đã đảm bảo nhập đúng các trường chi tiết bên dưới.</p>
                             </form>
                         </div>
+                </div>
 
+                <div class="bg-white shadow rounded mt-4">
                         {% if session['err_msg'] %}
-                        <div class="alert alert-info mt-4">{{ session['err_msg'] }}</div>
+                        <div class="alert alert-info">{{ session['err_msg'] }}</div>
                         {% endif %}
 
-                        <h2 class="text-center py-3">Nhập chi tiết</h2>
+                        <p class="text-center p-4 mb-0">Nhập thông tin chi tiết sách nhập kho, nhấn <span class="text-info font-weight-bold">Enter</span> để lưu dữ liệu</p>
                         <!--    Chi tiếc  -->
-                        <table class="table table-bordered">
+                        <div class="overflow-auto">
+                            <table class="table table-bordered rounded mb-0">
                             <!--    Tiêu đề   -->
                             <thead class="thead-dark">
                                 <tr>
                                     <th>STT</th>
-                                    <th>sách</th>
+                                    <th>Sách</th>
                                     <th>Thể loại</th>
                                     <th>Tác giả</th>
                                     <th>Giá nhập</th>
@@ -143,7 +143,7 @@ $(document).ready(function(){
                             <!--    kết thúc vòng lặp   -->
                             </tbody>
                         </table>
-                    </div>
+                        </div>
 
                 </div>
             </form>

@@ -1,5 +1,6 @@
 from flask import session
 from flask_login import current_user
+from sqlalchemy import and_, func
 from sqlalchemy.orm import class_mapper
 
 from BookstoreManager import app, db
@@ -42,14 +43,9 @@ def reset_value():
         del session['debt_collection_status']
 
 
-class TaskRules:
-    pass
-
-
-##########################################################
-
-
-#########################################################
+# |--------------------------|
+# | Tiện ích xử lý nhập sách |
+# |--------------------------|
 
 # Nếu là sách mới, chưa có trong kho, thì cập nhập dữ liệu sách mới vào kho
 def import_book(name, quantity, author, category, price):
@@ -123,9 +119,71 @@ def increase_instock(book_id, quantity, price):
     db.session.commit()
 
 
-# |==============================|      ##################################################################################################################
-# | TIỆN ÍCH DÙNG CHO KHÁCH HÀNG |      ##################################################################################################################
-# |==============================|      ##################################################################################################################
+# |------------------------|
+# | Tiện ích xử lý báo cáo |
+# |------------------------|
+
+
+# Return type: Dict, query tổng số nhập của tháng, năm
+def import_dict(report_month, report_year):
+    total_import = {}
+    import_list = db.session.query(BookStorage.name, func.sum(ImportDetail.quantity), BookStorage.id) \
+        .join(BookImport, BookImport.id == ImportDetail.import_id) \
+        .join(BookStorage, BookStorage.id == ImportDetail.book_id) \
+        .filter(and_(func.month(BookImport.date) == report_month,
+                     func.year(BookImport.date) == report_year)) \
+        .group_by(BookStorage.id) \
+        .order_by(BookStorage.id).all()
+    # Ghi vào một dict giá trị tên_sách: tổng_số_nhập
+    if import_list:
+        for item in import_list:
+            total_import[item[2]] = {}
+            total_import[item[2]]['name'] = item[0]
+            total_import[item[2]]['quantity'] = int(item[1])
+        print('import', total_import)
+
+    return total_import
+
+
+# Return type: Dict, query tổng số xuất của tháng, năm
+def export_dict(report_month, report_year):
+    total_export = {}
+    export_list = db.session.query(BookStorage.name, func.sum(InvoiceDetail.quantity), BookStorage.id) \
+        .join(Invoice, Invoice.invoice_id == InvoiceDetail.invoice_id) \
+        .join(BookStorage, BookStorage.id == InvoiceDetail.book_id) \
+        .filter(and_(func.month(Invoice.date) == report_month,
+                     func.year(Invoice.date) == report_year)) \
+        .group_by(BookStorage.id) \
+        .order_by(BookStorage.id).all()
+    # Ghi vào một dict giá trị tên_sách: tổng_số_xuất
+    if export_list:
+        for item in export_list:
+            total_export[item[2]] = {}
+            total_export[item[2]]['name'] = item[0]
+            total_export[item[2]]['quantity'] = int(item[1])
+        print('export', total_export)
+
+    return total_export
+
+
+# Return type: Boolean, kiểm tra tháng năm người dùng chọn có thể xuất báo cáo hay không
+def check_date(month, year):
+    # Kiểm tra xem có nhập xuất trong năm đó không
+    year_check_export = db.session.query(Invoice.invoice_id).filter(func.year(Invoice.date) == year).first()
+    year_check_import = db.session.query(BookImport.id).filter(func.year(BookImport.date) == year).first()
+    print(year_check_import, '  ', year_check_export)
+    if year_check_import is not None and year_check_export is not None:
+        month_check_export = db.session.query(Invoice.invoice_id).filter(func.month(Invoice.date) == month).first()
+        month_check_import = db.session.query(BookImport.id).filter(func.month(BookImport.date) == month).first()
+        print(month_check_import, '  ', year_check_export)
+        if month_check_import is not None and month_check_export is not None:
+            return True
+    return False
+
+
+# |==============================|
+# | TIỆN ÍCH DÙNG CHO KHÁCH HÀNG |
+# |==============================|
 
 
 # Thêm khách hàng vào db
@@ -321,7 +379,6 @@ def del_wish(book_id):
     return False
 
 
-
 # |--------------------------------------------------|
 # | Xử lý chức năng tự thay đổi thông tin khách hàng |
 # |--------------------------------------------------|
@@ -382,7 +439,7 @@ def read_invoice_get_info_book(invoice_id):
                             filter(InvoiceDetail.invoice_id == invoice_id).all()
 
 
-#
+# Xem hóa đơn
 def invoice_info(invoice_id):
     total_quantity, total_price = 0, 0
     info = read_invoice_get_info_book(invoice_id)
