@@ -78,21 +78,21 @@
 
               <!--   Thông tin sách trong giỏ  -->
               <tbody class="align-middle">
-              <!--    Vòng lặp for   -->
               {% for b in session['current_invoice'] %}
-                  <!--    Tên sách   -->
                   <tr>
+                      <!-- Tên sách -->
                       <td>{{ b[0] }}</td>
 
-                      <!--   giá   price là key của từ điển cart   -->
+                      <!-- Đơn giá -->
                       <td>{{ b[1] }} VNĐ</td>
 
                       <!--    Số lượng  -->
                       <td>{{ b[2] }}</td>
 
-                      <!--    Tổng giá: giá * số lượng   -->
-                      <td>{{ b[1] * b[2] }} VNĐ</td>
+                      <!--    Thành tiền   -->
+                      <td>{{ b[3] }} VNĐ</td>
                   </tr>
+                    <tr>Tổng tiền: {{ session['current_invoice_total'] }} VNĐ</tr>
               {% endfor %}
               <!--    kết thúc vòng lặp   -->
               </tbody>

@@ -33,7 +33,7 @@ a, a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: dark;
+  background: white;
   border-radius: 10px;
 }
 
@@ -268,3 +268,4 @@ tbody.stt tr.stt td:first-child:before
     width: 100%;
     overflow-x: hidden;
 }
+

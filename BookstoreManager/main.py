@@ -1,14 +1,23 @@
+# Flask modules
 from flask import render_template, request, redirect, url_for, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message, Mail
-from sqlalchemy import func
 
+# SQLAlchemy modules
+from sqlalchemy import func, and_
+from sqlalchemy.exc import IntegrityError
+
+# Custom module
 from BookstoreManager import app, login, utils, mail
 from BookstoreManager.decorator import *
 from BookstoreManager.admin import *
 from BookstoreManager.models import *
+
+# General python lib
 import hashlib, os, json
-from sqlalchemy.exc import IntegrityError
+from datetime import date
+
+# Creating token to authenticate
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 # |=============|
@@ -173,7 +182,7 @@ def check_debt():
 
         # Nếu hóa đơn tạm có sản phẩm
         if invoice_temp != {}:
-            print('size', len(invoice_temp))
+            total = 0
             # Thêm một trường mới trong bảng hóa đơn
             invoice = Invoice(customer_id=session['customer_id'], employee_id=current_user.id, total_price=total_price)
             db.session.add(invoice)
@@ -183,25 +192,29 @@ def check_debt():
                 book = BookStorage.query.filter_by(id=pid).first()
                 # Tính thành tiền
                 detail_price = int(invoice_temp[pid]['quantity']) * int(book.selling_price)
+                print(detail_price)
+                total += detail_price
                 # Thêm bảng chi tiết hóa đơn
                 detail = InvoiceDetail(invoice=invoice,
                                        book_id=pid,
                                        quantity=invoice_temp[pid]['quantity'],
                                        price=detail_price)
                 db.session.add(detail)
-
                 # Cập nhật số lượng sách dưới kho
                 book.instock = book.instock - int(invoice_temp[pid]['quantity'])
             try:
                 db.session.commit()
-                print('Commit successfully')
+                print('DB commit OK')
             except Exception as ex:
                 print(ex)
 
             # Lấy hóa đơn mới nhất vừa được ghi xuống db
             last_invoice = Invoice.query.order_by(Invoice.invoice_id.desc()).first()
-            invoice_detail = utils.read_invoice_get_info_book(last_invoice.invoice_id)
+            invoice_detail = db.session.query(BookStorage.name, BookStorage.selling_price,
+                                              InvoiceDetail.quantity, InvoiceDetail.price) \
+                .join(InvoiceDetail).filter(InvoiceDetail.invoice_id == last_invoice.invoice_id).all()
             session['current_invoice'] = invoice_detail
+            session['current_invoice_total'] = total
             session['valid_debt'] = 'processing'
             return redirect(url_for('sellview.index'))
 
@@ -289,7 +302,6 @@ def debt_collection():
             session['debt_collection_status'] = 'collected'
             return redirect(url_for('debtcollectionview.index'))
 
-
     # Mặc định trạng thái thu nợ là init
     session['debt_collection_status'] = 'init'
     session['valid_debt'] = 'init'
@@ -350,7 +362,7 @@ def import_book():
 
 
 # Tạo bản import và import_detail và có bổ xung thông tin sách mới (nến có)
-@app.route('/admin/submitimportview/',  methods=['post'])
+@app.route('/admin/submitimportview/', methods=['post'])
 def submit_import():
     if 'import_book' not in session:
         session['import_book'] = {}
@@ -380,6 +392,107 @@ def del_one_import_session():
     return jsonify({
 
     })
+
+
+# Xử lý chức năng báo cáo
+@app.route('/admin/reportview/', methods=["GET", "POST"])
+def report():
+    today = datetime.today()
+    if request.method == 'POST':
+        # Khởi tạo
+        report_type = report_year = report_month = ''
+        # Lấy các request được nhập viên nhập vào
+        report = request.form
+        # Nếu có request khác none
+        if report:
+            for arg in report:
+                if arg == 'report_month':
+                    report_month = report.get('report_month')
+                if arg == 'report_year':
+                    report_year = report.get('report_year')
+                # Loại báo cáo: nợ (debt), kho (storage)
+                if arg == 'report_type':
+                    report_type = report.get('report_type')
+
+            # Kiểm tra xem tháng năm có dữ liệu tồn tại trong hệ thống không
+            if not utils.check_date(month=int(report_month), year=int(report_year)):
+                print('checked', utils.check_date(month=int(report_month), year=int(report_year)))
+                session['report_msg'] = 'invalid date'
+                print(session['report_msg'])
+                return redirect(url_for('reportview.index'))
+            session['report_msg'] = 'ok'
+
+            # PHẦN CODE BÊN DƯỚI CHỈ HOẠT ĐỘNG CHÍNH XÁC VỚI THÁNG 12 =))
+            # VẪN CÒN ĐANG PHÁT TRIỂN
+            # Nếu loại báo cáo là kho sách
+            if report_type == 'storage':
+                # Tồn cuối là số tồn hiện tại trong kho
+                # Tồn đầu = số tồn hiện tại - tổng nhập + tổng xuất
+                report = {}
+                # Dữ liệu tổng nhập, xuất để xuất biểu đồ
+                data_import = 0
+                data_export = 0
+                data_change = 0
+                # Nếu là báo cáo của tháng hiện tại
+                # Query tổng sách nhập trong tháng đó
+                total_import = utils.import_dict(report_month=report_month, report_year=report_year)
+
+                # Query sách tổng xuất (bán) trong tháng đó
+                total_export = utils.export_dict(report_month=report_month, report_year=report_year)
+
+                # Query số tồn cuối của tháng hiện tại
+                end_list = db.session.query(BookStorage.name, BookStorage.instock, BookStorage.id).all()
+
+                # Tồn cuối là số tồn hiện tại trong kho
+                # Tồn đầu = số tồn hiện tại - tổng nhập + tổng xuất
+                # Xử lý dữ liệu, kết xuất kết quả, tìm số tồn đầu
+                if end_list:
+                    for book in end_list:
+                        report[book.id] = {}
+                        report[book.id]['id'] = 0
+                        report[book.id]['name'] = ''
+                        report[book.id]['begin'] = 0
+                        report[book.id]['end'] = 0
+                        report[book.id]['change'] = 0
+                        # Nếu có số nhập thì lấy tồn cuối - tổng nhập = tồn đầu (tạm)
+                        if book.id in total_import.keys():
+                            vl = book.instock - total_import[book.id]['quantity']
+                            report[book.id]['id'] = book.id
+                            report[book.id]['name'] = total_import[book.id]['name']
+                            report[book.id]['begin'] += vl
+                            report[book.id]['end'] += book.instock
+                            data_import += total_import[book.id]['quantity']
+                        # Nếu có số xuất thì lấy tồn cuối + tổng nhập = tồn đầu (tạm)
+                        if book.id in total_export.keys():
+                            vl = book.instock + total_export[book.id]['quantity']
+                            report[book.id]['id'] = book.id
+                            report[book.id]['name'] = total_export[book.id]['name']
+                            report[book.id]['begin'] += vl
+                            report[book.id]['end'] += book.instock
+                            data_export += total_export[book.id]['quantity']
+                        # Phát sinh = tồn cuối - tồn đầu
+                        report[book.id]['change'] = report[book.id]['end'] - report[book.id]['begin']
+                        data_change += report[book.id]['change']
+                        # Nếu sách không có nhập hoặc xuất => tồn đầu = tồn cuối => thay đổi = 0
+                        if book.id not in total_export.keys() and book.id not in total_import.keys():
+                            report[book.id] = {}
+                            report[book.id]['id'] = book.id
+                            name = db.session.query(BookStorage.name).filter(BookStorage.id == book.id).first()
+                            report[book.id]['name'] = name
+                            report[book.id]['begin'] = book.instock
+                            report[book.id]['end'] = book.instock
+                            report[book.id]['change'] = 0
+
+                session['report'] = report
+                report_date = [report_month, report_year]
+                session['report_data'] = [data_import, data_export]
+                session['report_date'] = report_date
+                print(report)
+
+            # qry = DBSession.query(User).filter(
+            #     and_(User.birthday <= '1988-01-17', User.birthday >= '1985-01-17'))
+
+    return redirect(url_for('reportview.index'))
 
 
 # |================|
