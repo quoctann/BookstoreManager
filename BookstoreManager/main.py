@@ -20,6 +20,13 @@ from datetime import date
 # Creating token to authenticate
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
+
+import json
+from urllib.request import urlopen
+import uuid
+import hmac
+import hashlib
+
 # |=============|
 # | XỬ LÝ CHUNG |
 # |=============|
@@ -1091,6 +1098,7 @@ def my_account():
         if avatar:
             avatar_path = 'images/upload/%s' % avatar.filename
             avatar.save(os.path.join(app.root_path, 'static/', avatar_path))
+            session["user"]["avatar"] = avatar_path
         else:
             avatar_path = None
         if name and phone and email and address:
