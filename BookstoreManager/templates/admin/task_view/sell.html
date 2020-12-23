@@ -92,15 +92,18 @@
                       <!--    Thành tiền   -->
                       <td>{{ b[3] }} VNĐ</td>
                   </tr>
-                    <tr>Tổng tiền: {{ session['current_invoice_total'] }} VNĐ</tr>
               {% endfor %}
               <!--    kết thúc vòng lặp   -->
               </tbody>
 
           </table>
       </div>
+        <div class="d-flex align-items-center">
+            <div class="alert alert-info my-2 mr-1">Tổng tiền: {{ session['current_invoice_total'] }} VNĐ</div>
+            <div class="alert alert-success my-2 ml-1">Đã thanh toán thành công <i class="fa fa-check-circle text-success mx-1"></i></div>
+        </div>
 
-        <div><button type="submit" value="end_session" class="btn btn-danger" onclick="endTask()">Hoàn tất đơn hàng</button></div>
+        <div><button type="submit" value="end_session" class="btn btn-danger my-2" onclick="endTask()">Hoàn tất đơn hàng</button></div>
 
 
       {% endif %}

@@ -104,6 +104,15 @@ class CustomerView(AuthenticatedView):
         return self.render('admin/task_view/customer.html')
 
 
+class CanCreate(CustomModelView, AuthenticatedView):
+    can_create = True
+    column_display_pk = True
+
+
+class CanEdit(CustomModelView, AuthenticatedView):
+    can_edit = True
+
+
 # |------------------------------------------|
 # | Các view tác vụ chỉ admin được thực hiện |
 # |------------------------------------------|
@@ -138,16 +147,16 @@ class RuleView(AdminView):
 
 
 # Admin thao tác với bảng
-class CanCreate(AdminModelView):
+class AdminCanCreate(AdminModelView):
     can_create = True
     column_display_pk = True
 
 
-class CanEdit(AdminModelView):
+class AdminCanEdit(AdminModelView):
     can_edit = True
 
 
-class CanCreateEdit(CanCreate, CanEdit):
+class AdminCanCreateEdit(AdminCanCreate, AdminCanEdit):
     pass
 
 
@@ -181,7 +190,7 @@ admin.add_view(AdminModelView(DebtCollection, db.session,
                               name="Chi tiết thu nợ"))
 # Tính năng bổ sung
 admin.add_view(RegisterView(category="Nhân viên", name='Thêm nhân viên'))
-admin.add_view(CanEdit(Employee, db.session, category="Nhân viên", name='Danh sách nhân viên'))
-admin.add_view(CanEdit(SystemRule, db.session, name="Đổi quy định"))
+admin.add_view(AdminCanEdit(Employee, db.session, category="Nhân viên", name='Danh sách nhân viên'))
+admin.add_view(AdminCanEdit(SystemRule, db.session, name="Đổi quy định"))
 # admin.add_view(RuleView(name='Đổi quy định'))
 admin.add_view(LogoutView(name="Đăng xuất"))
